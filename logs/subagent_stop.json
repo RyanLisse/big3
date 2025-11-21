@@ -1,0 +1,82 @@
+[
+  {
+    "session_id": "60c9541c-3a56-4db1-81ea-984ee476cf65",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/60c9541c-3a56-4db1-81ea-984ee476cf65.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "98eb30ed",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-98eb30ed.jsonl"
+  },
+  {
+    "session_id": "60c9541c-3a56-4db1-81ea-984ee476cf65",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/60c9541c-3a56-4db1-81ea-984ee476cf65.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "default",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "80048b22",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-80048b22.jsonl"
+  },
+  {
+    "session_id": "60c9541c-3a56-4db1-81ea-984ee476cf65",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/60c9541c-3a56-4db1-81ea-984ee476cf65.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "plan",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "89d808f2",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-89d808f2.jsonl"
+  },
+  {
+    "session_id": "c313a00a-58da-4d91-b4b4-76b30fab4f40",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/c313a00a-58da-4d91-b4b4-76b30fab4f40.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "17526230",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-17526230.jsonl"
+  },
+  {
+    "session_id": "c313a00a-58da-4d91-b4b4-76b30fab4f40",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/c313a00a-58da-4d91-b4b4-76b30fab4f40.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "ab87883d",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-ab87883d.jsonl"
+  },
+  {
+    "session_id": "c313a00a-58da-4d91-b4b4-76b30fab4f40",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/c313a00a-58da-4d91-b4b4-76b30fab4f40.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "2a6b157d",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-2a6b157d.jsonl"
+  },
+  {
+    "session_id": "c313a00a-58da-4d91-b4b4-76b30fab4f40",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/c313a00a-58da-4d91-b4b4-76b30fab4f40.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "7bfe378f",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-7bfe378f.jsonl"
+  },
+  {
+    "session_id": "c313a00a-58da-4d91-b4b4-76b30fab4f40",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/c313a00a-58da-4d91-b4b4-76b30fab4f40.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "SubagentStop",
+    "stop_hook_active": false,
+    "agent_id": "75bc5b5d",
+    "agent_transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/agent-75bc5b5d.jsonl"
+  }
+]
