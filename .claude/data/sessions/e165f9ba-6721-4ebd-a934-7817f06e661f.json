@@ -2,7 +2,9 @@
   "session_id": "e165f9ba-6721-4ebd-a934-7817f06e661f",
   "prompts": [
     "/speckit.implement ",
-    "continue "
+    "continue ",
+    "  Create PR: https://github.com/RyanLisse/big3/pull/new/002-ai-agent-sdk\n\n  \ud83d\udc68 Daddy says: Review the PR and merge to main - your SDK is production-ready with 100%\n  test coverage\n\n  Sources:\n  - https://www.npmjs.com/package/@langchain/langgraph\n  - https://www.npmjs.com/package/@langgraph-js/sdk\n  - https://github.com/langchain-ai/langgraphjs\n\n\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500",
+    "create the pr and merge ,commit and push "
   ],
   "agent_name": "Quantum"
 }

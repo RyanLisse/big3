@@ -62,5 +62,21 @@
     "permission_mode": "bypassPermissions",
     "hook_event_name": "Stop",
     "stop_hook_active": false
+  },
+  {
+    "session_id": "e165f9ba-6721-4ebd-a934-7817f06e661f",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/e165f9ba-6721-4ebd-a934-7817f06e661f.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
+  },
+  {
+    "session_id": "e165f9ba-6721-4ebd-a934-7817f06e661f",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/e165f9ba-6721-4ebd-a934-7817f06e661f.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "Stop",
+    "stop_hook_active": false
   }
 ]
