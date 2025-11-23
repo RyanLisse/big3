@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai"
-import { Context, Effect, Layer } from "effect"
+import { Console, Context, Duration, Effect, Layer } from "effect"
 import { chromium } from "playwright"
 
 export interface BrowserService {
@@ -24,29 +24,49 @@ export const BrowserServiceLive = Layer.scoped(
     const page = yield* _(Effect.tryPromise(() => context.newPage()))
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!)
     const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" })
+    const timeoutMs = 45_000
 
     return {
-      navigate: (url) => Effect.tryPromise(() => page.goto(url)).pipe(Effect.asVoid),
+      navigate: (url) =>
+        Effect.raceFirst(
+          Effect.tryPromise(async () => {
+            const start = Date.now()
+            await page.goto(url)
+            await Effect.runPromise(
+              Console.log(`Browser navigate(${url}) in ${Date.now() - start}ms`)
+            )
+          }),
+          Effect.flatMap(Effect.sleep(Duration.millis(timeoutMs)), () =>
+            Effect.fail(new Error(`Browser navigation timed out for ${url}`))
+          )
+        ).pipe(Effect.asVoid),
 
       act: (instruction) =>
-        Effect.tryPromise(async () => {
-          // Take screenshot for Gemini Computer Use
-          const screenshot = await page.screenshot()
-          const prompt = `Act on this page: ${instruction}`
+        Effect.raceFirst(
+          Effect.tryPromise(async () => {
+            const start = Date.now()
+            const screenshot = await page.screenshot()
+            const prompt = `Act on this page: ${instruction}`
 
-          // Send to Gemini (Simplified)
-          const result = await model.generateContent([
-            prompt,
-            {
-              inlineData: {
-                data: screenshot.toString("base64"),
-                mimeType: "image/png"
+            const result = await model.generateContent([
+              prompt,
+              {
+                inlineData: {
+                  data: screenshot.toString("base64"),
+                  mimeType: "image/png"
+                }
               }
-            }
-          ])
+            ])
 
-          return result.response.text()
-        })
+            await Effect.runPromise(
+              Console.log(`Browser act completed in ${Date.now() - start}ms`)
+            )
+            return result.response.text()
+          }),
+          Effect.flatMap(Effect.sleep(Duration.millis(timeoutMs)), () =>
+            Effect.fail(new Error("Browser act timed out"))
+          )
+        )
     }
   })
 )

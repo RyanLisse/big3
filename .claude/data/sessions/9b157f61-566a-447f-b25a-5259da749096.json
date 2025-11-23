@@ -1,0 +1,7 @@
+{
+  "session_id": "9b157f61-566a-447f-b25a-5259da749096",
+  "prompts": [
+    "/new-feature https://cookbook.openai.com/examples/codex/codex_mcp_agents_sdk/building_consistent_workflows_codex_cli_agents_sdk,https://cookbook.openai.com/articles/codex_exec_plans,https://cookbook.openai.com/examples/building_w_rt_mini/building_w_rt_mini,https://cookbook.openai.com/examples/partners/self_evolving_agents/autonomous_agent_retraining,https://cookbook.openai.com/examples/gpt-5/gpt-5-1_prompting_guide,https://cookbook.openai.com/examples/build_a_coding_agent_with_gpt-5.1,https://cookbook.openai.com/examples/codex/code_modernization,https://cookbook.openai.com/examples/realtime_out_of_band_transcription"
+  ],
+  "agent_name": "Oracle"
+}

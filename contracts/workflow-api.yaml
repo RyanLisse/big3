@@ -1,0 +1,162 @@
+# Workflow API Contract
+
+# OpenAPI Specification for AI Agent SDK Workflow Engine
+
+## Overview
+This contract defines the REST API endpoints for workflow management, including:
+- Plan creation and management
+- Workflow execution and monitoring
+- Step-by-step execution with real-time status updates
+
+## Base URL
+```
+/api/workflows
+```
+
+## Authentication
+- Bearer token authentication required
+- Rate limiting: 100 requests per minute per agent
+
+## Endpoints
+
+### POST /api/workflows
+Create a new workflow plan.
+
+**Request Body:**
+```yaml
+name: string
+description?: string
+config?: WorkflowPlanConfig
+```
+
+**Response:**
+```yaml
+id: string
+name: string
+description: string
+steps: WorkflowStep[]
+config?: WorkflowPlanConfig
+createdAt: number
+updatedAt: number
+```
+
+### GET /api/workflows/{id}
+Get workflow plan by ID.
+
+**Response:**
+```yaml
+id: string
+name: string
+description: string
+steps: WorkflowStep[]
+config?: WorkflowPlanConfig
+createdAt: number
+updatedAt: number
+status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+```
+
+### POST /api/workflows/{id}/execute
+Execute a workflow plan.
+
+**Request Body:**
+```yaml
+agentId?: string
+context?: Record<string, any>
+```
+
+**Response:**
+```yaml
+executionId: string
+planId: string
+status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+steps: WorkflowStep[]
+startedAt: number
+currentStep?: number
+completedAt?: number
+estimatedCompletion?: number
+```
+
+### GET /api/workflows/{id}/status/{executionId}
+Get workflow execution status.
+
+**Response:**
+```yaml
+executionId: string
+planId: string
+status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+steps: WorkflowStep[]
+startedAt: number
+currentStep?: number
+completedAt?: number
+estimatedCompletion?: number
+```
+
+### WebSocket /api/workflows/{id}/status/{executionId}/ws
+WebSocket endpoint for real-time workflow status updates.
+
+**Message Format:**
+```yaml
+type: 'step_update' | 'workflow_completed' | 'workflow_failed'
+executionId: string
+stepId?: string
+status?: string
+output?: any
+error?: {
+  code: string;
+  message: string;
+  details?: any;
+}
+timestamp: number
+```
+
+## Data Models
+
+### WorkflowStep
+```yaml
+id: string
+name: string
+description: string
+status: 'pending' | 'running' | 'completed' | 'failed' | 'paused'
+input?: any
+output?: any
+error?: {
+  code: string;
+  message: string;
+  details?: any;
+}
+startTime?: number
+endTime?: number
+duration?: number
+```
+
+### WorkflowPlan
+```yaml
+id: string
+name: string
+description: string
+steps: WorkflowStep[]
+config?: WorkflowPlanConfig
+createdAt: number
+updatedAt: number
+```
+
+### WorkflowPlanConfig
+```yaml
+maxSteps?: number
+timeout?: number
+retryAttempts?: number
+retryDelay?: number
+```
+
+## Error Codes
+- `INVALID_PLAN`: Invalid workflow plan configuration
+- `PLAN_NOT_FOUND`: Workflow plan not found
+- `EXECUTION_FAILED`: Workflow execution failed
+- `STEP_FAILED`: Individual step execution failed
+- `AGENT_NOT_FOUND`: Agent not found for execution
+- `INVALID_CONTEXT`: Invalid execution context provided
+
+## Rate Limits
+- Maximum 10 concurrent executions per agent
+- Maximum 100 workflow steps per plan
+- Maximum 1000 API requests per hour

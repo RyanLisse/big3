@@ -1,9 +1,10 @@
-import { defineConfig } from "tsup"
+import { defineConfig } from 'tsup';
 
 export default defineConfig({
-  entry: ["src/bin.ts"],
+  entry: ['src/main.ts'],
+  format: 'cjs',
+  dts: true,
   clean: true,
-  publicDir: true,
-  treeshake: "smallest",
-  external: ["@parcel/watcher"]
-})
+  sourcemap: true,
+  minify: false
+});

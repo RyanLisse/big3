@@ -1,0 +1,663 @@
+openapi: 3.0.0
+info:
+  title: AI Agent SDK - Agent Management API
+  version: 1.0.0
+  description: RESTful API for managing AI agent instances, workflows, and real-time communication
+
+paths:
+  /agents:
+    post:
+      summary: Create a new agent instance
+      operationId: createAgent
+      tags:
+        - Agent Management
+        - Creation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAgentRequest'
+      responses:
+        '201':
+          description: Agent created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentInstance'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /agents/{agentId}:
+    get:
+      summary: Get agent instance details
+      operationId: getAgent
+      tags:
+        - Agent Management
+        - Retrieval
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentInstance'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update agent configuration
+      operationId: updateAgent
+      tags:
+        - Agent Management
+        - Configuration
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: configuration
+          in: query
+          required: false
+          schema:
+            type: object
+            properties:
+              model:
+                type: object
+                properties:
+                  provider:
+                    type: string
+                    enum: [openai, anthropic, google]
+                  name:
+                    type: string
+                  version:
+                    type: string
+              performance:
+                type: object
+                properties:
+                  maxConcurrency:
+                    type: integer
+                    minimum: 1
+                    maximum: 100
+                  maxTokens:
+                    type: integer
+                    minimum: 1000
+                    maximum: 1000000
+              communication:
+                type: object
+                properties:
+                  maxLatency:
+                    type: integer
+                    minimum: 50
+                    maximum: 1000
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAgentRequest'
+      responses:
+        '200':
+          description: Agent updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AgentInstance'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete agent instance
+      operationId: deleteAgent
+      tags:
+        - Agent Management
+        - Deletion
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Agent deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /agents/{agentId}/messages:
+    post:
+      summary: Send message to agent
+      operationId: sendMessage
+      tags:
+        - Communication
+        - Real-time
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageRequest'
+      responses:
+        '200':
+          description: Message processed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageResponse'
+        '400':
+          description: Invalid message format
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    get:
+      summary: Get agent message history
+      operationId: getMessageHistory
+      tags:
+        - Communication
+        - History
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 1000
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+      responses:
+        '200':
+          description: Message history retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageHistoryResponse'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /agents/{agentId}/status:
+    get:
+      summary: Get agent performance metrics
+      operationId: getAgentMetrics
+      tags:
+        - Monitoring
+        - Performance
+      parameters:
+        - name: agentId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Performance metrics retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PerformanceMetrics'
+        '404':
+          description: Agent not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CreateAgentRequest:
+      type: object
+      required:
+        - name
+        - model
+      properties:
+        name:
+          type: string
+          description: Unique identifier for the agent
+        model:
+          type: object
+          required:
+            - provider
+            - name
+          properties:
+            provider:
+              type: string
+              enum: [openai, anthropic, google]
+              description: AI model provider
+            name:
+              type: string
+              description: Model name
+            version:
+              type: string
+              description: Model version
+            parameters:
+              type: object
+              description: Model-specific parameters
+        capabilities:
+          type: object
+          properties:
+            streaming:
+              type: boolean
+              description: Whether model supports streaming
+            functions:
+              type: boolean
+              description: Whether model supports function calling
+            maxConcurrency:
+              type: integer
+              minimum: 1
+              maximum: 100
+              description: Maximum concurrent operations
+        configuration:
+          type: object
+          properties:
+            performance:
+              type: object
+              properties:
+                optimization:
+                  type: string
+                  enum: [cost, speed, balanced]
+                  description: Performance optimization strategy
+                maxTokens:
+                  type: integer
+                  minimum: 1000
+                  maximum: 1000000
+                  description: Maximum tokens per operation
+            communication:
+              type: object
+              properties:
+                maxLatency:
+                  type: integer
+                  minimum: 50
+                  maximum: 1000
+                  description: Maximum acceptable latency in milliseconds
+                protocol:
+                  type: string
+                  enum: [websocket, sse, long_polling]
+                  description: Communication protocol
+            errorHandling:
+              type: object
+              properties:
+                retryAttempts:
+                  type: integer
+                  minimum: 0
+                  maximum: 10
+                  description: Number of retry attempts
+                fallbackAction:
+                  type: string
+                  enum: [abort, retry, human_intervention]
+                  description: Action on failure
+
+    UpdateAgentRequest:
+      type: object
+      properties:
+        model:
+          type: object
+          properties:
+            provider:
+              type: string
+              enum: [openai, anthropic, google]
+            name:
+              type: string
+            version:
+              type: string
+            parameters:
+              type: object
+        configuration:
+          type: object
+          properties:
+            performance:
+              type: object
+            communication:
+              type: object
+
+    AgentInstance:
+      type: object
+      required:
+        - id
+        - name
+        - model
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique agent identifier
+        name:
+          type: string
+          description: Agent name
+        model:
+          type: object
+          properties:
+            provider:
+              type: string
+              enum: [openai, anthropic, google]
+            name:
+              type: string
+            version:
+              type: string
+        state:
+          type: string
+          enum: [idle, processing, error, paused]
+          description: Current agent state
+        context:
+          type: object
+          properties:
+            sessionId:
+              type: string
+              description: Current session identifier
+            userId:
+              type: string
+              description: Associated user identifier
+        performance:
+          type: object
+          properties:
+            responseTime:
+              type: number
+              description: Average response time in milliseconds
+            tokensUsed:
+              type: integer
+              description: Total tokens consumed
+            requestsCompleted:
+              type: integer
+              description: Number of completed requests
+            errorRate:
+              type: number
+              description: Error rate as percentage
+            uptime:
+              type: number
+              description: Uptime percentage
+        createdAt:
+          type: string
+          format: date-time
+          description: Agent creation timestamp
+        lastActivity:
+          type: string
+          format: date-time
+          description: Last activity timestamp
+
+    MessageRequest:
+      type: object
+      required:
+        - content
+        - type
+      properties:
+        content:
+          type: string
+          description: Message content
+        type:
+          type: string
+          enum: [user, agent, system, error]
+          description: Message type
+        metadata:
+          type: object
+          description: Additional message metadata
+        streaming:
+          type: boolean
+          description: Enable streaming response
+        priority:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Message priority (1=high, 10=low)
+
+    MessageResponse:
+      type: object
+      required:
+        - id
+        - content
+        - timestamp
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Message identifier
+        content:
+          type: string
+          description: Response content
+        type:
+          type: string
+          enum: [user, agent, system, error]
+          description: Message type
+        timestamp:
+          type: string
+          format: date-time
+          description: Response timestamp
+        agentId:
+          type: string
+          description: Responding agent identifier
+        confidence:
+          type: number
+          minimum: 0
+          maximum: 1
+          description: Response confidence score
+        metadata:
+          type: object
+          description: Response metadata
+        streaming:
+          type: boolean
+          description: Whether response is streaming
+
+    MessageHistoryResponse:
+      type: object
+      required:
+        - messages
+        - total
+      properties:
+        messages:
+          type: array
+          items:
+            $ref: '#/components/schemas/MessageResponse'
+          description: Array of historical messages
+        total:
+          type: integer
+          description: Total number of messages
+        limit:
+          type: integer
+          description: Maximum messages returned
+        offset:
+          type: integer
+          description: Number of messages skipped
+
+    PerformanceMetrics:
+      type: object
+      required:
+        - responseTime
+        - throughput
+        - errorRate
+      properties:
+        responseTime:
+          type: object
+          properties:
+            average:
+              type: number
+              description: Average response time in milliseconds
+            p95:
+              type: number
+              description: 95th percentile response time
+            p99:
+              type: number
+              description: 99th percentile response time
+        throughput:
+          type: object
+          properties:
+            requestsPerSecond:
+              type: number
+              description: Requests processed per second
+            messagesPerMinute:
+              type: number
+              description: Messages processed per minute
+        errorRate:
+          type: number
+          description: Error rate as percentage
+        uptime:
+          type: number
+          description: Uptime percentage
+        resourceUsage:
+          type: object
+          properties:
+            cpu:
+              type: number
+              description: CPU usage percentage
+            memory:
+              type: number
+              description: Memory usage percentage
+            connections:
+              type: integer
+              description: Active connections count
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Operation success status
+        message:
+          type: string
+          description: Success message
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error description
+        details:
+          type: object
+          description: Additional error details
+        suggestions:
+          type: array
+          items:
+            type: string
+          description: Suggested resolutions
+
+tags:
+  - Agent Management
+    - Creation
+    - Configuration
+    - Retrieval
+    - Deletion
+  - Communication
+    - Real-time
+    - History
+  - Monitoring
+    - Performance

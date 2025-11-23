@@ -1,0 +1,729 @@
+openapi: 3.0.0
+info:
+  title: AI Agent SDK - Workflow API
+  version: 1.0.0
+  description: RESTful API for defining and executing autonomous workflows with step-by-step processing
+
+paths:
+  /workflows:
+    post:
+      summary: Create a new workflow
+      operationId: createWorkflow
+      tags:
+        - Workflow Management
+        - Creation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWorkflowRequest'
+      responses:
+        '201':
+          description: Workflow created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDefinition'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}:
+    get:
+      summary: Get workflow definition
+      operationId: getWorkflow
+      tags:
+        - Workflow Management
+        - Retrieval
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDefinition'
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    put:
+      summary: Update workflow definition
+      operationId: updateWorkflow
+      tags:
+        - Workflow Management
+        - Configuration
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWorkflowRequest'
+      responses:
+        '200':
+          description: Workflow updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowDefinition'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Delete workflow
+      operationId: deleteWorkflow
+      tags:
+        - Workflow Management
+        - Deletion
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}/execute:
+    post:
+      summary: Execute workflow
+      operationId: executeWorkflow
+      tags:
+        - Workflow Execution
+        - Autonomous
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ExecuteWorkflowRequest'
+      responses:
+        '200':
+          description: Workflow execution started
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecution'
+        '400':
+          description: Invalid request parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Workflow not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}/status:
+    get:
+      summary: Get workflow execution status
+      operationId: getWorkflowStatus
+      tags:
+        - Workflow Execution
+        - Monitoring
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+        - name: executionId
+          in: query
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Execution status retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowExecutionStatus'
+        '404':
+          description: Workflow execution not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}/pause:
+    post:
+      summary: Pause workflow execution
+      operationId: pauseWorkflow
+      tags:
+        - Workflow Execution
+        - Control
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow paused successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Workflow execution not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}/resume:
+    post:
+      summary: Resume workflow execution
+      operationId: resumeWorkflow
+      tags:
+        - Workflow Execution
+        - Control
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow resumed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Workflow execution not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /workflows/{workflowId}/cancel:
+    post:
+      summary: Cancel workflow execution
+      operationId: cancelWorkflow
+      tags:
+        - Workflow Execution
+        - Control
+      parameters:
+        - name: workflowId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Workflow cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessResponse'
+        '404':
+          description: Workflow execution not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Authentication failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    CreateWorkflowRequest:
+      type: object
+      required:
+        - name
+        - description
+        - steps
+      properties:
+        name:
+          type: string
+          description: Unique workflow name
+        description:
+          type: string
+          description: Workflow description
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+          description: Workflow steps array
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+          description: Workflow triggers
+        errorHandling:
+          type: object
+          properties:
+            retryAttempts:
+              type: integer
+              minimum: 0
+              maximum: 10
+              description: Number of retry attempts
+            fallbackAction:
+              type: string
+              enum: [abort, retry, human_intervention]
+              description: Action on failure
+            circuitBreaker:
+              type: object
+              properties:
+                failureThreshold:
+                  type: integer
+                  minimum: 1
+                  description: Failure threshold for circuit breaking
+                recoveryTimeout:
+                  type: integer
+                  minimum: 1000
+                  description: Recovery timeout in milliseconds
+
+    UpdateWorkflowRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated workflow name
+        description:
+          type: string
+          description: Updated workflow description
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+          description: Updated workflow steps
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+          description: Updated workflow triggers
+        errorHandling:
+          type: object
+          properties:
+            retryAttempts:
+              type: integer
+              minimum: 0
+              maximum: 10
+              description: Number of retry attempts
+            fallbackAction:
+              type: string
+              enum: [abort, retry, human_intervention]
+              description: Action on failure
+            circuitBreaker:
+              type: object
+              properties:
+                failureThreshold:
+                    type: integer
+                    minimum: 1
+                    description: Failure threshold for circuit breaking
+                recoveryTimeout:
+                    type: integer
+                    minimum: 1000
+                    description: Recovery timeout in milliseconds
+
+    ExecuteWorkflowRequest:
+      type: object
+      required:
+        - input
+      properties:
+        input:
+          type: object
+          description: Input data for workflow execution
+        autonomous:
+          type: boolean
+          description: Enable autonomous execution
+          default: true
+        context:
+          type: object
+          properties:
+            sessionId:
+                type: string
+                description: Session identifier
+            userId:
+                type: string
+                description: User identifier
+            timeout:
+                type: integer
+                minimum: 1000
+                description: Execution timeout in milliseconds
+        priority:
+          type: string
+          enum: [low, normal, high]
+          description: Execution priority
+          default: normal
+
+    WorkflowDefinition:
+      type: object
+      required:
+        - id
+        - name
+        - description
+        - steps
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique workflow identifier
+        name:
+          type: string
+          description: Workflow name
+        description:
+          type: string
+          description: Workflow description
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowStep'
+          description: Workflow steps array
+        triggers:
+          type: array
+          items:
+            $ref: '#/components/schemas/WorkflowTrigger'
+          description: Workflow triggers
+        errorHandling:
+          type: object
+          properties:
+            retryAttempts:
+              type: integer
+              minimum: 0
+              maximum: 10
+              description: Number of retry attempts
+            fallbackAction:
+              type: string
+              enum: [abort, retry, human_intervention]
+              description: Action on failure
+            circuitBreaker:
+              type: object
+              properties:
+                failureThreshold:
+                    type: integer
+                    minimum: 1
+                    description: Failure threshold for circuit breaking
+                recoveryTimeout:
+                    type: integer
+                    minimum: 1000
+                    description: Recovery timeout in milliseconds
+        parallel:
+          type: boolean
+          description: Enable parallel step execution
+          default: false
+
+    WorkflowStep:
+      type: object
+      required:
+        - id
+        - name
+        - type
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique step identifier
+        name:
+          type: string
+          description: Step name
+        type:
+          type: string
+          enum: [task, decision, parallel, subgraph]
+          description: Step type
+        configuration:
+          type: object
+          description: Step-specific configuration
+        inputs:
+          type: object
+          description: Expected input data structure
+        outputs:
+          type: object
+          description: Expected output data structure
+        dependencies:
+          type: array
+          items:
+            type: string
+          description: Step dependencies
+        timeout:
+          type: integer
+          minimum: 1000
+          description: Step timeout in milliseconds
+        retryPolicy:
+          type: object
+          properties:
+            maxAttempts:
+                type: integer
+                minimum: 0
+                maximum: 10
+                description: Maximum retry attempts
+            baseDelay:
+                type: integer
+                minimum: 100
+                description: Base delay in milliseconds
+            maxDelay:
+                type: integer
+                minimum: 100
+                description: Maximum delay in milliseconds
+            jitter:
+                type: boolean
+                description: Add jitter to retry delays
+
+    WorkflowTrigger:
+      type: object
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum: [manual, schedule, event, webhook]
+          description: Trigger type
+        configuration:
+          type: object
+          description: Trigger-specific configuration
+        conditions:
+          type: object
+          description: Trigger conditions
+
+    WorkflowExecution:
+      type: object
+      required:
+        - executionId
+        - status
+      properties:
+        executionId:
+          type: string
+          format: uuid
+          description: Unique execution identifier
+        workflowId:
+          type: string
+          format: uuid
+          description: Workflow identifier
+        status:
+          type: string
+          enum: [pending, running, completed, failed, paused, cancelled]
+          description: Current execution status
+        currentStep:
+          type: string
+          description: Currently executing step
+        startTime:
+          type: string
+          format: date-time
+          description: Execution start time
+        endTime:
+          type: string
+          format: date-time
+          description: Execution end time
+        progress:
+          type: object
+          properties:
+            completed:
+                type: integer
+                minimum: 0
+                maximum: 100
+                description: Percentage completed
+            currentStep:
+                type: string
+                description: Current step name
+        results:
+          type: object
+          description: Execution results
+        errors:
+          type: array
+          items:
+            $ref: '#/components/schemas/Error'
+          description: Execution errors
+
+    WorkflowExecutionStatus:
+      type: object
+      required:
+        - executionId
+        - status
+      properties:
+        executionId:
+          type: string
+          format: uuid
+          description: Unique execution identifier
+        status:
+          type: string
+          enum: [pending, running, completed, failed, paused, cancelled]
+          description: Current execution status
+        currentStep:
+          type: string
+          description: Currently executing step
+        progress:
+          type: object
+          properties:
+            completed:
+                type: integer
+                minimum: 0
+                maximum: 100
+                description: Percentage completed
+            currentStep:
+                type: string
+                description: Current step name
+        metrics:
+          type: object
+          properties:
+            executionTime:
+                type: integer
+                description: Execution time in milliseconds
+            stepsCompleted:
+                type: integer
+                description: Number of steps completed
+            errorsEncountered:
+                type: integer
+                description: Number of errors encountered
+
+    SuccessResponse:
+      type: object
+      required:
+        - success
+      properties:
+        success:
+          type: boolean
+          description: Operation success status
+        message:
+          type: string
+          description: Success message
+
+    Error:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          description: Error code
+        message:
+          type: string
+          description: Error description
+        details:
+          type: object
+          description: Additional error details
+        suggestions:
+          type: array
+          items:
+            type: string
+          description: Suggested resolutions
+
+tags:
+  - Workflow Management
+    - Creation
+    - Configuration
+    - Retrieval
+    - Deletion
+  - Workflow Execution
+    - Autonomous
+    - Monitoring
+    - Control

@@ -1,0 +1,55 @@
+# Dependencies
+node_modules/
+npm-debug.log*
+*.log
+
+# Build outputs  
+dist/
+build/
+coverage/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Development
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Testing
+coverage/
+.nyc_output/
+*.lcov
+
+# Package managers
+.npm
+.yarn-integrity
+.yarn-state
+.yarn-cache
+.pnpm-debug.log*
+.pnpm-store/
+
+# OS generated
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Runtime
+*.pid
+*.seed
+*.pid.lock
+
+# Cache
+.cache/
+.parcel-cache/
+.eslintcache
+.stylelintcache/

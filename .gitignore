@@ -21,3 +21,40 @@ dist/
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
+
+# TypeScript/Node.js patterns
+*.log
+*.tgz
+*.tar.gz
+.nyc_output
+coverage/
+.npm
+.eslintcache
+.node_repl_history
+
+# Encore.dev patterns
+backend/node_modules/
+backend/.encore/
+backend/dist/
+
+# Redis and database
+*.rdb
+*.db
+*.sqlite
+*.sqlite3
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+
+# IDE patterns
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS patterns
+Thumbs.db
+Desktop.ini
