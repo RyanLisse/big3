@@ -1,0 +1,68 @@
+<full task list>
+- [X] T001 Phase 1 Setup: Initialize project scaffolding per implementation plan (specs/002-ai-agent-sdk/plan.md)
+- [X] T002 Phase 1 Setup: Create repository structure (src/, contracts/, tests/ per plan) (specs/002-ai-agent-sdk/plan.md)
+- [X] T003 Phase 1 Setup: Bootstrap package.json, tsconfig.json, lint/test tooling (specs/002-ai-agent-sdk/plan.md)
+- 
+- - [X] T004 Phase 2 Foundational: SDK core scaffolding (src/sdk/index.ts) to support initialization and agent creation (src/sdk/index.ts)
+- - [X] T005 Phase 2 Foundational: Model registry skeleton (src/models/registry.ts) with type definitions
+- - [X] T006 Phase 2 Foundational: Real-time communication scaffold (src/communication/ws.ts) interface
+- - [X] T007 Phase 2 Foundational: Basic error handling framework (src/core/errors.ts)
+- - [X] T008 Phase 2 Foundational: Workflow engine skeleton (src/workflow/engine.ts)
+- - [ ] T009 Phase 2 Foundational: Contracts scaffolding for endpoints mapping (contracts/)
+- 
+- ## Phase 3: User Stories
+- 
+- ### US1 — SDK Initialization and Configuration (Priority: P1)
+- 
+- - [X] T010 [US1] Create agent initialization flow (src/sdk/initialize.ts)
+- - [X] T011 [US1] Implement config types for API credentials and model selection (src/config/types.ts) [P]
+- - [X] T012 [US1] Expose MVP agent creation API in SDK (src/sdk/agents.ts)
+- - [X] T013 [US1] Add basic validation and error messaging for initialization (src/core/validation.ts)
+- 
+- ### US2 — Multi-Model Agent Creation (Priority: P1)
+-
+- - [X] T014 [US2] Implement multi-model agent creation API (src/sdk/models.ts) [P]
+- - [X] T015 [US2] Implement dynamic model switching logic (src/sdk/model-switch.ts) [P]
+- - [X] T016 [US2] Validate model compatibility against registry (src/models/registry.ts)
+- - [ ] T017 [US2] Update quickstart/docs with multi-model usage (docs/quickstart.md)
+- 
+- ### US3 — Autonomous Workflow Execution (Priority: P2)
+-
+- - [X] T018 [US3] Implement workflow step runner (src/workflow/runner.ts) [P]
+- - [X] T019 [US3] Define workflow plan format and execution semantics (src/workflow/plan.ts)
+- - [X] T020 [US3] Implement checkpointing and recovery hooks (src/workflow/recovery.ts)
+- 
+- ### US4 — Real-time Communication (Priority: P2)
+-
+- - [X] T021 [US4] Integrate WebSocket server for real-time agents (src/communication/ws-server.ts) [P]
+- - [X] T022 [US4] Implement latency-aware batching (src/communication/batching.ts) [P]
+- - [X] T023 [US4] Implement WebSocket client integration with batching (src/communication/ws-client.ts)
+- 
+- ### US5 — Code Modernization Support (Priority: P3)
+- 
+- - [ ] T024 [US5] Build code modernization tooling scaffold (src/modernize/index.ts) [P]
+- - [ ] T025 [US5] Document modernization usage and upgrade paths (docs/upgrade.md)
+- - [ ] T026 [US5] Expose results in a contracts/docs section (docs/contracts-usage.md)
+- 
+- ## Final Phase: Polish & Cross-Cutting
+- 
+- - [ ] T027 Phase Final: Documentation polish and cross-cutting concerns (docs/, README.md)
+- - [ ] T028 Phase Final: Linting/formatting and pre-commit hooks (lint) and CI checks
+- - [ ] T029 Phase Final: Validation checklist generation and summary report (specs/002-ai-agent-sdk/tasks.md)
+- 
+- ## Dependencies & Execution Order
+- 
+- - Phase 1 must complete before Phase 2.
+- - Phase 2 must complete before Phase 3 (US1-US5).
+- - US1 must precede US2; US2 precedes US3-US4-US5 where applicable.
+- - US3-US4-US5 can proceed in parallel where there are no cross-dependencies within their phases.
+- - Final Polish depends on all prior phases.
+- 
+- ## Parallel Execution Opportunities
+- 
+- - Phase 2 tasks could be executed in parallel where not depending on each other (T004, T005, T006, T007, T008, T009).
+- - US2 tasks (T014, T015) can run in parallel with T016.
+- - US4 tasks (T021, T022) can run in parallel with US3 tasks (T018, T019) where appropriate.
+- 
+- ## MVP Scope
+- - Phase 3 US1 tasks cover MVP: SDK initialization and configuration.

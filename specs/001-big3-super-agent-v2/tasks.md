@@ -33,14 +33,14 @@ description: "Tasks for Big 3 Super-Agent V2 (feature 001)"
 **Purpose**: Ensure the repo layout and tooling support V2 development with structured concurrency
 and observability.
 
-- [ ] T001 [P] [-] Confirm Node/TypeScript toolchain and Effect/Encore versions in `README.md` and
+- [X] T001 [P] [-] Confirm Node/TypeScript toolchain and Effect/Encore versions in `README.md` and
       `quickstart.md` are accurate; update if needed.
-- [ ] T002 [P] [-] Ensure `backend/agent/` directory exists with placeholder files from plan
+- [X] T002 [P] [-] Ensure `backend/agent/` directory exists with placeholder files from plan
       (`domain.ts`, `persistence.ts`, `graph.ts`, `coder.ts`, `browser.ts`, `voice.ts`,
       `encore.service.ts`).
-- [ ] T003 [P] [-] Add or update `package.json` scripts for running backend tests and (future)
+- [X] T003 [P] [-] Add or update `package.json` scripts for running backend tests and (future)
       Encore dev server; document in `quickstart.md`.
-- [ ] T004 [P] [-] Verify Vitest configuration in `vitest.config.ts` supports tests in
+- [X] T004 [P] [-] Verify Vitest configuration in `vitest.config.ts` supports tests in
       `backend/agent/` and update paths/globs if required.
 
 ---
@@ -52,22 +52,22 @@ implemented.
 
 **⚠️ CRITICAL**: No user story work can begin until this phase is complete.
 
-- [ ] T010 [US2] Implement Redis checkpointer and composite filesystem in
+- [X] T010 [US2] Implement Redis checkpointer and composite filesystem in
       `backend/agent/persistence.ts` (persistent `/workspace`, ephemeral `/tmp`).
-- [ ] T011 [P] [US2] Add unit tests for persistence layer behavior (save/load session state,
+- [X] T011 [P] [US2] Add unit tests for persistence layer behavior (save/load session state,
       workspace file operations) in `test/agent/persistence.test.ts`.
-- [ ] T012 [US2] Implement basic Agent Registry domain types and interfaces in
+- [X] T012 [US2] Implement basic Agent Registry domain types and interfaces in
       `backend/agent/domain.ts` (AgentSession, AgentRegistryEntry, etc.) based on `data-model.md`.
-- [ ] T013 [US2] Implement initial Encore endpoints skeleton in `backend/agent/encore.service.ts`
+- [X] T013 [US2] Implement initial Encore endpoints skeleton in `backend/agent/encore.service.ts`
       for `/agents/spawn`, `/agents/{id}/status`, `/agents/{id}/resume`, and streaming stub.
-- [ ] T014 [P] [US2] Add integration tests for Agent Registry endpoints in
+- [X] T014 [P] [US2] Add integration tests for Agent Registry endpoints in
       `test/agent/encore.service.test.ts` (spawn + status + resume happy paths).
-- [ ] T015 [US2] Wire Redis client creation and configuration (using `REDIS_URL`) into an Effect
+- [X] T015 [US2] Wire Redis client creation and configuration (using `REDIS_URL`) into an Effect
       layer that is reused across persistence and orchestration.
-- [ ] T016 [US2] Implement structured logging utilities (duration, payload size, provider, cost
+- [X] T016 [US2] Implement structured logging utilities (duration, payload size, provider, cost
       bucket) in a shared module (e.g., `backend/agent/logging.ts`) and integrate with Encore
       handlers.
-- [ ] T017 [P] [-] Add minimal observability configuration (log format, basic metrics hooks) so
+- [X] T017 [P] [-] Add minimal observability configuration (log format, basic metrics hooks) so
       that key agent events can be traced in local dev.
 
 **Checkpoint**: Persistence, Agent Registry, and baseline logging are in place with tests; user
@@ -85,20 +85,16 @@ concrete result (summary or code) without relying on resumption.
 
 ### Tests for User Story 1 (REQUIRED)
 
-- [ ] T020 [P] [US1] Add integration test that exercises a minimal request flow
-      (e.g., text-based input instead of real audio) from a simulated client through
-      `encore.service.ts` into the orchestrator, verifying at least one tool call and response.
-- [ ] T021 [P] [US1] Add failure-path test that forces a tool error (e.g., mocked Claude failure)
-      and checks that user receives a clear error message and the system remains stable.
-
-### Implementation for User Story 1
-
-- [ ] T022 [P] [US1] Implement orchestrator entrypoint in `backend/agent/graph.ts` that wires
-      together Voice, Coder, and Browser services with Effect structured concurrency.
-- [ ] T023 [P] [US1] Implement Effect layers for Coder and Browser integrations in
-      `backend/agent/coder.ts` and `backend/agent/browser.ts`, reusing the existing logic from
-      `src/services/*` while enforcing `acquireRelease` and timeouts.
-- [ ] T024 [US1] Refactor `src/main.ts` orchestration logic into shared, testable functions used by
+- [X] T020 [US1] Add integration test that exercises a minimal request flow (text input → plan → tool
+      execution → result) and asserts at least one concrete result.
+- [X] T021 [P] [US1] Add failure-path test that forces a tool error (e.g., Claude service failure) and asserts
+      graceful degradation + clear user message.
+- [X] T022 [US1] Implement orchestrator entrypoint in `backend/agent/graph.ts` that creates SoT plans,
+      executes steps, and streams events (no UI yet).
+- [X] T023 [US1] Add Effect layers for Coder and Browser integrations in `backend/agent/coder.ts` and
+      `backend/agent/browser.ts` (wrap existing services with Effect interfaces).
+- [X] T024 [US1] Wire orchestrator into Encore `/agents/spawn` endpoint to accept initial prompt and
+      return session ID + initial SoT plan.Refactor `src/main.ts` orchestration logic into shared, testable functions used by
       both CLI and Encore orchestrator where appropriate.
 - [ ] T025 [US1] Integrate SoT planning (Solomon skeleton-of-thought) at a minimal level in
       `graph.ts` to break a request into internal steps, even if they are executed sequentially at
@@ -116,26 +112,30 @@ services with logs and tests.
 **Goal**: Support sessions that survive backend restarts and client disconnects using the Redis
 checkpointer and composite filesystem.
 
-**Independent Test**: Start a long-running session, create artifacts, restart backend, and resume
-session using the same ID with state restored.
-
 ### Tests for User Story 2 (REQUIRED)
 
-- [ ] T030 [P] [US2] Add integration test that spawns a session, writes at least one
-      `WorkspaceArtifact` (e.g., a note file), simulates a backend restart, and then resumes the
-      session, verifying artifact availability.
-- [ ] T031 [P] [US2] Add test that verifies cancel/stop cleans up external resources (e.g.,
-      browser contexts) and leaves session in a stable `cancelled` status.
+- [X] T030 [P] [US2] Add persistence tests for session resumption (save/load session state, workspace
+      artifacts survive restart) in `test/agent/session-persistence.test.ts`.
+- [X] T031 [US2] Implement session repository in `backend/agent/session-repository.ts` using Redis
+      client wrapper and checkpointer.
+- [X] T032 [US2] Implement workspace artifact repository in `backend/agent/artifact-repository.ts` using
+      composite filesystem.
+- [X] T033 [US2] Implement session resumption in Encore `/agents/{id}/resume` endpoint that loads
+      existing session state and artifacts.
+- [X] T034 [US2] Add integration test that spawns a session, creates artifacts, restarts (simulate),
+      resumes, and asserts continuity.
+- [X] T035 [US2] Wire session and artifact repositories into orchestrator for automatic
+      checkpointing during plan execution.
+- [X] T036 [US2] Ensure workspace files are persisted in `/workspace` and survive backend restarts.
 
 ### Implementation for User Story 2
 
-- [ ] T032 [US2] Connect orchestrator state machine in `graph.ts` to the Redis checkpointer so that
+- [X] T037 [US2] Connect orchestrator state machine in `graph.ts` to the Redis checkpointer so that
       all session progress is keyed by `sessionId` (thread_id).
-- [ ] T033 [US2] Implement composite filesystem middleware that routes `/workspace` and `/tmp`
+- [X] T038 [US2] Implement composite filesystem middleware that routes `/workspace` and `/tmp`
       appropriately and is used by tools that read/write files.
-- [ ] T034 [US2] Wire Agent Registry endpoints to redis-backed state so `/agents/spawn` and
+- [X] T039 [US2] Wire Agent Registry endpoints to redis-backed state so `/agents/spawn` and
       `/agents/{id}/resume` operate on real session state instead of in-memory placeholders.
-- [ ] T035 [US2] Implement cancel/stop logic that sends interruption signals through Effect scopes
       and ensures all fibers and external resources are terminated cleanly.
 
 **Checkpoint**: Sessions can be paused, resumed, and cancelled reliably with persisted state.
@@ -152,16 +152,16 @@ updates and tool events in order.
 
 ### Tests for User Story 3 (REQUIRED)
 
-- [ ] T040 [P] [US3] Add test or harness that consumes the streaming endpoint and validates event
+- [X] T040 [P] [US3] Add test or harness that consumes the streaming endpoint and validates event
       ordering and structure for a representative multi-step request.
 
 ### Implementation for User Story 3
 
-- [ ] T041 [US3] Define a concrete event schema for `AgentStreamEvent` and implement it in
+- [X] T041 [US3] Define a concrete event schema for `AgentStreamEvent` and implement it in
       `backend/agent/domain.ts` and `backend/agent/encore.service.ts`.
-- [ ] T042 [US3] Emit `plan_update`, `tool_started`, `tool_finished`, `status_change`, and `log`
+- [X] T042 [US3] Emit `plan_update`, `tool_started`, `tool_finished`, `status_change`, and `log`
       events from orchestrator and tool integration points.
-- [ ] T043 [P] [US3] Create a minimal frontend or CLI visualization (e.g., in `frontend/src/` or a
+- [X] T043 [P] [US3] Create a minimal frontend or CLI visualization (e.g., in `frontend/src/` or a
       dev-only CLI script) that renders the stream as a live checklist/timeline.
 
 **Checkpoint**: Users can see what the agent is doing in real time and correlate this with logs.
@@ -173,7 +173,7 @@ updates and tool events in order.
 **Purpose**: Improvements that affect multiple user stories, with emphasis on reliability,
 observability, and developer ergonomics.
 
-- [ ] T050 [P] [-] Documentation updates in `specs/001-big3-super-agent-v2/quickstart.md` and
+- [X] T050 [P] [-] Documentation updates in `specs/001-big3-super-agent-v2/quickstart.md` and
       `README.md` to match actual commands and flows.
 - [ ] T051 [-] Code cleanup and refactoring across `backend/agent/` to reduce duplication and
       enforce clear boundaries between Voice, Coder, Browser, and orchestrator.
