@@ -2,8 +2,8 @@
 
 import { ArrowLeft, Copy, RotateCcw } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { AgentTimeline } from "@/components/AgentTimeline";
-import { Markdown } from "@/components/Markdown";
+import { AgentTimeline } from "@/src/components/AgentTimeline";
+import { Markdown } from "@/components/markdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
