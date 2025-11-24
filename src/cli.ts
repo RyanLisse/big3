@@ -110,11 +110,20 @@ const CliProgram = Effect.gen(function* (_) {
 
       // Main Event Loop for voice
       while (true) {
-        const event = (yield* _(Queue.take(voice.eventStream))) as any;
+        const event = yield* _(Queue.take(voice.eventStream));
 
-        if (event.type === "response.function_call_arguments.done") {
+        if (
+          typeof event === "object" &&
+          event !== null &&
+          "type" in event &&
+          event.type === "response.function_call_arguments.done" &&
+          "name" in event &&
+          "arguments" in event
+        ) {
           const functionName = event.name;
-          const args = JSON.parse(event.arguments);
+          const args = JSON.parse(
+            typeof event.arguments === "string" ? event.arguments : "{}"
+          );
 
           yield* _(Console.log(`🛠️ Tool Call: ${functionName}`));
 
@@ -228,11 +237,20 @@ const runVoiceMode = (args: readonly string[]) =>
 
     // Main Event Loop for voice
     while (true) {
-      const event = (yield* _(Queue.take(voice.eventStream))) as any;
+      const event = yield* _(Queue.take(voice.eventStream));
 
-      if (event.type === "response.function_call_arguments.done") {
+      if (
+        typeof event === "object" &&
+        event !== null &&
+        "type" in event &&
+        event.type === "response.function_call_arguments.done" &&
+        "name" in event &&
+        "arguments" in event
+      ) {
         const functionName = event.name;
-        const args = JSON.parse(event.arguments);
+        const args = JSON.parse(
+          typeof event.arguments === "string" ? event.arguments : "{}"
+        );
 
         yield* _(Console.log(`🛠️ Tool Call: ${functionName}`));
 
@@ -402,7 +420,7 @@ export async function runCli(args: string[]): Promise<void> {
   });
 
   const main = Effect.provide(CliProgramWithArgs, CliLayer);
-  await Effect.runPromise(main as any);
+  await Effect.runPromise(main as Effect.Effect<void, never, never>);
 }
 
 // Run the CLI Program
@@ -412,6 +430,6 @@ void (async () => {
   } else {
     // Run the default CLI program when no arguments provided
     const main = Effect.provide(CliProgram, CliLayer);
-    await Effect.runPromise(main as any);
+    await Effect.runPromise(main as Effect.Effect<void, never, never>);
   }
 })();

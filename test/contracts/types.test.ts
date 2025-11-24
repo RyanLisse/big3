@@ -325,7 +325,7 @@ describe("Contract Types - Workflow API", () => {
           conditions: {},
         };
         expect(trigger.type).toBe(type);
-  }
+      }
     });
 
     it("should support ExecuteWorkflowRequest schema", () => {
@@ -358,7 +358,7 @@ describe("Type Safety Validation", () => {
     ];
     for (const provider of validProviders) {
       expect(["openai", "anthropic", "google"]).toContain(provider);
-  }
+    }
   });
 
   it("should enforce message type constraints", () => {
@@ -372,7 +372,7 @@ describe("Type Safety Validation", () => {
     ];
     for (const type of validTypes) {
       expect(["user", "agent", "system", "error"]).toContain(type);
-  }
+    }
   });
 
   it("should enforce workflow step type constraints", () => {
@@ -385,7 +385,7 @@ describe("Type Safety Validation", () => {
     ];
     for (const stepType of validStepTypes) {
       expect(["task", "decision", "parallel", "subgraph"]).toContain(stepType);
-  }
+    }
   });
 
   it("should enforce workflow execution status constraints", () => {
@@ -407,7 +407,7 @@ describe("Type Safety Validation", () => {
         "paused",
         "cancelled",
       ]).toContain(status);
-  }
+    }
   });
 
   it("should enforce confidence score range (0-1)", () => {
@@ -424,7 +424,7 @@ describe("Type Safety Validation", () => {
       };
       expect(msg.confidence).toBeGreaterThanOrEqual(0);
       expect(msg.confidence).toBeLessThanOrEqual(1);
-  }
+    }
   });
 
   it("should enforce priority constraints (1-10)", () => {
@@ -439,7 +439,7 @@ describe("Type Safety Validation", () => {
       };
       expect(msg.priority).toBeGreaterThanOrEqual(1);
       expect(msg.priority).toBeLessThanOrEqual(10);
-  }
+    }
   });
 
   it("should enforce progress percentage constraints (0-100)", () => {
@@ -453,6 +453,6 @@ describe("Type Safety Validation", () => {
       };
       expect(exec.progress.completed).toBeGreaterThanOrEqual(0);
       expect(exec.progress.completed).toBeLessThanOrEqual(100);
-  }
+    }
   });
 });

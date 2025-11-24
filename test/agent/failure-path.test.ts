@@ -187,7 +187,11 @@ describe("Failure Path Tests - User Story 1", () => {
 
         for (const tool of tools) {
           const toolResult = yield* Effect.tryPromise(() => tool.fn()).pipe(
-            Effect.map((result) => ({ tool: tool.name, success: true, result })),
+            Effect.map((result) => ({
+              tool: tool.name,
+              success: true,
+              result,
+            })),
             Effect.catchAll((error) =>
               Effect.succeed({
                 tool: tool.name,
@@ -253,7 +257,10 @@ describe("Failure Path Tests - User Story 1", () => {
         const execution = yield* Effect.tryPromise(() =>
           mockCoderService.executeCode("console.log('test')")
         ).pipe(
-          Effect.map(() => ({ sessionId: session.sessionId, codeExecuted: true })),
+          Effect.map(() => ({
+            sessionId: session.sessionId,
+            codeExecuted: true,
+          })),
           Effect.catchAll(() =>
             Effect.succeed({
               sessionId: session.sessionId,

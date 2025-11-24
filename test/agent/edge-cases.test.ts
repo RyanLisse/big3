@@ -115,7 +115,7 @@ describe("Edge Case Tests", () => {
         if (prefix) {
           expect(id.startsWith(`${prefix}_`)).toBe(true);
         }
-  }
+      }
     });
 
     it("should generate IDs with consistent length", () => {
@@ -143,7 +143,7 @@ describe("Edge Case Tests", () => {
       for (const id of validIds) {
         const result = Effect.runSync(validateSessionId(id));
         expect(result).toBe(id);
-  }
+      }
     });
 
     it("should reject invalid session IDs", () => {
@@ -161,7 +161,7 @@ describe("Edge Case Tests", () => {
       for (const id of invalidIds) {
         const result = Effect.runSync(Effect.either(validateSessionId(id)));
         expect(Either.isLeft(result)).toBe(true);
-  }
+      }
     });
 
     it("should handle JSON parsing edge cases", async () => {

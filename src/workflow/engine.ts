@@ -13,12 +13,12 @@ export type WorkflowStep = {
   name: string;
   description: string;
   status: "pending" | "running" | "completed" | "failed" | "paused";
-  input?: any;
-  output?: any;
+  input?: unknown;
+  output?: unknown;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   startTime?: number;
   endTime?: number;
@@ -36,7 +36,7 @@ export type WorkflowPlan = {
     retryAttempts?: number;
     retryDelay?: number;
   };
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;
 };
@@ -44,7 +44,7 @@ export type WorkflowPlan = {
 export type WorkflowContext = {
   planId: string;
   stepId: string;
-  data: Record<string, any>;
+  data: Record<string, unknown>;
   agentId?: string;
   checkpoint?: string;
 };
@@ -56,7 +56,7 @@ export type CreatePlanConfig = {
   timeout?: number;
   retryAttempts?: number;
   retryDelay?: number;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 };
 
 export class WorkflowEngine {
@@ -118,14 +118,14 @@ export class WorkflowEngine {
               output: result,
               endTime: Date.now(),
             });
-          } catch (error: any) {
+          } catch (error) {
             results.push({
               ...step,
               status: "failed",
               error: {
                 code: "STEP_EXECUTION_FAILED",
                 message: `Step ${step.name} failed: ${error.message}`,
-                details: error,
+                details: error instanceof Error ? error.message : String(error),
               },
               endTime: Date.now(),
             });
@@ -151,7 +151,7 @@ export class WorkflowEngine {
   private async executeStep(
     step: WorkflowStep,
     context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     switch (step.name) {
       case "agent_initialization":
         return this.executeAgentInitialization(step, context);
@@ -185,7 +185,7 @@ export class WorkflowEngine {
   private async executeAgentInitialization(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would initialize agent with configuration
     return { status: "completed", output: "Agent initialized" };
   }
@@ -196,7 +196,7 @@ export class WorkflowEngine {
   private async executeModelValidation(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would validate model compatibility
     return { status: "completed", output: "Model validated" };
   }
@@ -207,7 +207,7 @@ export class WorkflowEngine {
   private async executeAgentCreation(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would create new agent
     return { status: "completed", output: "Agent created" };
   }
@@ -218,7 +218,7 @@ export class WorkflowEngine {
   private async executeWorkflowStep(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would execute workflow logic
     return { status: "completed", output: "Workflow step executed" };
   }
@@ -229,7 +229,7 @@ export class WorkflowEngine {
   private async executeCommunication(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would handle real-time communication
     return { status: "completed", output: "Communication established" };
   }
@@ -240,7 +240,7 @@ export class WorkflowEngine {
   private async executeCheckpoint(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would create workflow checkpoint
     return { status: "completed", output: "Checkpoint created" };
   }
@@ -251,7 +251,7 @@ export class WorkflowEngine {
   private async executeRecovery(
     _step: WorkflowStep,
     _context: WorkflowContext
-  ): Promise<any> {
+  ): Promise<unknown> {
     // Implementation would handle error recovery
     return { status: "completed", output: "Recovery completed" };
   }

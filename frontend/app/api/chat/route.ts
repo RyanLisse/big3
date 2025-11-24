@@ -1,6 +1,6 @@
-import { streamText } from "ai";
 import { anthropic } from "@ai-sdk/anthropic";
-import { NextRequest } from "next/server";
+import { streamText } from "ai";
+import type { NextRequest } from "next/server";
 
 // Configure Anthropic Claude
 const model = anthropic("claude-3-5-sonnet-20241022");

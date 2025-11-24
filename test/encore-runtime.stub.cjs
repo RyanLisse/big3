@@ -1,3 +1,4 @@
+"use strict";
 // Minimal Encore runtime stub for tests in the root package.
 // Avoids requiring the native Encore runtime during unit tests.
 class Runtime {

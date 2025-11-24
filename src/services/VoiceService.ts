@@ -3,8 +3,8 @@ import WebSocket from "ws";
 
 export type VoiceService = {
   readonly connect: Effect.Effect<void, Error>;
-  readonly eventStream: Queue.Dequeue<any>; // Stream of events from OpenAI
-  readonly send: (event: any) => Effect.Effect<void, Error>;
+  readonly eventStream: Queue.Dequeue<unknown>; // Stream of events from OpenAI
+  readonly send: (event: unknown) => Effect.Effect<void, Error>;
 };
 
 export const VoiceService = Context.GenericTag<VoiceService>("VoiceService");
@@ -12,7 +12,7 @@ export const VoiceService = Context.GenericTag<VoiceService>("VoiceService");
 export const VoiceServiceLive = Layer.scoped(
   VoiceService,
   Effect.gen(function* (_) {
-    const eventQueue = yield* _(Queue.unbounded<any>());
+    const eventQueue = yield* _(Queue.unbounded<unknown>());
 
     const connectWithRetry = (attempt = 1): Effect.Effect<WebSocket, never> =>
       Effect.tryPromise({

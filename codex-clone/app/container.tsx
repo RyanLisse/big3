@@ -32,9 +32,7 @@ export default function Container({ children }: { children: React.ReactNode }) {
       if (latestData.data.message.type === "local_shell_call") {
         const task = getTaskById(latestData.data.taskId);
         updateTask(latestData.data.taskId, {
-          statusMessage: `Running command ${(
-            latestData.data.message as { action: { command: string[] } }
-          ).action.command.join(" ")}`,
+          statusMessage: `Running command ${(latestData.data.message as { action: { command: string[] } }).action.command.join(" ")}`,
           messages: [
             ...(task?.messages || []),
             {

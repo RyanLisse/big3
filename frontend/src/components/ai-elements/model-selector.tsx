@@ -1,5 +1,6 @@
-import type { ComponentProps, ReactNode } from "react";
 import NextImage from "next/image";
+import type { ComponentProps, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 import {
   Command,
   CommandDialog,
@@ -10,14 +11,13 @@ import {
   CommandList,
   CommandSeparator,
   CommandShortcut,
-} from "@/src/components/ui/command";
+} from "@/components/ui/command";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
   DialogTrigger,
-} from "@/src/components/ui/dialog";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/dialog";
 
 export type ModelSelectorProps = ComponentProps<typeof Dialog>;
 

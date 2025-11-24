@@ -7,11 +7,7 @@ const ResizablePanelGroup = React.forwardRef<
   React.ElementRef<typeof ResizablePrimitive.PanelGroup>,
   React.ComponentPropsWithoutRef<typeof ResizablePrimitive.PanelGroup>
 >(({ className, ...props }, ref) => (
-  <ResizablePrimitive.PanelGroup
-    ref={ref}
-    className={className}
-    {...props}
-  />
+  <ResizablePrimitive.PanelGroup className={className} ref={ref} {...props} />
 ));
 ResizablePanelGroup.displayName = ResizablePrimitive.PanelGroup.displayName;
 
@@ -19,11 +15,7 @@ const ResizablePanel = React.forwardRef<
   React.ElementRef<typeof ResizablePrimitive.Panel>,
   React.ComponentPropsWithoutRef<typeof ResizablePrimitive.Panel>
 >(({ className, ...props }, ref) => (
-  <ResizablePrimitive.Panel
-    ref={ref}
-    className={className}
-    {...props}
-  />
+  <ResizablePrimitive.Panel className={className} ref={ref} {...props} />
 ));
 ResizablePanel.displayName = ResizablePrimitive.Panel.displayName;
 
@@ -34,12 +26,15 @@ const ResizableHandle = React.forwardRef<
   }
 >(({ className, withHandle, ...props }, ref) => (
   <div
-    ref={ref}
     className={[
-      "relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:-translate-x-1/2 after:bg-border hover:after:bg-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
-      withHandle && "hover:bg-accent hover:transition-colors focus-visible:bg-accent",
-      className
-    ].filter(Boolean).join(" ")}
+      "after:-translate-x-1/2 relative flex w-px items-center justify-center bg-border after:absolute after:inset-y-0 after:left-1/2 after:w-1 after:bg-border hover:after:bg-accent-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-1 focus-visible:ring-offset-background",
+      withHandle &&
+        "hover:bg-accent hover:transition-colors focus-visible:bg-accent",
+      className,
+    ]
+      .filter(Boolean)
+      .join(" ")}
+    ref={ref}
     {...props}
   >
     {withHandle && (

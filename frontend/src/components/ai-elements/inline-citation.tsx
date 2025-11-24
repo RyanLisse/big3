@@ -9,19 +9,19 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Badge } from "@/src/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
-} from "@/src/components/ui/carousel";
+} from "@/components/ui/carousel";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/src/components/ui/hover-card";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/hover-card";
 
 export type InlineCitationProps = ComponentProps<"span">;
 

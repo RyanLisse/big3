@@ -69,10 +69,8 @@ const mockSessionRepo: AgentSessionRepo = {
     Effect.sync(() => {
       inMemorySessions.delete(id);
     }),
-  listActive: () =>
-    Effect.sync(() => Array.from(inMemorySessions.values())),
-  get: (id: string) =>
-    Effect.sync(() => inMemorySessions.get(id) ?? null),
+  listActive: () => Effect.sync(() => Array.from(inMemorySessions.values())),
+  get: (id: string) => Effect.sync(() => inMemorySessions.get(id) ?? null),
 };
 
 const mockArtifactRepo: WorkspaceArtifactRepo = {
@@ -180,7 +178,8 @@ describe("Persistence Property-Based Tests", () => {
         )
       );
 
-      const loadedSession = loadedSessionOpt?._tag === "Some" ? loadedSessionOpt.value : null;
+      const loadedSession =
+        loadedSessionOpt?._tag === "Some" ? loadedSessionOpt.value : null;
 
       expect(loadedSession).not.toBeNull();
       expect(loadedSession?.id).toBe(originalSession.id);
@@ -361,7 +360,7 @@ describe("Persistence Property-Based Tests", () => {
       }
 
       await Promise.all(
-        artifacts.map(artifact =>
+        artifacts.map((artifact) =>
           Effect.runPromise(
             WorkspaceArtifactRepo.pipe(
               Effect.flatMap((repo) => repo.create(artifact)),
@@ -402,11 +401,11 @@ describe("Persistence Property-Based Tests", () => {
 
       for (const artifact of session1Artifacts) {
         expect(artifact.sessionId).toBe(sessionId1);
-  }
+      }
 
       for (const artifact of session2Artifacts) {
         expect(artifact.sessionId).toBe(sessionId2);
-  }
+      }
     });
   });
 
@@ -470,9 +469,7 @@ describe("Persistence Property-Based Tests", () => {
 
       // Save checkpoints in order
       for (let i = 0; i < numCheckpoints; i++) {
-        await Effect.runPromise(
-          mockRedisSaver.save(threadId, checkpoints[i])
-        );
+        await Effect.runPromise(mockRedisSaver.save(threadId, checkpoints[i]));
       }
 
       // Load latest checkpoint
@@ -526,7 +523,9 @@ describe("Persistence Property-Based Tests", () => {
       ];
 
       for (const malformed of malformedJsonStrings) {
-        await expect(Effect.runPromise(safeJsonParse(malformed, "test"))).rejects.toThrow(/Invalid JSON/);
+        await expect(
+          Effect.runPromise(safeJsonParse(malformed, "test"))
+        ).rejects.toThrow(/Invalid JSON/);
       }
     });
 

@@ -169,7 +169,7 @@ describe("MessageBatcher", () => {
 
       for (const latency of flushTimes) {
         expect(latency).toBeLessThan(200);
-  }
+      }
     });
 
     it("should adapt flush interval based on latency", async () => {
@@ -196,7 +196,7 @@ describe("MessageBatcher", () => {
           expect(msg.id).toBeDefined();
           expect(msg.type).toBeDefined();
           expect(msg.timestamp).toBeDefined();
-  }
+        }
       });
 
       batcher.onFlush(flushHandler);

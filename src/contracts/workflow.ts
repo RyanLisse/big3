@@ -8,12 +8,12 @@ export type WorkflowStep = {
   name: string;
   description: string;
   status: "pending" | "running" | "completed" | "failed" | "paused";
-  input?: any;
-  output?: any;
+  input?: unknown;
+  output?: unknown;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   startTime?: number;
   endTime?: number;
@@ -46,7 +46,7 @@ export type CreateWorkflowPlanRequest = {
 
 export type ExecuteWorkflowRequest = {
   agentId?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 };
 
 export type WorkflowExecutionStatus = {
@@ -65,11 +65,11 @@ export type WorkflowUpdateMessage = {
   executionId: string;
   stepId?: string;
   status?: string;
-  output?: any;
+  output?: unknown;
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
   timestamp: number;
 };

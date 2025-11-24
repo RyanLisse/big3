@@ -128,7 +128,7 @@ export class GitHubAuth {
     title: string,
     body: string,
     head: string,
-    base: string = "main"
+    base = "main"
   ) {
     const response = await fetch(
       `https://api.github.com/repos/${owner}/${repo}/pulls`,

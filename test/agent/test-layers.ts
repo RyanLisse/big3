@@ -5,18 +5,18 @@
 
 import { Effect, Layer, Option } from "effect";
 import {
-  AgentOrchestrator,
+  type AgentSession,
+  AgentSessionRepo,
+  type AgentStream,
+  StreamManager,
+  type WorkspaceArtifact,
+  WorkspaceArtifactRepo,
+} from "../../backend/agent/domain.js";
+import {
   type AgentInput,
+  AgentOrchestrator,
   type AgentOutput,
 } from "../../backend/agent/graph.js";
-import {
-  AgentSessionRepo,
-  type AgentSession,
-  WorkspaceArtifactRepo,
-  type WorkspaceArtifact,
-  StreamManager,
-  type AgentStream,
-} from "../../backend/agent/domain.js";
 
 // ============================================================================
 // Mock AgentOrchestrator
@@ -137,11 +137,11 @@ const MockAgentSessionRepoLive = Layer.succeed(
       }),
 
     listActive: () =>
-      Effect.sync(() => {
-        return Array.from(sessionStore.values()).filter(
+      Effect.sync(() =>
+        Array.from(sessionStore.values()).filter(
           (s) => s.status === "planning" || s.status === "running"
-        );
-      }),
+        )
+      ),
 
     get: (id: string) =>
       Effect.sync(() => {
@@ -167,11 +167,11 @@ const MockWorkspaceArtifactRepoLive = Layer.succeed(
       }),
 
     findBySessionId: (sessionId: string) =>
-      Effect.sync(() => {
-        return Array.from(artifactStore.values()).filter(
+      Effect.sync(() =>
+        Array.from(artifactStore.values()).filter(
           (a) => a.sessionId === sessionId
-        );
-      }),
+        )
+      ),
 
     get: (id: string) =>
       Effect.sync(() => {
@@ -191,18 +191,18 @@ const MockWorkspaceArtifactRepoLive = Layer.succeed(
       }),
 
     findByKind: (sessionId: string, kind) =>
-      Effect.sync(() => {
-        return Array.from(artifactStore.values()).filter(
+      Effect.sync(() =>
+        Array.from(artifactStore.values()).filter(
           (a) => a.sessionId === sessionId && a.kind === kind
-        );
-      }),
+        )
+      ),
 
     listBySession: (sessionId: string) =>
-      Effect.sync(() => {
-        return Array.from(artifactStore.values()).filter(
+      Effect.sync(() =>
+        Array.from(artifactStore.values()).filter(
           (a) => a.sessionId === sessionId
-        );
-      }),
+        )
+      ),
   })
 );
 
@@ -238,10 +238,7 @@ const MockStreamManagerLive = Layer.succeed(
         streamStore.delete(sessionId);
       }),
 
-    listActiveStreams: () =>
-      Effect.sync(() => {
-        return Array.from(streamStore.keys());
-      }),
+    listActiveStreams: () => Effect.sync(() => Array.from(streamStore.keys())),
 
     broadcastEvent: (_event) => Effect.unit,
   })

@@ -13,8 +13,8 @@ import type {
   ToolRuleType,
 } from "../src/domain.js";
 import {
-  MultiAgentApiServiceTag,
   MultiAgentApiServiceImpl,
+  MultiAgentApiServiceTag,
 } from "../src/services/MultiAgentApiService.js";
 
 // Mock MultiAgentService for API testing
@@ -164,7 +164,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.name).toBe("Test Team");
       expect(result.data?.description).toBe("A test team for API testing");
       expect(result.data?.status).toBe("active");
-      
+
       return result;
     });
 
@@ -187,7 +187,7 @@ describe("MultiAgentApiService", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error?.code).toBe("ApiValidationError");
-      
+
       return result;
     });
 
@@ -206,7 +206,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data).toBeDefined();
       expect(result.data?.id).toBe("team-123");
       expect(result.data?.name).toBe("Test Team");
-      
+
       return result;
     });
 
@@ -231,7 +231,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data).toBeDefined();
       expect(result.data?.name).toBe("Updated Team");
       expect(result.data?.status).toBe("paused");
-      
+
       return result;
     });
 
@@ -248,7 +248,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeUndefined();
-      
+
       return result;
     });
 
@@ -265,7 +265,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -284,7 +284,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeUndefined();
-      
+
       return result;
     });
 
@@ -303,7 +303,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeUndefined();
-      
+
       return result;
     });
 
@@ -320,7 +320,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -352,7 +352,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.value).toBe("Test content");
       expect(result.data?.type).toBe("project_context");
       expect(result.data?.accessLevel).toBe("read_write");
-      
+
       return result;
     });
 
@@ -374,7 +374,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.id).toBe("memory-123");
       expect(result.data?.label).toBe("Test Memory");
       expect(result.data?.value).toBe("Test content");
-      
+
       return result;
     });
 
@@ -401,7 +401,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.value).toBe("Updated content");
       expect(result.data?.accessLevel).toBe("admin");
       expect(result.data?.version).toBe(2);
-      
+
       return result;
     });
 
@@ -420,7 +420,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeUndefined();
-      
+
       return result;
     });
 
@@ -439,7 +439,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -468,7 +468,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.content).toBe("Hello from agent-1");
       expect(result.data?.messageType).toBe("request");
       expect(result.data?.priority).toBe("high");
-      
+
       return result;
     });
 
@@ -493,7 +493,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -510,7 +510,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -527,7 +527,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -546,7 +546,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(result.data).toBeUndefined();
-      
+
       return result;
     });
 
@@ -576,7 +576,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data?.type).toBe("TerminalToolRule");
       expect(result.data?.toolNames).toEqual(["test_tool"]);
       expect(result.data?.isActive).toBe(true);
-      
+
       return result;
     });
 
@@ -593,7 +593,7 @@ describe("MultiAgentApiService", () => {
 
       expect(result.success).toBe(true);
       expect(Array.isArray(result.data)).toBe(true);
-      
+
       return result;
     });
 
@@ -612,7 +612,7 @@ describe("MultiAgentApiService", () => {
       expect(result.data).toBeDefined();
       expect(result.data?.status).toBe("healthy");
       expect(result.data?.timestamp).toBeInstanceOf(Date);
-      
+
       return result;
     });
 
@@ -639,7 +639,7 @@ describe("MultiAgentApiService", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error?.code).toBe("ApiValidationError");
-      
+
       return result;
     });
 
@@ -666,7 +666,7 @@ describe("MultiAgentApiService", () => {
       expect(result.success).toBe(false);
       expect(result.error).toBeDefined();
       expect(result.error?.code).toBe("ApiValidationError");
-      
+
       return result;
     });
 

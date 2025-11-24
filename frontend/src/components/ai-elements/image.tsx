@@ -20,10 +20,7 @@ export const Image = ({
   <NextImage
     {...props}
     alt={props.alt || ""}
-    className={cn(
-      "max-w-full overflow-hidden rounded-md",
-      props.className
-    )}
+    className={cn("max-w-full overflow-hidden rounded-md", props.className)}
     height={height}
     src={`data:${mediaType};base64,${base64}`}
     width={width}

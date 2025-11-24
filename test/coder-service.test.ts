@@ -1,13 +1,11 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { describe, expect, it } from "@effect/vitest";
 import { Effect, Layer } from "effect";
-import {
-  CoderServiceTag,
-} from "../src/services/CoderService";
+import { CoderServiceTag } from "../src/services/CoderService";
 
 // Mock CoderService for unit tests
 const MockCoderService = Layer.succeed(CoderServiceTag, {
-  createSession: (name: string) => Effect.succeed(`✅ Created Claude Session: ${name}`),
+  createSession: (name: string) =>
+    Effect.succeed(`✅ Created Claude Session: ${name}`),
   execute: (_sessionId: string, instruction: string) => {
     if (instruction === "Test network error") {
       return Effect.fail(new Error("Network timeout"));
@@ -38,7 +36,6 @@ const MockCoderService = Layer.succeed(CoderServiceTag, {
 });
 
 describe("CoderService", () => {
-
   describe("createSession", () => {
     it("should return formatted session string", async () => {
       const program = Effect.gen(function* () {

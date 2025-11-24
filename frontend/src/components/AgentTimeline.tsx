@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { ToolEvent } from "./ToolEvent";
 
 type AgentTimelineProps = {

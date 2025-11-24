@@ -1,36 +1,37 @@
 "use client";
 
-import { Moon, Sun, LogOut, Github } from "lucide-react";
-import { useTheme } from "next-themes";
+import { Github, LogOut, Moon, Sun } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/src/components/ui/button";
+import { useTheme } from "next-themes";
+import { Button } from "@/components/ui/button";
 import { useGitHubAuth } from "@/src/hooks/use-github-auth";
 
 export function Navbar() {
   const { theme, setTheme } = useTheme();
-  const { isAuthenticated, user, login, logout, isLoading, error } = useGitHubAuth();
+  const { isAuthenticated, user, login, logout, isLoading, error } =
+    useGitHubAuth();
 
   return (
-    <nav className="border-b bg-card sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+    <nav className="sticky top-0 z-50 border-b bg-card">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div className="flex h-16 items-center justify-between">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 font-bold text-lg">
+          <Link className="flex items-center gap-2 font-bold text-lg" href="/">
             <span className="text-primary">Big3</span>
             <span className="text-muted-foreground">Codex</span>
           </Link>
 
           {/* Navigation Links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden items-center gap-6 md:flex">
             <Link
+              className="font-medium text-sm transition hover:text-primary"
               href="/"
-              className="text-sm font-medium hover:text-primary transition"
             >
               Tasks
             </Link>
             <Link
+              className="font-medium text-sm transition hover:text-primary"
               href="/environments"
-              className="text-sm font-medium hover:text-primary transition"
             >
               Environments
             </Link>
@@ -41,60 +42,56 @@ export function Navbar() {
             {/* GitHub Auth */}
             {isLoading ? (
               <div className="animate-spin">
-                <Github className="w-4 h-4" />
+                <Github className="h-4 w-4" />
               </div>
             ) : isAuthenticated && user ? (
               <div className="flex items-center gap-3">
                 {user.avatar_url && (
                   <img
-                    src={user.avatar_url}
                     alt={user.login}
-                    className="w-8 h-8 rounded-full"
+                    className="h-8 w-8 rounded-full"
+                    src={user.avatar_url}
                   />
                 )}
-                <span className="text-sm font-medium hidden sm:inline">
+                <span className="hidden font-medium text-sm sm:inline">
                   {user.login}
                 </span>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={logout}
                   className="gap-2"
+                  onClick={logout}
+                  size="sm"
+                  variant="ghost"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="h-4 w-4" />
                   <span className="hidden sm:inline">Logout</span>
                 </Button>
               </div>
             ) : (
               <Button
-                variant="outline"
-                size="sm"
-                onClick={login}
                 className="gap-2"
+                onClick={login}
+                size="sm"
+                variant="outline"
               >
-                <Github className="w-4 h-4" />
+                <Github className="h-4 w-4" />
                 <span className="hidden sm:inline">Connect GitHub</span>
               </Button>
             )}
 
             {/* Error Message */}
-            {error && (
-              <div className="text-xs text-destructive">
-                {error}
-              </div>
-            )}
+            {error && <div className="text-destructive text-xs">{error}</div>}
 
             {/* Theme Toggle */}
             <Button
-              variant="ghost"
-              size="icon"
+              className="h-9 w-9"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="w-9 h-9"
+              size="icon"
+              variant="ghost"
             >
               {theme === "dark" ? (
-                <Sun className="w-4 h-4" />
+                <Sun className="h-4 w-4" />
               ) : (
-                <Moon className="w-4 h-4" />
+                <Moon className="h-4 w-4" />
               )}
             </Button>
           </div>

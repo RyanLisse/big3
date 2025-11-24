@@ -1,10 +1,8 @@
 "use server";
+import { getSubscriptionToken, type Realtime } from "@inngest/realtime";
 import { cookies } from "next/headers";
-import { getSubscriptionToken, Realtime } from "@inngest/realtime";
-
-import { inngest } from "@/lib/inngest";
-import { Task } from "@/stores/tasks";
-import { getInngestApp, taskChannel } from "@/lib/inngest";
+import { getInngestApp, inngest, taskChannel } from "@/lib/inngest";
+import type { Task } from "@/stores/tasks";
 
 export type TaskChannelToken = Realtime.Token<
   typeof taskChannel,
@@ -32,8 +30,8 @@ export const createTaskAction = async ({
     data: {
       task,
       token: githubToken,
-      sessionId: sessionId,
-      prompt: prompt,
+      sessionId,
+      prompt,
     },
   });
 };
@@ -54,7 +52,7 @@ export const createPullRequestAction = async ({
     name: "clonedex/create.pull-request",
     data: {
       token: githubToken,
-      sessionId: sessionId,
+      sessionId,
     },
   });
 };

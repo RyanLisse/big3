@@ -10,6 +10,7 @@
  */
 
 import { randomUUID } from "node:crypto";
+import { Effect } from "effect";
 import type { AgentConfig, ModelRegistry } from "../config/types";
 import { AgentError } from "../domain";
 import type { Agent, CreateAgentRequest } from "./index";
@@ -22,7 +23,6 @@ import type {
   SharedMemoryBlock,
   SharedMemoryRequest,
 } from "./types/multi-agent";
-import { Effect } from "effect";
 
 /**
  * Create a new agent with MVP validation
@@ -86,7 +86,7 @@ function deepCopyConfig(config: AgentConfig): AgentConfig {
  */
 function validateAgentConfigRequired(
   config: unknown
-): asserts config is Record<string, any> {
+): asserts config is AgentConfig {
   if (!config || typeof config !== "object") {
     throw new AgentError(
       "Agent config must be an object",
@@ -95,7 +95,7 @@ function validateAgentConfigRequired(
     );
   }
 
-  const configObj = config as Record<string, any>;
+  const configObj = config as Record<string, unknown>;
 
   // Validate required fields
   const name = configObj.name;

@@ -14,8 +14,8 @@ export const CoderServiceTag = Context.GenericTag<CoderService>("CoderService");
 // Implementation using Anthropic SDK
 export const CoderServiceLive = Layer.effect(
   CoderServiceTag,
-  Effect.gen(function* () {
-    const client = new (Anthropic as any)({
+  Effect.sync(() => {
+    const client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY ?? "test-api-key",
     });
     const timeoutMs = 60_000;
@@ -37,9 +37,9 @@ export const CoderServiceLive = Layer.effect(
               throw new Error("Invalid Claude response format");
             }
 
-            const textBlock = content.find(
-              (block) => block?.type === "text"
-            ) as { type: string; text?: string } | undefined;
+            const textBlock = content.find((block) => block?.type === "text") as
+              | { type: string; text?: string }
+              | undefined;
 
             return textBlock?.text ?? "No response";
           },

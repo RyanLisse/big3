@@ -5,7 +5,7 @@
  * Supports configuration validation, model selection, and agent creation.
  */
 
-import { StructuredError } from "../core/errors";
+import { ErrorCode, StructuredError } from "../core/errors";
 import type { AIAgentSDK, CreateAgentRequest } from "./index";
 
 /**
@@ -35,7 +35,7 @@ export class AgentInitialization {
       }
       throw new StructuredError(
         "Failed to initialize agent",
-        "AGENT_INITIALIZATION_ERROR" as any,
+        ErrorCode.AGENT_INITIALIZATION_ERROR,
         undefined,
         { originalError: error }
       );

@@ -37,13 +37,13 @@ export type Agent = {
   config: AgentConfig;
 
   /** Workflow execution context */
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 
   /** Error information if status is 'error' */
   error?: {
     code: string;
     message: string;
-    details?: any;
+    details?: unknown;
   };
 };
 

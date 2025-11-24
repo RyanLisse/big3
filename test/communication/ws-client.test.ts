@@ -134,7 +134,7 @@ describe("WsClient", () => {
 
       for (const msg of messages) {
         client.send(msg);
-  }
+      }
 
       const state = client.getState();
       expect(state.pendingMessages).toBeGreaterThanOrEqual(0);
@@ -335,7 +335,7 @@ describe("WsClient", () => {
 
       for (const msg of messages) {
         client.send(msg);
-  }
+      }
 
       const state = client.getState();
       expect(state.messagesSent).toBeGreaterThanOrEqual(0);

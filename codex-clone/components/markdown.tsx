@@ -1,27 +1,28 @@
-import React, { memo, useState } from "react";
-import ReactMarkdown, { type Components } from "react-markdown";
-import remarkGfm from "remark-gfm";
-import rehypeRaw from "rehype-raw";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { CopyIcon, CheckIcon } from "lucide-react";
+import { CheckIcon, CopyIcon } from "lucide-react";
+import Link from "next/link";
 import { useTheme } from "next-themes";
+import type React from "react";
+import { memo, useState } from "react";
+import ReactMarkdown, { type Components } from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import {
   oneDark,
   oneLight,
 } from "react-syntax-highlighter/dist/cjs/styles/prism";
+import rehypeRaw from "rehype-raw";
+import remarkGfm from "remark-gfm";
 import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { Separator } from "@/components/ui/separator";
 import {
   Table,
-  TableHeader,
   TableBody,
+  TableCell,
   TableFooter,
   TableHead,
+  TableHeader,
   TableRow,
-  TableCell,
 } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 
 type CodeComponentProps = React.ComponentPropsWithoutRef<"code"> & {
   inline?: boolean;
@@ -43,7 +44,7 @@ export const CodeComponent: React.FC<CodeComponentProps> = ({
   if (inline) {
     return (
       <code
-        className="text-sm bg-background dark:bg-zinc-800 py-0.5 px-1 rounded-md"
+        className="rounded-md bg-background px-1 py-0.5 text-sm dark:bg-zinc-800"
         style={{ wordBreak: "break-all" }}
         {...props}
       >
@@ -55,31 +56,35 @@ export const CodeComponent: React.FC<CodeComponentProps> = ({
   // Code block with language
   if (match) {
     return (
-      <div className="border rounded-lg bg-background my-2 overflow-hidden">
-        <div className="flex items-center justify-between bg-sidebar px-2 py-1 border-b">
-          <span className="text-xs text-muted-foreground">{match[1]}</span>
+      <div className="my-2 overflow-hidden rounded-lg border bg-background">
+        <div className="flex items-center justify-between border-b bg-sidebar px-2 py-1">
+          <span className="text-muted-foreground text-xs">{match[1]}</span>
           <Button
-            variant="ghost"
-            size="icon"
             className="size-7"
             onClick={() => {
               navigator.clipboard.writeText(String(children));
               setCopied(true);
               setTimeout(() => setCopied(false), 2000);
             }}
+            size="icon"
+            variant="ghost"
           >
             {copied ? (
-              <CheckIcon className="w-4 h-4 text-green-500" />
+              <CheckIcon className="h-4 w-4 text-green-500" />
             ) : (
-              <CopyIcon className="w-4 h-4" />
+              <CopyIcon className="h-4 w-4" />
             )}
           </Button>
         </div>
         <ScrollArea className="max-w-full">
           <div className="px-4 py-2" style={{ maxWidth: "100%" }}>
             <SyntaxHighlighter
-              language={match[1]}
-              style={theme === "dark" ? oneDark : oneLight}
+              codeTagProps={{
+                style: {
+                  whiteSpace: "pre",
+                  display: "block",
+                },
+              }}
               customStyle={{
                 fontSize: "12.5px",
                 backgroundColor: "transparent",
@@ -88,14 +93,10 @@ export const CodeComponent: React.FC<CodeComponentProps> = ({
                 background: "none",
                 overflow: "visible",
               }}
-              wrapLongLines={false}
+              language={match[1]}
               PreTag="div"
-              codeTagProps={{
-                style: {
-                  whiteSpace: "pre",
-                  display: "block",
-                },
-              }}
+              style={theme === "dark" ? oneDark : oneLight}
+              wrapLongLines={false}
             >
               {String(children).replace(/\n$/, "")}
             </SyntaxHighlighter>
@@ -108,7 +109,7 @@ export const CodeComponent: React.FC<CodeComponentProps> = ({
   // Code block without language
   return (
     <code
-      className="relative rounded !bg-sidebar border border-muted-foreground/20 px-[0.3rem] py-[0.2rem] font-mono text-xs"
+      className="!bg-sidebar relative rounded border border-muted-foreground/20 px-[0.3rem] py-[0.2rem] font-mono text-xs"
       style={{ wordBreak: "break-word" }}
     >
       {children}
@@ -120,7 +121,7 @@ const components: Partial<Components> = {
   code: CodeComponent,
   pre: ({ children }) => <>{children}</>,
   ol: ({ children, ...props }) => (
-    <ol className="list-decimal list-outside ml-4" {...props}>
+    <ol className="ml-4 list-outside list-decimal" {...props}>
       {children}
     </ol>
   ),
@@ -130,7 +131,7 @@ const components: Partial<Components> = {
     </li>
   ),
   ul: ({ children, ...props }) => (
-    <ul className="list-disc list-outside ml-4" {...props}>
+    <ul className="ml-4 list-outside list-disc" {...props}>
       {children}
     </ul>
   ),
@@ -156,13 +157,13 @@ const components: Partial<Components> = {
       return (
         <a
           className="text-blue-500 hover:underline"
+          href={href}
+          rel="noreferrer"
           style={{
             wordBreak: "break-word",
             overflowWrap: "break-word",
           }}
-          href={href}
           target="_blank"
-          rel="noreferrer"
           {...props}
         >
           {children}
@@ -172,15 +173,15 @@ const components: Partial<Components> = {
 
     return (
       <Link
-        passHref
         className="text-blue-500 hover:underline"
+        href={href || "#"}
+        passHref
+        rel="noreferrer"
         style={{
           wordBreak: "break-word",
           overflowWrap: "break-word",
         }}
-        href={href || "#"}
         target="_blank"
-        rel="noreferrer"
         {...props}
       >
         {children}
@@ -189,7 +190,7 @@ const components: Partial<Components> = {
   },
   h1: ({ children, ...props }) => (
     <h1
-      className="text-3xl font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-3xl"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -198,7 +199,7 @@ const components: Partial<Components> = {
   ),
   h2: ({ children, ...props }) => (
     <h2
-      className="text-2xl font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-2xl"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -207,7 +208,7 @@ const components: Partial<Components> = {
   ),
   h3: ({ children, ...props }) => (
     <h3
-      className="text-xl font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-xl"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -216,7 +217,7 @@ const components: Partial<Components> = {
   ),
   h4: ({ children, ...props }) => (
     <h4
-      className="text-lg font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-lg"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -225,7 +226,7 @@ const components: Partial<Components> = {
   ),
   h5: ({ children, ...props }) => (
     <h5
-      className="text-base font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-base"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -234,7 +235,7 @@ const components: Partial<Components> = {
   ),
   h6: ({ children, ...props }) => (
     <h6
-      className="text-sm font-semibold mt-6 mb-2"
+      className="mt-6 mb-2 font-semibold text-sm"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -243,8 +244,8 @@ const components: Partial<Components> = {
   ),
   img: ({ alt, src, title, ...props }) => (
     <img
-      className="max-w-full h-auto my-2 rounded"
       alt={alt}
+      className="my-2 h-auto max-w-full rounded"
       src={src}
       title={title}
       {...props}
@@ -252,7 +253,7 @@ const components: Partial<Components> = {
   ),
   blockquote: ({ children, ...props }) => (
     <blockquote
-      className="border-l-4 border-gray-300 dark:border-gray-700 pl-4 italic my-4"
+      className="my-4 border-gray-300 border-l-4 pl-4 italic dark:border-gray-700"
       style={{ wordBreak: "break-word" }}
       {...props}
     >
@@ -260,7 +261,7 @@ const components: Partial<Components> = {
     </blockquote>
   ),
   table: ({ children, ...props }) => (
-    <ScrollArea className="w-140 border rounded-lg my-4">
+    <ScrollArea className="my-4 w-140 rounded-lg border">
       <Table className="w-full" {...props}>
         {children}
       </Table>
@@ -325,9 +326,9 @@ const NonMemoizedMarkdown = ({ children, repoUrl, branch }: MarkdownProps) => {
   return (
     <div style={{ width: "100%", maxWidth: "100%" }}>
       <ReactMarkdown
-        remarkPlugins={remarkPlugins}
-        rehypePlugins={rehypePlugins}
         components={components}
+        rehypePlugins={rehypePlugins}
+        remarkPlugins={remarkPlugins}
       >
         {processedContent}
       </ReactMarkdown>

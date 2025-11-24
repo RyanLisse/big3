@@ -68,7 +68,7 @@ describe("Model Registry Enhancement", () => {
       expect(openaiModels.length).toBeGreaterThan(0);
       for (const model of openaiModels) {
         expect(model.provider).toBe("openai");
-  }
+      }
     });
 
     it("should get model by ID", () => {
@@ -274,7 +274,7 @@ describe("Model Registry Enhancement", () => {
       expect(available.length).toBeGreaterThan(0);
       for (const modelId of available) {
         expect(registry.isModelSupported(modelId)).toBe(true);
-  }
+      }
     });
   });
 
@@ -298,7 +298,7 @@ describe("Model Registry Enhancement", () => {
       for (const model of models) {
         expect(model.inputPrice).toBeGreaterThanOrEqual(0);
         expect(model.outputPrice).toBeGreaterThanOrEqual(0);
-  }
+      }
     });
 
     it("should provide context window information", () => {
@@ -307,7 +307,7 @@ describe("Model Registry Enhancement", () => {
       for (const model of models) {
         expect(model.contextWindow).toBeGreaterThan(0);
         expect(model.maxOutputTokens).toBeGreaterThan(0);
-  }
+      }
     });
   });
 });

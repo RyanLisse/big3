@@ -30,7 +30,7 @@ type ClientState = {
   maxReconnectAttempts?: number;
 };
 
-type EventListener = (data: any) => void;
+type EventListener = (data: WebSocketMessage | Error | undefined) => void;
 
 export class WsClient {
   private readonly url: string;
@@ -65,7 +65,7 @@ export class WsClient {
         targetLatency: 200,
       });
 
-      this.batcher.onFlush((batch, _metadata) => {
+      this.batcher.onFlush((batch) => {
         this.sendBatch(batch);
       });
     }
@@ -197,13 +197,16 @@ export class WsClient {
     this.sendDirectly(batchMessage);
   }
 
-  private emit(event: string, data: any): void {
+  private emit(
+    event: string,
+    data: WebSocketMessage | Error | undefined
+  ): void {
     const listeners = this.listeners.get(event);
     if (listeners) {
       listeners.forEach((listener) => {
         try {
           listener(data);
-        } catch (_error) {
+        } catch {
           // Event listener error - handled by connection lifecycle
         }
       });

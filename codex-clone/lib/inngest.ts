@@ -1,6 +1,6 @@
+import { channel, realtimeMiddleware, topic } from "@inngest/realtime";
+import { VibeKit, type VibeKitConfig } from "@vibe-kit/sdk";
 import { Inngest } from "inngest";
-import { realtimeMiddleware, channel, topic } from "@inngest/realtime";
-import { VibeKit, VibeKitConfig } from "@vibe-kit/sdk";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({
@@ -75,17 +75,15 @@ export const createTask = inngest.createFunction(
       );
 
       return { message: parsedLines };
-    } else {
-      return { message: result };
     }
+    return { message: result };
   }
 );
 
 let app: Inngest | undefined;
 
-export const getInngestApp = () => {
-  return (app ??= new Inngest({
+export const getInngestApp = () =>
+  (app ??= new Inngest({
     id: typeof window !== "undefined" ? "client" : "server",
     middleware: [realtimeMiddleware()],
   }));
-};

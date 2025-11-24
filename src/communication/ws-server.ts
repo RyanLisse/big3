@@ -134,7 +134,7 @@ export class WsServer {
   async broadcast(message: WebSocketMessage): Promise<boolean> {
     let successCount = 0;
 
-    for (const [_, ws] of this.connections.entries()) {
+    for (const [, ws] of this.connections.entries()) {
       if (ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify(message));
         successCount++;

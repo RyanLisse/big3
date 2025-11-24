@@ -193,7 +193,7 @@ describe("WsServer", () => {
 
       for (const msg of messages) {
         server.handleIncomingMessage(msg, "conn1");
-  }
+      }
 
       expect(messageHandler).toHaveBeenCalledTimes(3);
     });

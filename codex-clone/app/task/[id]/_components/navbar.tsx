@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link";
+import { formatDistanceToNow } from "date-fns";
 import {
   Archive,
   ArrowLeft,
@@ -8,12 +8,11 @@ import {
   GithubIcon,
   Loader,
 } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import Link from "next/link";
 import { useCallback, useState } from "react";
-
+import { createPullRequestAction } from "@/app/actions/vibekit";
 import { Button } from "@/components/ui/button";
 import { useTaskStore } from "@/stores/tasks";
-import { createPullRequestAction } from "@/app/actions/vibekit";
 
 interface Props {
   id: string;
@@ -47,18 +46,18 @@ export default function TaskNavbar({ id }: Props) {
   }, [task, id, updateTask]);
 
   return (
-    <div className="h-14 border-b flex items-center justify-between px-4">
+    <div className="flex h-14 items-center justify-between border-b px-4">
       <div className="flex items-center gap-x-2">
         <Link href="/">
-          <Button variant="ghost" size="icon">
+          <Button size="icon" variant="ghost">
             <ArrowLeft />
           </Button>
         </Link>
         <div className="h-8 border-r" />
-        <div className="flex flex-col gap-x-2 ml-4">
-          <h3 className=" font-medium">{task?.title}</h3>
+        <div className="ml-4 flex flex-col gap-x-2">
+          <h3 className="font-medium">{task?.title}</h3>
           <div className="flex items-center gap-x-0">
-            <p className="text-sm text-muted-foreground">
+            <p className="text-muted-foreground text-sm">
               {task?.createdAt
                 ? formatDistanceToNow(new Date(task.createdAt), {
                     addSuffix: true,
@@ -66,25 +65,25 @@ export default function TaskNavbar({ id }: Props) {
                 : "Loading..."}
             </p>
             <Dot className="size-4 text-muted-foreground" />
-            <p className="text-sm text-muted-foreground">{task?.repository}</p>
+            <p className="text-muted-foreground text-sm">{task?.repository}</p>
           </div>
         </div>
       </div>
       <div className="flex items-center gap-x-2">
         {task?.isArchived ? (
           <Button
-            variant="outline"
             className="rounded-full"
             onClick={handleArchiveTask}
+            variant="outline"
           >
             <Archive />
             Unarchive
           </Button>
         ) : (
           <Button
-            variant="outline"
             className="rounded-full"
             onClick={handleArchiveTask}
+            variant="outline"
           >
             <Archive />
             Archive
@@ -100,11 +99,11 @@ export default function TaskNavbar({ id }: Props) {
         ) : (
           <Button
             className="rounded-full"
-            onClick={handleCreatePullRequest}
             disabled={isCreatingPullRequest}
+            onClick={handleCreatePullRequest}
           >
             {isCreatingPullRequest ? (
-              <Loader className="animate-spin size-4" />
+              <Loader className="size-4 animate-spin" />
             ) : (
               <GitBranchPlus />
             )}

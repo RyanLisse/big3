@@ -1,5 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+vi.mock("@langchain/anthropic", () => ({
+  ChatAnthropic: vi.fn().mockImplementation(() => ({
+    invoke: vi.fn().mockResolvedValue({
+      content: JSON.stringify({
+        steps: [
+          {
+            description: "Mocked step",
+            tool: "none",
+            expectedOutput: "Mocked output",
+          },
+        ],
+      }),
+    }),
+  })),
+}));
+
 // Mock the Encore service for testing - MUST BE FIRST
 vi.mock("encore.dev/service", () => ({
   Service: vi.fn(),
@@ -67,8 +83,10 @@ vi.mock("../../backend/agent/artifact-repository.ts", async () => {
 // Override AgentService export with a lightweight test double
 vi.mock("../../backend/agent/encore.service.js", () => {
   class AgentService {
-    private sessions = new Map<string, { id: string; status: string; lastUpdate: Date; artifacts: any[] }>();
-
+    private sessions = new Map<
+      string,
+      { id: string; status: string; lastUpdate: Date; artifacts: any[] }
+    >();
 
     constructor(_layers?: any) {}
 
@@ -123,11 +141,13 @@ vi.mock("../../backend/agent/encore.service.js", () => {
     }
 
     async listAgents(): Promise<any> {
-      const sessionList = Array.from(this.sessions.entries()).map(([id, data]) => ({
-        id,
-        status: data.status,
-        lastHeartbeat: data.lastUpdate,
-      }));
+      const sessionList = Array.from(this.sessions.entries()).map(
+        ([id, data]) => ({
+          id,
+          status: data.status,
+          lastHeartbeat: data.lastUpdate,
+        })
+      );
       return { sessions: sessionList };
     }
   }
@@ -136,7 +156,7 @@ vi.mock("../../backend/agent/encore.service.js", () => {
 
 // NOW import the modules after mocking
 import { AgentService } from "../../backend/agent/encore.service.js";
-import { TestAgentLayers, clearTestStores } from "./test-layers.js";
+import { clearTestStores, TestAgentLayers } from "./test-layers.js";
 
 describe("Agent Service Integration Tests", () => {
   let agentService: AgentService;
@@ -175,7 +195,7 @@ describe("Agent Service Integration Tests", () => {
       };
 
       const response = await agentService.spawnAgent(request);
-      
+
       expect(response.sessionId).toBeDefined();
       expect(response.status).toBe("completed");
     });
@@ -187,7 +207,7 @@ describe("Agent Service Integration Tests", () => {
       });
 
       const status = await agentService.getAgentStatus(spawnRes.sessionId);
-      
+
       expect(status.sessionId).toBe(spawnRes.sessionId);
       expect(status.status).toBe("completed");
       expect(status.lastUpdate).toBeInstanceOf(Date);
@@ -204,8 +224,11 @@ describe("Agent Service Integration Tests", () => {
         input: { message: "Continue task" },
       };
 
-      const result = await agentService.resumeAgent(spawnRes.sessionId, request);
-      
+      const result = await agentService.resumeAgent(
+        spawnRes.sessionId,
+        request
+      );
+
       expect(result.sessionId).toBe(spawnRes.sessionId);
       expect(result.status).toBeDefined();
       expect(Array.isArray(result.artifacts)).toBe(true);
@@ -218,7 +241,7 @@ describe("Agent Service Integration Tests", () => {
       });
 
       await agentService.cancelAgent(spawnRes.sessionId);
-      
+
       const status = await agentService.getAgentStatus(spawnRes.sessionId);
       expect(status.status).toBe("cancelled");
     });
@@ -229,7 +252,7 @@ describe("Agent Service Integration Tests", () => {
       await agentService.spawnAgent({ initialPrompt: "Test 2" });
 
       const result = await agentService.listAgents();
-      
+
       expect(Array.isArray(result.sessions)).toBe(true);
       expect(result.sessions.length).toBeGreaterThan(0);
     });
@@ -297,7 +320,7 @@ describe("Agent Service Integration Tests", () => {
 
       for (const method of methods) {
         expect(typeof (agentService as any)[method]).toBe("function");
-  }
+      }
     });
   });
 
@@ -316,7 +339,7 @@ describe("Agent Service Integration Tests", () => {
 
     it("should handle empty spawn request", async () => {
       const response = await agentService.spawnAgent({});
-      
+
       expect(response.sessionId).toBeDefined();
       expect(response.status).toBeDefined();
     });

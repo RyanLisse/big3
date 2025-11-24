@@ -1,43 +1,43 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen, waitFor } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import TaskList from '../TaskList';
+import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import TaskList from "../TaskList";
 
 // Mock the task store
-vi.mock('@/stores/tasks', () => ({
+vi.mock("@/stores/tasks", () => ({
   useTaskStore: vi.fn(() => ({
     getActiveTasks: vi.fn(() => [
       {
-        id: 'task-1',
-        title: 'Implement feature',
-        status: 'IN_PROGRESS',
-        statusMessage: 'Running tests',
+        id: "task-1",
+        title: "Implement feature",
+        status: "IN_PROGRESS",
+        statusMessage: "Running tests",
         hasChanges: true,
-        branch: 'main',
-        repository: 'owner/repo',
-        createdAt: new Date(Date.now() - 5 * 60000).toISOString(), // 5 minutes ago
+        branch: "main",
+        repository: "owner/repo",
+        createdAt: new Date(Date.now() - 5 * 60_000).toISOString(), // 5 minutes ago
       },
       {
-        id: 'task-2',
-        title: 'Fix bug',
-        status: 'DONE',
-        statusMessage: '',
+        id: "task-2",
+        title: "Fix bug",
+        status: "DONE",
+        statusMessage: "",
         hasChanges: false,
-        branch: 'develop',
-        repository: 'owner/repo',
-        createdAt: new Date(Date.now() - 60 * 60000).toISOString(), // 1 hour ago
+        branch: "develop",
+        repository: "owner/repo",
+        createdAt: new Date(Date.now() - 60 * 60_000).toISOString(), // 1 hour ago
       },
     ]),
     getArchivedTasks: vi.fn(() => [
       {
-        id: 'task-3',
-        title: 'Old task',
-        status: 'MERGED',
-        statusMessage: '',
+        id: "task-3",
+        title: "Old task",
+        status: "MERGED",
+        statusMessage: "",
         hasChanges: false,
-        branch: 'old-branch',
-        repository: 'owner/repo',
-        createdAt: new Date(Date.now() - 24 * 60 * 60000).toISOString(), // 1 day ago
+        branch: "old-branch",
+        repository: "owner/repo",
+        createdAt: new Date(Date.now() - 24 * 60 * 60_000).toISOString(), // 1 day ago
       },
     ]),
     archiveTask: vi.fn(),
@@ -45,106 +45,108 @@ vi.mock('@/stores/tasks', () => ({
   })),
 }));
 
-describe('TaskList', () => {
+describe("TaskList", () => {
   beforeEach(() => {
     vi.clearAllMocks();
   });
 
-  describe('Display', () => {
-    it('should render the tasks tab and archive tab', () => {
+  describe("Display", () => {
+    it("should render the tasks tab and archive tab", () => {
       render(<TaskList />);
-      expect(screen.getByRole('tab', { name: /tasks/i })).toBeInTheDocument();
-      expect(screen.getByRole('tab', { name: /archive/i })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: /tasks/i })).toBeInTheDocument();
+      expect(screen.getByRole("tab", { name: /archive/i })).toBeInTheDocument();
     });
 
-    it('should display active tasks by default', async () => {
+    it("should display active tasks by default", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        expect(screen.getByText('Implement feature')).toBeInTheDocument();
-        expect(screen.getByText('Fix bug')).toBeInTheDocument();
+        expect(screen.getByText("Implement feature")).toBeInTheDocument();
+        expect(screen.getByText("Fix bug")).toBeInTheDocument();
       });
     });
 
-    it('should show indicator for tasks with changes', async () => {
+    it("should show indicator for tasks with changes", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        const indicators = document.querySelectorAll('.size-2.rounded-full.bg-blue-500');
+        const indicators = document.querySelectorAll(
+          ".size-2.rounded-full.bg-blue-500"
+        );
         expect(indicators.length).toBeGreaterThan(0);
       });
     });
 
-    it('should show streaming status for in-progress tasks', async () => {
+    it("should show streaming status for in-progress tasks", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/running tests/i)).toBeInTheDocument();
       });
     });
 
-    it('should show task metadata (repository, timestamp)', async () => {
+    it("should show task metadata (repository, timestamp)", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        expect(screen.getByText('owner/repo')).toBeInTheDocument();
+        expect(screen.getByText("owner/repo")).toBeInTheDocument();
       });
     });
   });
 
-  describe('Navigation', () => {
-    it('should link to task detail page', async () => {
+  describe("Navigation", () => {
+    it("should link to task detail page", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        const link = screen.getByRole('link', { name: /implement feature/i });
-        expect(link).toHaveAttribute('href', '/task/task-1');
+        const link = screen.getByRole("link", { name: /implement feature/i });
+        expect(link).toHaveAttribute("href", "/task/task-1");
       });
     });
   });
 
-  describe('Archive Tab', () => {
-    it('should display archived tasks when archive tab is clicked', async () => {
+  describe("Archive Tab", () => {
+    it("should display archived tasks when archive tab is clicked", async () => {
       const user = userEvent.setup();
       render(<TaskList />);
-      
-      const archiveTab = screen.getByRole('tab', { name: /archive/i });
+
+      const archiveTab = screen.getByRole("tab", { name: /archive/i });
       await user.click(archiveTab);
-      
+
       await waitFor(() => {
-        expect(screen.getByText('Old task')).toBeInTheDocument();
+        expect(screen.getByText("Old task")).toBeInTheDocument();
       });
     });
 
-    it('should show delete button for archived tasks', async () => {
+    it("should show delete button for archived tasks", async () => {
       const user = userEvent.setup();
       render(<TaskList />);
-      
-      const archiveTab = screen.getByRole('tab', { name: /archive/i });
+
+      const archiveTab = screen.getByRole("tab", { name: /archive/i });
       await user.click(archiveTab);
-      
+
       await waitFor(() => {
-        const deleteButtons = screen.getAllByRole('button');
+        const deleteButtons = screen.getAllByRole("button");
         expect(deleteButtons.length).toBeGreaterThan(0);
       });
     });
 
-    it('should call removeTask when delete is clicked', async () => {
+    it("should call removeTask when delete is clicked", async () => {
       const user = userEvent.setup();
-      const { useTaskStore } = await import('@/stores/tasks');
+      const { useTaskStore } = await import("@/stores/tasks");
       const mockRemoveTask = vi.fn();
 
       vi.mocked(useTaskStore).mockReturnValue({
         getActiveTasks: vi.fn(() => []),
         getArchivedTasks: vi.fn(() => [
           {
-            id: 'task-3',
-            title: 'Old task',
-            status: 'MERGED',
-            statusMessage: '',
+            id: "task-3",
+            title: "Old task",
+            status: "MERGED",
+            statusMessage: "",
             hasChanges: false,
-            branch: 'old-branch',
-            repository: 'owner/repo',
+            branch: "old-branch",
+            repository: "owner/repo",
             createdAt: new Date().toISOString(),
           },
         ]),
@@ -153,46 +155,46 @@ describe('TaskList', () => {
       } as any);
 
       render(<TaskList />);
-      
-      const archiveTab = screen.getByRole('tab', { name: /archive/i });
+
+      const archiveTab = screen.getByRole("tab", { name: /archive/i });
       await user.click(archiveTab);
-      
+
       await waitFor(() => {
-        const deleteButton = screen.getByRole('button');
+        const deleteButton = screen.getByRole("button");
         user.click(deleteButton);
       });
 
       await waitFor(() => {
-        expect(mockRemoveTask).toHaveBeenCalledWith('task-3');
+        expect(mockRemoveTask).toHaveBeenCalledWith("task-3");
       });
     });
   });
 
-  describe('Archive Functionality', () => {
-    it('should show archive button for completed tasks', async () => {
+  describe("Archive Functionality", () => {
+    it("should show archive button for completed tasks", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        const archiveButtons = screen.getAllByRole('button');
+        const archiveButtons = screen.getAllByRole("button");
         expect(archiveButtons.length).toBeGreaterThan(0);
       });
     });
 
-    it('should call archiveTask when archive button is clicked', async () => {
+    it("should call archiveTask when archive button is clicked", async () => {
       const user = userEvent.setup();
-      const { useTaskStore } = await import('@/stores/tasks');
+      const { useTaskStore } = await import("@/stores/tasks");
       const mockArchiveTask = vi.fn();
 
       vi.mocked(useTaskStore).mockReturnValue({
         getActiveTasks: vi.fn(() => [
           {
-            id: 'task-2',
-            title: 'Fix bug',
-            status: 'DONE',
-            statusMessage: '',
+            id: "task-2",
+            title: "Fix bug",
+            status: "DONE",
+            statusMessage: "",
             hasChanges: false,
-            branch: 'develop',
-            repository: 'owner/repo',
+            branch: "develop",
+            repository: "owner/repo",
             createdAt: new Date().toISOString(),
           },
         ]),
@@ -202,21 +204,21 @@ describe('TaskList', () => {
       } as any);
 
       render(<TaskList />);
-      
+
       await waitFor(() => {
-        const archiveButton = screen.getByRole('button');
+        const archiveButton = screen.getByRole("button");
         user.click(archiveButton);
       });
 
       await waitFor(() => {
-        expect(mockArchiveTask).toHaveBeenCalledWith('task-2');
+        expect(mockArchiveTask).toHaveBeenCalledWith("task-2");
       });
     });
   });
 
-  describe('Empty States', () => {
-    it('should show message when no active tasks exist', async () => {
-      const { useTaskStore } = await import('@/stores/tasks');
+  describe("Empty States", () => {
+    it("should show message when no active tasks exist", async () => {
+      const { useTaskStore } = await import("@/stores/tasks");
       vi.mocked(useTaskStore).mockReturnValue({
         getActiveTasks: vi.fn(() => []),
         getArchivedTasks: vi.fn(() => []),
@@ -225,15 +227,15 @@ describe('TaskList', () => {
       } as any);
 
       render(<TaskList />);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/no active tasks yet/i)).toBeInTheDocument();
       });
     });
 
-    it('should show message when no archived tasks exist', async () => {
+    it("should show message when no archived tasks exist", async () => {
       const user = userEvent.setup();
-      const { useTaskStore } = await import('@/stores/tasks');
+      const { useTaskStore } = await import("@/stores/tasks");
       vi.mocked(useTaskStore).mockReturnValue({
         getActiveTasks: vi.fn(() => []),
         getArchivedTasks: vi.fn(() => []),
@@ -242,18 +244,18 @@ describe('TaskList', () => {
       } as any);
 
       render(<TaskList />);
-      
-      const archiveTab = screen.getByRole('tab', { name: /archive/i });
+
+      const archiveTab = screen.getByRole("tab", { name: /archive/i });
       await user.click(archiveTab);
-      
+
       await waitFor(() => {
         expect(screen.getByText(/no archived tasks yet/i)).toBeInTheDocument();
       });
     });
   });
 
-  describe('Hydration', () => {
-    it('should show loading state initially', () => {
+  describe("Hydration", () => {
+    it("should show loading state initially", () => {
       const { useTaskStore } = await import('@/stores/tasks');
       vi.mocked(useTaskStore).mockReturnValue({
         getActiveTasks: vi.fn(() => []),
@@ -263,17 +265,17 @@ describe('TaskList', () => {
       } as any);
 
       render(<TaskList />);
-      
+
       // Should show loading message initially
       expect(screen.getByText(/loading tasks/i)).toBeInTheDocument();
     });
 
-    it('should display tasks after hydration', async () => {
+    it("should display tasks after hydration", async () => {
       render(<TaskList />);
-      
+
       await waitFor(() => {
         expect(screen.queryByText(/loading tasks/i)).not.toBeInTheDocument();
-        expect(screen.getByText('Implement feature')).toBeInTheDocument();
+        expect(screen.getByText("Implement feature")).toBeInTheDocument();
       });
     });
   });

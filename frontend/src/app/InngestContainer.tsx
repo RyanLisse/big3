@@ -5,7 +5,11 @@ import { useEffect } from "react";
 import { fetchRealtimeSubscriptionToken } from "@/app/actions/inngest";
 import { useTaskStore } from "@/stores/tasks";
 
-export default function InngestContainer({ children }: { children: React.ReactNode }) {
+export default function InngestContainer({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const { updateTask, getTaskById } = useTaskStore();
   const { latestData } = useInngestSubscription({
     refreshToken: fetchRealtimeSubscriptionToken,
@@ -32,9 +36,7 @@ export default function InngestContainer({ children }: { children: React.ReactNo
       if (latestData.data.message.type === "local_shell_call") {
         const task = getTaskById(latestData.data.taskId);
         updateTask(latestData.data.taskId, {
-          statusMessage: `Running command ${(
-            latestData.data.message as { action: { command: string[] } }
-          ).action.command.join(" ")}`,
+          statusMessage: `Running command ${(latestData.data.message as { action: { command: string[] } }).action.command.join(" ")}`,
           messages: [
             ...(task?.messages || []),
             {

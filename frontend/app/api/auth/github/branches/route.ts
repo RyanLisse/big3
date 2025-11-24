@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 interface GitHubBranch {
   name: string;
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     const owner = searchParams.get("owner");
     const repo = searchParams.get("repo");
 
-    if (!owner || !repo) {
+    if (!(owner && repo)) {
       return NextResponse.json(
         { error: "Owner and repo parameters are required" },
         { status: 400 }
@@ -84,7 +84,7 @@ export async function GET(request: NextRequest) {
           sha: branch.commit.sha,
           url: branch.commit.url,
         },
-        protected: branch.protected || false,
+        protected: branch.protected,
         isDefault: branch.name === defaultBranch,
       })),
     });

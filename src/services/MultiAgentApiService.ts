@@ -14,8 +14,6 @@ import type {
   SendMessageRequest,
 } from "../domain.js";
 import {
-  type MemoryAccessLevel,
-  type MemoryType,
   type MessagePriority,
   type MessageStatus,
   type MessageType,
@@ -32,21 +30,6 @@ export interface PaginatedResponse<T> extends ApiResponse<T[]> {
     readonly totalPages: number;
   };
 }
-
-// Validation helper
-const _validateRequest = <T>(
-  request: T,
-  errors: string[]
-): Effect.Effect<T, ApiValidationError> => {
-  if (errors.length > 0) {
-    return Effect.fail(
-      new ApiValidationError(
-        errors.map((e) => ({ field: "general", message: e }))
-      )
-    );
-  }
-  return Effect.succeed(request);
-};
 
 // Request validation
 export type ValidationErrors = {
@@ -73,17 +56,7 @@ const ValidMessageStatuses: readonly MessageStatus[] = [
   "read",
   "failed",
 ];
-const ValidMemoryTypes: readonly MemoryType[] = [
-  "project_context",
-  "shared_knowledge",
-  "workflow_state",
-  "custom",
-];
-const ValidMemoryAccessLevels: readonly MemoryAccessLevel[] = [
-  "read",
-  "read_write",
-  "admin",
-];
+
 const ValidMessageTypes: readonly MessageType[] = [
   "request",
   "response",
@@ -209,14 +182,15 @@ class MultiAgentApiServiceImpl implements MultiAgentApiService {
         }
         return result.data;
       },
-      catch: (error: any) =>
+      catch: (error: unknown) =>
         new ApiValidationError(
-          (error.issues ?? []).map(
-            (issue: { path: string[]; message: string }) => ({
-              field: issue.path.join("."),
-              message: issue.message,
-            })
-          )
+          (
+            (error as { issues?: Array<{ path: string[]; message: string }> })
+              .issues ?? []
+          ).map((issue) => ({
+            field: issue.path.join("."),
+            message: issue.message,
+          }))
         ),
     });
 
@@ -231,14 +205,15 @@ class MultiAgentApiServiceImpl implements MultiAgentApiService {
         }
         return result.data;
       },
-      catch: (error: any) =>
+      catch: (error: unknown) =>
         new ApiValidationError(
-          (error.issues ?? []).map(
-            (issue: { path: string[]; message: string }) => ({
-              field: issue.path.join("."),
-              message: issue.message,
-            })
-          )
+          (
+            (error as { issues?: Array<{ path: string[]; message: string }> })
+              .issues ?? []
+          ).map((issue) => ({
+            field: issue.path.join("."),
+            message: issue.message,
+          }))
         ),
     });
 
@@ -337,7 +312,7 @@ class MultiAgentApiServiceImpl implements MultiAgentApiService {
               ])
             )
       ),
-      Effect.flatMap((_teamId) =>
+      Effect.flatMap(() =>
         Effect.try({
           try: () => {
             const result = validateUpdateTeamRequest(request);
@@ -346,14 +321,18 @@ class MultiAgentApiServiceImpl implements MultiAgentApiService {
             }
             return result.data;
           },
-          catch: (error: any) =>
+          catch: (error: unknown) =>
             new ApiValidationError(
-              (error.issues ?? []).map(
-                (issue: { path: any[]; message: string }) => ({
-                  field: issue.path.join("."),
-                  message: issue.message,
-                })
-              )
+              (
+                (
+                  error as {
+                    issues?: Array<{ path: unknown[]; message: string }>;
+                  }
+                ).issues ?? []
+              ).map((issue) => ({
+                field: issue.path.join("."),
+                message: issue.message,
+              }))
             ),
         })
       ),
@@ -568,14 +547,18 @@ class MultiAgentApiServiceImpl implements MultiAgentApiService {
             }
             return [mid, aid, result.data] as const;
           },
-          catch: (error: any) =>
+          catch: (error: unknown) =>
             new ApiValidationError(
-              (error.issues ?? []).map(
-                (issue: { path: any[]; message: string }) => ({
-                  field: issue.path.join("."),
-                  message: issue.message,
-                })
-              )
+              (
+                (
+                  error as {
+                    issues?: Array<{ path: unknown[]; message: string }>;
+                  }
+                ).issues ?? []
+              ).map((issue) => ({
+                field: issue.path.join("."),
+                message: issue.message,
+              }))
             ),
         })
       ),

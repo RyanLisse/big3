@@ -4,8 +4,8 @@ import type { AgentTool, ExecutionPlan } from "../src/domain.js";
 import { BrowserServiceTag } from "../src/services/BrowserService.js";
 import { CoderServiceTag } from "../src/services/CoderService.js";
 import {
-  ExecutionServiceTag,
   ExecutionServiceLive,
+  ExecutionServiceTag,
 } from "../src/services/ExecutionService.js";
 
 // Mock Services

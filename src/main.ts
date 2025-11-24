@@ -51,9 +51,18 @@ const MainProgram = Effect.gen(function* (_) {
   while (true) {
     const event = yield* _(Queue.take(voice.eventStream));
 
-    if (event.type === "response.function_call_arguments.done") {
+    if (
+      typeof event === "object" &&
+      event !== null &&
+      "type" in event &&
+      event.type === "response.function_call_arguments.done" &&
+      "name" in event &&
+      "arguments" in event
+    ) {
       const functionName = event.name;
-      const args = JSON.parse(event.arguments);
+      const args = JSON.parse(
+        typeof event.arguments === "string" ? event.arguments : "{}"
+      );
 
       yield* _(Console.log(`🛠️ Tool Call: ${functionName}`));
 

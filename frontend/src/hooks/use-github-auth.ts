@@ -1,7 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { GitHubRepository, GitHubUser, GitHubBranch } from "@/src/lib/github";
+import { useEffect, useState } from "react";
+import type {
+  GitHubBranch,
+  GitHubRepository,
+  GitHubUser,
+} from "@/src/lib/github";
 
 interface UseGitHubAuthReturn {
   isAuthenticated: boolean;
@@ -27,7 +31,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
   // Check authentication status on mount
   useEffect(() => {
     const abortController = new AbortController();
-    
+
     const checkAuth = async () => {
       try {
         setIsLoading(true);
@@ -62,7 +66,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
           setUser(null);
         }
       } catch (error) {
-        if (error instanceof Error && error.name === 'AbortError') {
+        if (error instanceof Error && error.name === "AbortError") {
           // Ignore abort errors
           return;
         }
@@ -77,7 +81,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
     };
 
     checkAuth();
-    
+
     return () => {
       abortController.abort("Component unmounted");
     };
@@ -173,7 +177,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
 
   const fetchRepositories = async (): Promise<void> => {
     if (!isAuthenticated) return;
-    
+
     try {
       setIsLoading(true);
       setError(null);
@@ -187,7 +191,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
       const data = await response.json();
       setRepositories(data.repositories || []);
     } catch (error) {
-      if (error instanceof Error && error.name === 'AbortError') {
+      if (error instanceof Error && error.name === "AbortError") {
         // Ignore abort errors
         return;
       }
@@ -208,7 +212,7 @@ export function useGitHubAuth(): UseGitHubAuthReturn {
       // Repository name should be in format "owner/repo"
       const [owner, repo] = repositoryName.split("/");
 
-      if (!owner || !repo) {
+      if (!(owner && repo)) {
         throw new Error('Repository name must be in format "owner/repo"');
       }
 

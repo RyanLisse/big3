@@ -365,9 +365,22 @@ describe("Agent Creation API (T012)", () => {
 });
 
 import { Effect } from "effect";
-import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
-import { createTeam, addAgent, sharedMemory, sendMessage } from "../../src/sdk/agents";
-import type { CreateTeamRequest, AddAgentRequest, SharedMemoryRequest, SendMessageRequest, MultiAgentTeam, SharedMemoryBlock, AgentMessage } from "../../src/sdk/types/multi-agent";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import {
+  addAgent,
+  createTeam,
+  sendMessage,
+  sharedMemory,
+} from "../../src/sdk/agents";
+import type {
+  AddAgentRequest,
+  AgentMessage,
+  CreateTeamRequest,
+  MultiAgentTeam,
+  SendMessageRequest,
+  SharedMemoryBlock,
+  SharedMemoryRequest,
+} from "../../src/sdk/types/multi-agent";
 
 describe("Multi-agent API client", () => {
   const baseUrl = "http://test";
@@ -384,15 +397,22 @@ describe("Multi-agent API client", () => {
 
   describe("createTeam", () => {
     it("creates team successfully", async () => {
-      const request: CreateTeamRequest = { name: "DevTeam", description: "Test team" };
-      const expectedTeam: MultiAgentTeam = { 
-        id: "team-1", name: "DevTeam", description: "Test team", 
-        status: "active", createdAt: "2025-01-01T00:00:00Z", updatedAt: "2025-01-01T00:00:00Z", 
-        configuration: {} 
+      const request: CreateTeamRequest = {
+        name: "DevTeam",
+        description: "Test team",
+      };
+      const expectedTeam: MultiAgentTeam = {
+        id: "team-1",
+        name: "DevTeam",
+        description: "Test team",
+        status: "active",
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: "2025-01-01T00:00:00Z",
+        configuration: {},
       };
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ team: expectedTeam })
+        json: () => Promise.resolve({ team: expectedTeam }),
       } as Response);
 
       const team = await Effect.runPromise(createTeam(baseUrl, request));
@@ -402,21 +422,26 @@ describe("Multi-agent API client", () => {
         expect.objectContaining({
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(request)
+          body: JSON.stringify(request),
         })
       );
       expect(team).toEqual(expectedTeam);
     });
 
     it("throws on error response", async () => {
-      const request: CreateTeamRequest = { name: "DevTeam", description: "Test team" };
+      const request: CreateTeamRequest = {
+        name: "DevTeam",
+        description: "Test team",
+      };
       mockFetch.mockResolvedValueOnce({
         ok: false,
         status: 400,
-        json: () => Promise.resolve({ message: "Invalid name" })
+        json: () => Promise.resolve({ message: "Invalid name" }),
       } as Response);
 
-      await expect(() => Effect.runPromise(createTeam(baseUrl, request))).rejects.toThrow("Invalid name");
+      await expect(() =>
+        Effect.runPromise(createTeam(baseUrl, request))
+      ).rejects.toThrow("Invalid name");
     });
   });
 
@@ -432,7 +457,7 @@ describe("Multi-agent API client", () => {
         `${baseUrl}/multi-agent/teams/${teamId}/agents`,
         expect.objectContaining({
           method: "POST",
-          body: JSON.stringify(request)
+          body: JSON.stringify(request),
         })
       );
     });
@@ -441,21 +466,34 @@ describe("Multi-agent API client", () => {
   describe("sharedMemory", () => {
     it("creates shared memory successfully", async () => {
       const teamId = "team-1";
-      const request: SharedMemoryRequest = { 
-        label: "project", value: "spec", description: "test", 
-        type: "project_context", accessLevel: "read_write" 
+      const request: SharedMemoryRequest = {
+        label: "project",
+        value: "spec",
+        description: "test",
+        type: "project_context",
+        accessLevel: "read_write",
       };
-      const expected: SharedMemoryBlock = { 
-        id: "mem-1", teamId, label: "project", value: "spec", description: "test", 
-        type: "project_context", accessLevel: "read_write", version: 1, 
-        lastModifiedBy: "system", createdAt: "2025-01-01T00:00:00Z", updatedAt: "2025-01-01T00:00:00Z" 
+      const expected: SharedMemoryBlock = {
+        id: "mem-1",
+        teamId,
+        label: "project",
+        value: "spec",
+        description: "test",
+        type: "project_context",
+        accessLevel: "read_write",
+        version: 1,
+        lastModifiedBy: "system",
+        createdAt: "2025-01-01T00:00:00Z",
+        updatedAt: "2025-01-01T00:00:00Z",
       };
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ memoryBlock: expected })
+        json: () => Promise.resolve({ memoryBlock: expected }),
       } as Response);
 
-      const mem = await Effect.runPromise(sharedMemory(baseUrl, teamId, request));
+      const mem = await Effect.runPromise(
+        sharedMemory(baseUrl, teamId, request)
+      );
 
       expect(mem).toEqual(expected);
     });
@@ -464,20 +502,31 @@ describe("Multi-agent API client", () => {
   describe("sendMessage", () => {
     it("sends message successfully", async () => {
       const toAgentId = "agent-2";
-      const request: SendMessageRequest = { 
-        fromAgentId: "agent-1", teamId: "team-1", content: "Hello" 
+      const request: SendMessageRequest = {
+        fromAgentId: "agent-1",
+        teamId: "team-1",
+        content: "Hello",
       };
-      const expected: AgentMessage = { 
-        id: "msg-1", fromAgentId: "agent-1", toAgentId, teamId: "team-1", 
-        messageType: "request", content: "Hello", metadata: {}, 
-        status: "pending", priority: "normal", createdAt: "2025-01-01T00:00:00Z" 
+      const expected: AgentMessage = {
+        id: "msg-1",
+        fromAgentId: "agent-1",
+        toAgentId,
+        teamId: "team-1",
+        messageType: "request",
+        content: "Hello",
+        metadata: {},
+        status: "pending",
+        priority: "normal",
+        createdAt: "2025-01-01T00:00:00Z",
       };
       mockFetch.mockResolvedValueOnce({
         ok: true,
-        json: () => Promise.resolve({ message: expected })
+        json: () => Promise.resolve({ message: expected }),
       } as Response);
 
-      const msg = await Effect.runPromise(sendMessage(baseUrl, toAgentId, request));
+      const msg = await Effect.runPromise(
+        sendMessage(baseUrl, toAgentId, request)
+      );
 
       expect(msg).toEqual(expected);
     });

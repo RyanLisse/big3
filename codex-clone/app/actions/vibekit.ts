@@ -1,8 +1,8 @@
 "use server";
 
+import { VibeKit, type VibeKitConfig } from "@vibe-kit/sdk";
 import { cookies } from "next/headers";
-import { VibeKit, VibeKitConfig } from "@vibe-kit/sdk";
-import { Task } from "@/stores/tasks";
+import type { Task } from "@/stores/tasks";
 
 export const createPullRequestAction = async ({ task }: { task: Task }) => {
   const cookieStore = await cookies();

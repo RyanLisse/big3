@@ -1,14 +1,13 @@
 "use client";
 
-import { useParams, useRouter } from "next/navigation";
-import { useTaskStore } from "@/stores/tasks";
 import { ArrowLeft, Copy, RotateCcw } from "lucide-react";
-import { Button } from "@/src/components/ui/button";
-import { Card } from "@/src/components/ui/card";
-import { Badge } from "@/src/components/ui/badge";
-import { Markdown } from "@/src/components/Markdown";
-import { AgentTimeline } from "@/src/components/AgentTimeline";
-import { ToolEvent } from "@/src/components/ToolEvent";
+import { useParams, useRouter } from "next/navigation";
+import { AgentTimeline } from "@/components/AgentTimeline";
+import { Markdown } from "@/components/Markdown";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { useTaskStore } from "@/stores/tasks";
 
 export default function TaskDetailPage() {
   const params = useParams();
@@ -19,9 +18,9 @@ export default function TaskDetailPage() {
 
   if (!task) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <h1 className="text-2xl font-bold">Task not found</h1>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="space-y-4 text-center">
+          <h1 className="font-bold text-2xl">Task not found</h1>
           <p className="text-muted-foreground">
             The task you're looking for doesn't exist or has been deleted.
           </p>
@@ -60,19 +59,19 @@ export default function TaskDetailPage() {
     <div className="min-h-screen bg-background" data-testid="task-detail">
       {/* Header */}
       <div className="border-b bg-card">
-        <div className="max-w-6xl mx-auto p-6">
-          <div className="flex items-start justify-between mb-4">
+        <div className="mx-auto max-w-6xl p-6">
+          <div className="mb-4 flex items-start justify-between">
             <div className="flex items-center gap-4">
               <Button
-                variant="outline"
-                size="icon"
                 onClick={() => router.back()}
+                size="icon"
+                variant="outline"
               >
-                <ArrowLeft className="w-4 h-4" />
+                <ArrowLeft className="h-4 w-4" />
               </Button>
               <div>
-                <h1 className="text-3xl font-bold">{task.title}</h1>
-                <p className="text-muted-foreground mt-1">{task.description}</p>
+                <h1 className="font-bold text-3xl">{task.title}</h1>
+                <p className="mt-1 text-muted-foreground">{task.description}</p>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -102,7 +101,9 @@ export default function TaskDetailPage() {
             <div>
               <p className="text-muted-foreground">Status</p>
               {task.status === "IN_PROGRESS" && task.statusMessage ? (
-                <p className="font-medium text-blue-500">{task.statusMessage}</p>
+                <p className="font-medium text-blue-500">
+                  {task.statusMessage}
+                </p>
               ) : (
                 <p className="font-medium">{task.status}</p>
               )}
@@ -112,25 +113,25 @@ export default function TaskDetailPage() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-6xl mx-auto p-6">
+      <div className="mx-auto max-w-6xl p-6">
         <div className="grid grid-cols-3 gap-6">
           {/* Messages Panel */}
           <div className="col-span-2 space-y-4">
             <div>
-              <h2 className="text-lg font-semibold mb-4">Conversation</h2>
+              <h2 className="mb-4 font-semibold text-lg">Conversation</h2>
               <div className="space-y-4">
                 {task.messages && task.messages.length > 0 ? (
                   task.messages.map((message) => (
                     <Card
-                      key={message.id}
                       className={`p-4 ${
                         message.role === "user"
                           ? "bg-muted/50"
-                          : "bg-background border-primary/20"
+                          : "border-primary/20 bg-background"
                       }`}
+                      key={message.id}
                     >
                       <div className="flex items-start gap-3">
-                        <div className="text-xs font-semibold text-muted-foreground uppercase">
+                        <div className="font-semibold text-muted-foreground text-xs uppercase">
                           {message.role}
                         </div>
                         <div className="flex-1">
@@ -156,19 +157,19 @@ export default function TaskDetailPage() {
               {task.status === "DONE" && (
                 <>
                   <Button
-                    variant="outline"
-                    onClick={handleRerun}
                     className="gap-2"
+                    onClick={handleRerun}
+                    variant="outline"
                   >
-                    <RotateCcw className="w-4 h-4" />
+                    <RotateCcw className="h-4 w-4" />
                     Re-run Task
                   </Button>
                   <Button
-                    variant="outline"
-                    onClick={handleDuplicate}
                     className="gap-2"
+                    onClick={handleDuplicate}
+                    variant="outline"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="h-4 w-4" />
                     Duplicate Task
                   </Button>
                 </>
@@ -178,11 +179,8 @@ export default function TaskDetailPage() {
 
           {/* Tool Events Panel */}
           <div>
-            <h2 className="text-lg font-semibold mb-4">Events</h2>
-            <div
-              className="space-y-2"
-              data-testid="tool-events"
-            >
+            <h2 className="mb-4 font-semibold text-lg">Events</h2>
+            <div className="space-y-2" data-testid="tool-events">
               {task.messages && task.messages.length > 0 ? (
                 <AgentTimeline messages={task.messages as any} />
               ) : (

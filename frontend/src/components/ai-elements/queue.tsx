@@ -3,14 +3,14 @@
 import { ChevronDownIcon, PaperclipIcon } from "lucide-react";
 import NextImage from "next/image";
 import type { ComponentProps } from "react";
-import { Button } from "@/src/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/src/components/ui/collapsible";
-import { ScrollArea } from "@/src/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+} from "@/components/ui/collapsible";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export type QueueMessagePart = {
   type: string;

@@ -241,7 +241,11 @@ describe("User Story 1 - Voice-driven coding assistant", () => {
         const execution = yield* Effect.tryPromise(() =>
           mockCoderService.executeCode("console.log('test')")
         ).pipe(
-          Effect.map((analysis) => ({ status: "success", result: "Code executed", analysis })),
+          Effect.map((analysis) => ({
+            status: "success",
+            result: "Code executed",
+            analysis,
+          })),
           Effect.catchAll(() =>
             Effect.succeed({
               status: "degraded",
@@ -268,8 +272,13 @@ describe("User Story 1 - Voice-driven coding assistant", () => {
       );
 
       const program = Effect.gen(function* (_) {
-        const result = yield* Effect.tryPromise(() => mockVoiceService.processAudio("audio-data")).pipe(
-          Effect.map(() => ({ success: true, message: "Audio processed successfully" })),
+        const result = yield* Effect.tryPromise(() =>
+          mockVoiceService.processAudio("audio-data")
+        ).pipe(
+          Effect.map(() => ({
+            success: true,
+            message: "Audio processed successfully",
+          })),
           Effect.catchAll(() =>
             Effect.succeed({
               success: false,

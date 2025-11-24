@@ -24,7 +24,7 @@ export type ModelRegistry = {
   isModelSupported(modelId: string): boolean;
   validateModelCompatibility(
     modelId: string,
-    requirements: Record<string, any>
+    requirements: Record<string, unknown>
   ): ModelCompatibility;
   getDefaultModel(): string;
   getAvailableModels(): string[];
@@ -163,24 +163,26 @@ export const isValidLoggingConfig = (logging: unknown): logging is object =>
   logging !== null &&
   typeof logging === "object" &&
   "level" in logging &&
-  typeof (logging as any).level === "string" &&
-  ["error", "warn", "info", "debug"].includes((logging as any).level);
+  typeof (logging as { level: unknown }).level === "string" &&
+  ["error", "warn", "info", "debug"].includes(
+    (logging as { level: string }).level
+  );
 
 export const isValidWebSocketConfig = (config: unknown): config is object =>
   config !== null &&
   typeof config === "object" &&
   "url" in config &&
-  typeof (config as any).url === "string" &&
-  (config as any).url.trim().length > 0;
+  typeof (config as { url: unknown }).url === "string" &&
+  (config as { url: string }).url.trim().length > 0;
 
 export const isValidBatchingConfig = (config: unknown): config is object =>
   config !== null &&
   typeof config === "object" &&
   "enabled" in config &&
-  typeof (config as any).enabled === "boolean" &&
+  typeof (config as { enabled: unknown }).enabled === "boolean" &&
   "maxSize" in config &&
-  typeof (config as any).maxSize === "number" &&
-  (config as any).maxSize > 0 &&
+  typeof (config as { maxSize: unknown }).maxSize === "number" &&
+  (config as { maxSize: number }).maxSize > 0 &&
   "flushInterval" in config &&
-  typeof (config as any).flushInterval === "number" &&
-  (config as any).flushInterval > 0;
+  typeof (config as { flushInterval: unknown }).flushInterval === "number" &&
+  (config as { flushInterval: number }).flushInterval > 0;

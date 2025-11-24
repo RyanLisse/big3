@@ -1,7 +1,7 @@
-import { Card } from "@/src/components/ui/card";
-import { Badge } from "@/src/components/ui/badge";
-import { Code, Terminal, Globe, Database } from "lucide-react";
 import type { UIMessage } from "ai";
+import { Code, Database, Globe, Terminal } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 
 type ToolEventProps = {
   message: UIMessage;
@@ -30,37 +30,39 @@ const getToolIcon = (toolName: string) => {
 
 export function ToolEvent({ message }: ToolEventProps) {
   // Extract tool invocations from message parts
-  const toolParts = message.parts?.filter((part) => part.type.startsWith("tool-")) || [];
-  
+  const toolParts =
+    message.parts?.filter((part) => part.type.startsWith("tool-")) || [];
+
   // If there are tool parts, display them
   if (toolParts.length > 0) {
     return (
       <div className="space-y-2">
         {toolParts.map((part, index) => (
-          <Card key={index} className="p-3">
-            <div className="flex items-center gap-2 mb-2">
+          <Card className="p-3" key={index}>
+            <div className="mb-2 flex items-center gap-2">
               {getToolIcon((part as any).toolName || "tool")}
-              <span className="font-medium text-sm">{(part as any).toolName || "Unknown Tool"}</span>
-              <Badge variant="outline" className="text-xs">
+              <span className="font-medium text-sm">
+                {(part as any).toolName || "Unknown Tool"}
+              </span>
+              <Badge className="text-xs" variant="outline">
                 {(part as any).state || "executing"}
               </Badge>
             </div>
-            
+
             {(part as any).args && (
-              <div className="text-xs text-muted-foreground mb-2">
-                <pre className="whitespace-pre-wrap bg-muted/50 p-2 rounded">
+              <div className="mb-2 text-muted-foreground text-xs">
+                <pre className="whitespace-pre-wrap rounded bg-muted/50 p-2">
                   {JSON.stringify((part as any).args, null, 2)}
                 </pre>
               </div>
             )}
-            
+
             {(part as any).result && (
               <div className="text-xs">
-                <pre className="whitespace-pre-wrap bg-green-50 dark:bg-green-950/20 p-2 rounded text-green-800 dark:text-green-200">
-                  {typeof (part as any).result === "string" 
-                    ? (part as any).result 
-                    : JSON.stringify((part as any).result, null, 2)
-                  }
+                <pre className="whitespace-pre-wrap rounded bg-green-50 p-2 text-green-800 dark:bg-green-950/20 dark:text-green-200">
+                  {typeof (part as any).result === "string"
+                    ? (part as any).result
+                    : JSON.stringify((part as any).result, null, 2)}
                 </pre>
               </div>
             )}
@@ -71,20 +73,20 @@ export function ToolEvent({ message }: ToolEventProps) {
   }
 
   // Fallback: show message content if available
-  const content = (message.parts?.find(p => p.type === 'text') as any)?.text;
-  
+  const content = (message.parts?.find((p) => p.type === "text") as any)?.text;
+
   if (content && message.role === "assistant") {
     return (
       <Card className="p-3">
-        <div className="flex items-center gap-2 mb-2">
+        <div className="mb-2 flex items-center gap-2">
           <Terminal className="h-3 w-3" />
           <span className="font-medium text-sm">Agent Response</span>
-          <Badge variant="outline" className="text-xs">
+          <Badge className="text-xs" variant="outline">
             complete
           </Badge>
         </div>
-        <div className="text-xs text-muted-foreground">
-          <pre className="whitespace-pre-wrap bg-muted/50 p-2 rounded max-h-32 overflow-y-auto">
+        <div className="text-muted-foreground text-xs">
+          <pre className="max-h-32 overflow-y-auto whitespace-pre-wrap rounded bg-muted/50 p-2">
             {content.slice(0, 200)}
             {content.length > 200 && "..."}
           </pre>

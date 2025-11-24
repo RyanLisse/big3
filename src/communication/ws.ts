@@ -23,7 +23,7 @@ export type WebSocketMessage = {
   id: string;
   type: string;
   timestamp: number;
-  payload?: any;
+  payload?: unknown;
 };
 
 export interface AgentMessage extends WebSocketMessage {
@@ -31,7 +31,7 @@ export interface AgentMessage extends WebSocketMessage {
   payload: {
     messages: WebSocketMessage[];
     batched?: boolean;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
@@ -39,14 +39,14 @@ export interface SystemMessage extends WebSocketMessage {
   type: "system_message";
   payload: {
     event: string;
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 
 export interface ControlMessage extends WebSocketMessage {
   type: "control_message";
   command: "start" | "stop" | "pause" | "resume" | "switch_model";
-  payload?: any;
+  payload?: unknown;
 }
 
 export type IWebSocketCommunication = {
@@ -139,7 +139,7 @@ export class WebSocketCommunication implements IWebSocketCommunication {
     }, this.batchingConfig.flushInterval);
 
     // Store interval for cleanup
-    (this.server as any)?.on("close", () => {
+    this.server?.on("close", () => {
       clearInterval(interval);
     });
   }
