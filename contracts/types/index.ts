@@ -1,15 +1,15 @@
 // Barrel export for generated contract types from OpenAPI specs
 
 export type {
-  paths as AgentManagementPaths,
-  operations as AgentManagementOperations,
-  webhooks as AgentManagementWebhooks,
   components as AgentManagementComponents,
-} from './agent-management';
+  operations as AgentManagementOperations,
+  paths as AgentManagementPaths,
+  webhooks as AgentManagementWebhooks,
+} from "./agent-management";
 
 export type {
-  paths as WorkflowPaths,
-  operations as WorkflowOperations,
-  webhooks as WorkflowWebhooks,
   components as WorkflowComponents,
-} from './workflow';
+  operations as WorkflowOperations,
+  paths as WorkflowPaths,
+  webhooks as WorkflowWebhooks,
+} from "./workflow";

@@ -3,88 +3,88 @@
  * Tests for workflow plan format definition and execution semantics
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { beforeEach, describe, expect, it } from "vitest";
 import {
-  WorkflowPlan,
-  WorkflowPlanDefinition,
-  createWorkflowPlan,
-  validatePlanDefinition,
-  addStepToPlan,
   addDependencyToPlan,
+  addStepToPlan,
+  createWorkflowPlan,
   resolveDependencies,
-} from '../../src/workflow/plan';
+  validatePlanDefinition,
+  type WorkflowPlan,
+  type WorkflowPlanDefinition,
+} from "../../src/workflow/plan";
 
-describe('WorkflowPlan', () => {
+describe("WorkflowPlan", () => {
   let plan: WorkflowPlan;
 
   beforeEach(() => {
     plan = createWorkflowPlan({
-      name: 'Test Workflow',
-      description: 'A test workflow plan',
+      name: "Test Workflow",
+      description: "A test workflow plan",
     });
   });
 
-  describe('createWorkflowPlan', () => {
-    it('should create a plan with default config', () => {
+  describe("createWorkflowPlan", () => {
+    it("should create a plan with default config", () => {
       expect(plan).toBeDefined();
       expect(plan.id).toMatch(/^plan_/);
-      expect(plan.name).toBe('Test Workflow');
-      expect(plan.description).toBe('A test workflow plan');
+      expect(plan.name).toBe("Test Workflow");
+      expect(plan.description).toBe("A test workflow plan");
       expect(plan.steps).toEqual([]);
       expect(plan.config).toBeDefined();
       expect(plan.config.maxSteps).toBe(100);
-      expect(plan.config.timeout).toBe(300000);
+      expect(plan.config.timeout).toBe(300_000);
       expect(plan.config.retryAttempts).toBe(3);
       expect(plan.config.retryDelay).toBe(1000);
     });
 
-    it('should create a plan with custom config', () => {
+    it("should create a plan with custom config", () => {
       const customPlan = createWorkflowPlan({
-        name: 'Custom',
+        name: "Custom",
         config: {
           maxSteps: 50,
-          timeout: 600000,
+          timeout: 600_000,
           retryAttempts: 5,
           retryDelay: 2000,
         },
       });
 
       expect(customPlan.config.maxSteps).toBe(50);
-      expect(customPlan.config.timeout).toBe(600000);
+      expect(customPlan.config.timeout).toBe(600_000);
       expect(customPlan.config.retryAttempts).toBe(5);
       expect(customPlan.config.retryDelay).toBe(2000);
     });
 
-    it('should initialize with empty steps', () => {
+    it("should initialize with empty steps", () => {
       expect(plan.steps).toEqual([]);
     });
   });
 
-  describe('addStepToPlan', () => {
-    it('should add a step to the plan', () => {
+  describe("addStepToPlan", () => {
+    it("should add a step to the plan", () => {
       const step = addStepToPlan(plan, {
-        name: 'Initialize Agent',
-        description: 'Initialize AI agent',
-        type: 'agent_init',
+        name: "Initialize Agent",
+        description: "Initialize AI agent",
+        type: "agent_init",
       });
 
       expect(plan.steps).toHaveLength(1);
       expect(step.id).toMatch(/^step_/);
-      expect(step.name).toBe('Initialize Agent');
-      expect(step.type).toBe('agent_init');
-      expect(step.status).toBe('pending');
+      expect(step.name).toBe("Initialize Agent");
+      expect(step.type).toBe("agent_init");
+      expect(step.status).toBe("pending");
       expect(step.dependencies).toEqual([]);
     });
 
-    it('should add multiple steps in sequence', () => {
+    it("should add multiple steps in sequence", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       expect(plan.steps).toHaveLength(2);
@@ -92,31 +92,31 @@ describe('WorkflowPlan', () => {
       expect(plan.steps[1].id).toBe(step2.id);
     });
 
-    it('should throw if plan exceeds maxSteps', () => {
+    it("should throw if plan exceeds maxSteps", () => {
       const smallPlan = createWorkflowPlan({
-        name: 'Small',
+        name: "Small",
         config: { maxSteps: 2 },
       });
 
-      addStepToPlan(smallPlan, { name: 'Step 1', type: 'action' });
-      addStepToPlan(smallPlan, { name: 'Step 2', type: 'action' });
+      addStepToPlan(smallPlan, { name: "Step 1", type: "action" });
+      addStepToPlan(smallPlan, { name: "Step 2", type: "action" });
 
       expect(() => {
-        addStepToPlan(smallPlan, { name: 'Step 3', type: 'action' });
-      }).toThrow('Plan exceeds maximum step limit');
+        addStepToPlan(smallPlan, { name: "Step 3", type: "action" });
+      }).toThrow("Plan exceeds maximum step limit");
     });
   });
 
-  describe('addDependencyToPlan', () => {
-    it('should add a dependency between steps', () => {
+  describe("addDependencyToPlan", () => {
+    it("should add a dependency between steps", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       addDependencyToPlan(plan, step2.id, step1.id);
@@ -125,51 +125,51 @@ describe('WorkflowPlan', () => {
       expect(updatedStep2.dependencies).toContain(step1.id);
     });
 
-    it('should prevent circular dependencies', () => {
+    it("should prevent circular dependencies", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       addDependencyToPlan(plan, step2.id, step1.id);
 
       expect(() => {
         addDependencyToPlan(plan, step1.id, step2.id);
-      }).toThrow('Circular dependency detected');
+      }).toThrow("Circular dependency detected");
     });
 
-    it('should throw if referenced step does not exist', () => {
+    it("should throw if referenced step does not exist", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       expect(() => {
-        addDependencyToPlan(plan, step1.id, 'nonexistent');
-      }).toThrow('Dependency step not found');
+        addDependencyToPlan(plan, step1.id, "nonexistent");
+      }).toThrow("Dependency step not found");
     });
   });
 
-  describe('resolveDependencies', () => {
-    it('should return steps in execution order', () => {
+  describe("resolveDependencies", () => {
+    it("should return steps in execution order", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       const step3 = addStepToPlan(plan, {
-        name: 'Step 3',
-        type: 'action',
+        name: "Step 3",
+        type: "action",
       });
 
       addDependencyToPlan(plan, step2.id, step1.id);
@@ -182,15 +182,15 @@ describe('WorkflowPlan', () => {
       expect(ordered[2].id).toBe(step3.id);
     });
 
-    it('should handle independent parallel steps', () => {
+    it("should handle independent parallel steps", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       const ordered = resolveDependencies(plan);
@@ -200,15 +200,15 @@ describe('WorkflowPlan', () => {
       expect(ordered.map((s) => s.id)).toContain(step2.id);
     });
 
-    it('should throw on circular dependencies', () => {
+    it("should throw on circular dependencies", () => {
       const step1 = addStepToPlan(plan, {
-        name: 'Step 1',
-        type: 'action',
+        name: "Step 1",
+        type: "action",
       });
 
       const step2 = addStepToPlan(plan, {
-        name: 'Step 2',
-        type: 'action',
+        name: "Step 2",
+        type: "action",
       });
 
       addDependencyToPlan(plan, step2.id, step1.id);
@@ -217,20 +217,20 @@ describe('WorkflowPlan', () => {
 
       expect(() => {
         resolveDependencies(plan);
-      }).toThrow('Circular dependency detected');
+      }).toThrow("Circular dependency detected");
     });
   });
 
-  describe('validatePlanDefinition', () => {
-    it('should validate a valid plan definition', () => {
+  describe("validatePlanDefinition", () => {
+    it("should validate a valid plan definition", () => {
       const definition: WorkflowPlanDefinition = {
-        name: 'Valid Plan',
-        description: 'A valid plan',
+        name: "Valid Plan",
+        description: "A valid plan",
         steps: [
           {
-            name: 'Step 1',
-            type: 'action',
-            description: 'First step',
+            name: "Step 1",
+            type: "action",
+            description: "First step",
           },
         ],
       };
@@ -240,9 +240,9 @@ describe('WorkflowPlan', () => {
       }).not.toThrow();
     });
 
-    it('should reject a plan without name', () => {
+    it("should reject a plan without name", () => {
       const definition = {
-        description: 'Invalid plan',
+        description: "Invalid plan",
         steps: [],
       } as unknown as WorkflowPlanDefinition;
 
@@ -251,10 +251,10 @@ describe('WorkflowPlan', () => {
       }).toThrow();
     });
 
-    it('should reject a plan without steps', () => {
+    it("should reject a plan without steps", () => {
       const definition = {
-        name: 'Invalid Plan',
-        description: 'No steps',
+        name: "Invalid Plan",
+        description: "No steps",
       } as unknown as WorkflowPlanDefinition;
 
       expect(() => {
@@ -262,13 +262,13 @@ describe('WorkflowPlan', () => {
       }).toThrow();
     });
 
-    it('should reject steps with invalid types', () => {
+    it("should reject steps with invalid types", () => {
       const definition = {
-        name: 'Invalid Plan',
+        name: "Invalid Plan",
         steps: [
           {
-            name: 'Step 1',
-            type: 'invalid_type',
+            name: "Step 1",
+            type: "invalid_type",
           },
         ],
       } as unknown as WorkflowPlanDefinition;

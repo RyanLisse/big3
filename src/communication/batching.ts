@@ -3,55 +3,57 @@
  * Latency-aware batching for WebSocket messages with sub-200ms target
  */
 
-import type { WebSocketMessage } from './ws';
+import type { WebSocketMessage } from "./ws";
 
-export interface BatchingConfig {
+export type BatchingConfig = {
   maxBatchSize: number;
   flushInterval: number;
   targetLatency: number;
   adaptive?: boolean;
-}
+};
 
-interface BatchMetadata {
+type BatchMetadata = {
   batchSize: number;
   connectionId: string;
-  flushReason: 'size' | 'time' | 'manual';
+  flushReason: "size" | "time" | "manual";
   timestamp: number;
-}
+};
 
-interface BatcherStats {
+type BatcherStats = {
   totalBatches: number;
   totalMessages: number;
   avgBatchSize: number;
   avgLatency: number;
   isAdaptive: boolean;
-}
+};
 
-type FlushCallback = (batch: WebSocketMessage[], metadata: BatchMetadata) => void;
+type FlushCallback = (
+  batch: WebSocketMessage[],
+  metadata: BatchMetadata
+) => void;
 
 export class MessageBatcher {
-  private config: BatchingConfig;
-  private queues: Map<string, WebSocketMessage[]> = new Map();
-  private timers: Map<string, NodeJS.Timeout> = new Map();
+  private readonly config: BatchingConfig;
+  private readonly queues: Map<string, WebSocketMessage[]> = new Map();
+  private readonly timers: Map<string, NodeJS.Timeout> = new Map();
   private flushCallbacks: FlushCallback[] = [];
-  private stats = {
+  private readonly stats = {
     totalBatches: 0,
     totalMessages: 0,
-    latencies: [] as number[]
+    latencies: [] as number[],
   };
   private isShutdown = false;
-  private startTime = Date.now();
 
   constructor(config: BatchingConfig) {
     this.config = {
       ...config,
-      adaptive: config.adaptive ?? false
+      adaptive: config.adaptive ?? false,
     };
   }
 
   queue(connectionId: string, message: WebSocketMessage): void {
     if (this.isShutdown) {
-      throw new Error('MessageBatcher has been shut down');
+      throw new Error("MessageBatcher has been shut down");
     }
 
     if (!this.queues.has(connectionId)) {
@@ -64,13 +66,18 @@ export class MessageBatcher {
     this.stats.totalMessages++;
 
     if (queue.length >= this.config.maxBatchSize) {
-      this.flush(connectionId, 'size');
+      this.flush(connectionId, "size");
     }
   }
 
-  flush(connectionId: string, reason: 'size' | 'time' | 'manual' = 'manual'): void {
+  flush(
+    connectionId: string,
+    reason: "size" | "time" | "manual" = "manual"
+  ): void {
     const queue = this.queues.get(connectionId);
-    if (!queue || queue.length === 0) return;
+    if (!queue || queue.length === 0) {
+      return;
+    }
 
     const batchStart = Date.now();
     const batch = queue.splice(0, queue.length);
@@ -78,14 +85,14 @@ export class MessageBatcher {
       batchSize: batch.length,
       connectionId,
       flushReason: reason,
-      timestamp: batchStart
+      timestamp: batchStart,
     };
 
     this.stats.totalBatches++;
     const latency = Date.now() - batchStart;
     this.stats.latencies.push(latency);
 
-    this.flushCallbacks.forEach(cb => cb(batch, metadata));
+    this.flushCallbacks.forEach((cb) => cb(batch, metadata));
   }
 
   closeConnection(connectionId: string): void {
@@ -97,7 +104,7 @@ export class MessageBatcher {
 
     const queue = this.queues.get(connectionId);
     if (queue && queue.length > 0) {
-      this.flush(connectionId, 'manual');
+      this.flush(connectionId, "manual");
     }
 
     this.queues.delete(connectionId);
@@ -109,21 +116,21 @@ export class MessageBatcher {
 
   getStats(): BatcherStats {
     const msgCount = this.stats.latencies.length;
-    const avgLatency = msgCount > 0
-      ? this.stats.latencies.reduce((a, b) => a + b, 0) / msgCount
-      : 0;
+    const avgLatency =
+      msgCount > 0
+        ? this.stats.latencies.reduce((a, b) => a + b, 0) / msgCount
+        : 0;
 
     const totalMsgs = this.stats.totalMessages;
-    const avgBatchSize = this.stats.totalBatches > 0
-      ? totalMsgs / this.stats.totalBatches
-      : 0;
+    const avgBatchSize =
+      this.stats.totalBatches > 0 ? totalMsgs / this.stats.totalBatches : 0;
 
     return {
       totalBatches: this.stats.totalBatches,
       totalMessages: this.stats.totalMessages,
       avgBatchSize,
       avgLatency,
-      isAdaptive: this.config.adaptive ?? false
+      isAdaptive: this.config.adaptive ?? false,
     };
   }
 
@@ -132,11 +139,13 @@ export class MessageBatcher {
   }
 
   shutdown(): void {
-    if (this.isShutdown) return;
+    if (this.isShutdown) {
+      return;
+    }
 
     // Flush all pending messages
     for (const connectionId of this.queues.keys()) {
-      this.flush(connectionId, 'manual');
+      this.flush(connectionId, "manual");
     }
 
     // Clear timers
@@ -153,7 +162,7 @@ export class MessageBatcher {
   private setupTimer(connectionId: string): void {
     const timer = setInterval(() => {
       if (!this.isShutdown) {
-        this.flush(connectionId, 'time');
+        this.flush(connectionId, "time");
       }
     }, this.config.flushInterval);
 

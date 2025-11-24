@@ -5,31 +5,30 @@
  * and retry logic for autonomous workflow execution.
  */
 
-import { WorkflowError } from '../core/errors';
+import { WorkflowError } from "../core/errors";
 import {
-  WorkflowPlan,
-  WorkflowStepDefinition,
   resolveDependencies,
-  areAllDependenciesCompleted,
-} from './plan';
+  type WorkflowPlan,
+  type WorkflowStepDefinition,
+} from "./plan";
 
-export interface ExecutionContext {
+export type ExecutionContext = {
   planId: string;
   stepId: string;
   data: Record<string, unknown>;
   agentId?: string;
-}
+};
 
-export interface RetryOptions {
+export type RetryOptions = {
   maxRetries: number;
   retryDelay: number;
   backoffMultiplier?: number;
-}
+};
 
-export interface ParallelExecutionOptions {
+export type ParallelExecutionOptions = {
   maxConcurrency?: number;
   continueOnError?: boolean;
-}
+};
 
 export type StepHandler = (
   step: WorkflowStepDefinition,
@@ -41,7 +40,7 @@ export type StepHandler = (
  * parallel, and retry logic.
  */
 export class WorkflowRunner {
-  private handlers: Map<string, StepHandler> = new Map();
+  private readonly handlers: Map<string, StepHandler> = new Map();
 
   /**
    * Register a handler for a specific step type
@@ -67,28 +66,28 @@ export class WorkflowRunner {
     const handler = this.handlers.get(step.type);
 
     if (!handler) {
-      throw new WorkflowError('No handler registered for step type', {
+      throw new WorkflowError("No handler registered for step type", {
         stepType: step.type,
         stepId: step.id,
       });
     }
 
-    step.status = 'running';
+    step.status = "running";
     step.startTime = Date.now();
 
     try {
       const result = await handler(step, context);
 
-      step.status = 'completed';
+      step.status = "completed";
       step.output = result;
       step.endTime = Date.now();
 
       return result;
     } catch (error) {
-      step.status = 'failed';
+      step.status = "failed";
       step.error = {
-        code: 'STEP_EXECUTION_ERROR',
-        message: error instanceof Error ? error.message : 'Unknown error',
+        code: "STEP_EXECUTION_ERROR",
+        message: error instanceof Error ? error.message : "Unknown error",
         details: error,
       };
       step.endTime = Date.now();
@@ -114,7 +113,7 @@ export class WorkflowRunner {
         data: {
           ...context.data,
           previousResults: results,
-          previousOutput: results[results.length - 1],
+          previousOutput: results.at(-1),
         },
       };
 
@@ -163,7 +162,9 @@ export class WorkflowRunner {
         results[index] = await this.executeStep(step, stepContext);
       } catch (error) {
         if (continueOnError) {
-          errors.push(error instanceof Error ? error : new Error(String(error)));
+          errors.push(
+            error instanceof Error ? error : new Error(String(error))
+          );
         } else {
           throw error;
         }
@@ -180,7 +181,7 @@ export class WorkflowRunner {
     await Promise.all(promises);
 
     if (errors.length > 0) {
-      throw new WorkflowError('Parallel execution errors', {
+      throw new WorkflowError("Parallel execution errors", {
         errorCount: errors.length,
         errors: errors.map((e) => e.message),
       });
@@ -203,7 +204,7 @@ export class WorkflowRunner {
 
     for (let attempt = 0; attempt <= options.maxRetries; attempt++) {
       try {
-        step.status = 'pending';
+        step.status = "pending";
         return await this.executeStep(step, context);
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
@@ -232,7 +233,7 @@ export class WorkflowRunner {
         setTimeout(
           () =>
             reject(
-              new WorkflowError('Step execution timeout', {
+              new WorkflowError("Step execution timeout", {
                 stepId: step.id,
                 timeout,
               })
@@ -254,7 +255,9 @@ export class WorkflowRunner {
     duration?: number;
   } {
     const duration =
-      step.startTime && step.endTime ? step.endTime - step.startTime : undefined;
+      step.startTime && step.endTime
+        ? step.endTime - step.startTime
+        : undefined;
 
     return {
       id: step.id,
@@ -277,10 +280,10 @@ export class WorkflowRunner {
     percentage: number;
   } {
     const total = plan.steps.length;
-    const completed = plan.steps.filter((s) => s.status === 'completed').length;
-    const failed = plan.steps.filter((s) => s.status === 'failed').length;
-    const pending = plan.steps.filter((s) => s.status === 'pending').length;
-    const running = plan.steps.filter((s) => s.status === 'running').length;
+    const completed = plan.steps.filter((s) => s.status === "completed").length;
+    const failed = plan.steps.filter((s) => s.status === "failed").length;
+    const pending = plan.steps.filter((s) => s.status === "pending").length;
+    const running = plan.steps.filter((s) => s.status === "running").length;
     const percentage = total > 0 ? Math.round((completed / total) * 100) : 0;
 
     return {
@@ -299,7 +302,7 @@ export class WorkflowRunner {
  */
 class Semaphore {
   private permits: number;
-  private waiting: Array<() => void> = [];
+  private readonly waiting: Array<() => void> = [];
 
   constructor(permits: number) {
     this.permits = permits;

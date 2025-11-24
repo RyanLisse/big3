@@ -1,3 +1,5 @@
+import type { ComponentProps, ReactNode } from "react";
+import NextImage from "next/image";
 import {
   Command,
   CommandDialog,
@@ -16,7 +18,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
-import type { ComponentProps, ReactNode } from "react";
 
 export type ModelSelectorProps = ComponentProps<typeof Dialog>;
 
@@ -170,7 +171,7 @@ export const ModelSelectorLogo = ({
   className,
   ...props
 }: ModelSelectorLogoProps) => (
-  <img
+  <NextImage
     {...props}
     alt={`${provider} logo`}
     className={cn("size-3 dark:invert", className)}

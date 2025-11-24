@@ -161,6 +161,52 @@ curl http://localhost:4000/agents/session-abc123/status
 
 ## 🔧 Development Workflow
 
+### **SDK Usage Examples**
+
+```typescript
+import { Effect } from "effect";
+import { createAgent } from "./src/sdk/agents";
+import { createTeam, addAgent, sharedMemory, sendMessage } from "./src/sdk/agents";
+import type { ModelRegistryImpl } from "./src/models/registry";
+
+// Single agent
+const registry = new ModelRegistryImpl();
+const agent = createAgent(
+  { 
+    config: {
+      name: "MyAgent",
+      instructions: "You are a helpful assistant.",
+    } 
+  },
+  registry
+);
+
+// Multi-agent team
+const baseUrl = process.env.BACKEND_URL || "http://localhost:4000";
+
+const teamReq = { name: "DevTeam", description: "Development coordination team" };
+const team = await Effect.runPromise(createTeam(baseUrl, teamReq));
+
+await Effect.runPromise(addAgent(baseUrl, team.id, {
+  agentId: agent.id,
+  role: "lead-developer"
+}));
+
+const memory = await Effect.runPromise(sharedMemory(baseUrl, team.id, {
+  label: "project-requirements",
+  value: JSON.stringify({ features: ["auth", "ui"] }),
+  description: "Current project specs shared across agents",
+  type: "project_context",
+  accessLevel: "read_write"
+}));
+
+const response = await Effect.runPromise(sendMessage(baseUrl, "agent-reviewer", {
+  fromAgentId: agent.id,
+  teamId: team.id,
+  content: "Please review the latest code changes."
+}));
+```
+
 ### **Running Tests**
 ```bash
 # Run all tests

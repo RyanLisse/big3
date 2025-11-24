@@ -94,3 +94,10 @@ A user interacts with the Super-Agent through a UI (or log stream) that shows it
 - **SC-004**: For long-running tasks (lasting longer than 5 minutes), users can safely disconnect and reconnect without losing access to the task’s results or its current status.
 - **SC-005**: Observability data (logs/metrics) is sufficient for an operator to reconstruct, after the fact, the major steps the agent took during at least 95% of completed sessions.
 - **SC-006**: No critical flows depend on a specific provider or technology choice being visible to end users; if a provider is swapped or reconfigured, user-facing behavior and success criteria remain valid.
+
+## Assumptions & Dependencies
+
+- The system is used by a small group of trusted developers/operators in controlled environments (no public multi-tenant access in V2).
+- At least one reliable conversational model, one coding-capable model, and one browser automation capability are available; the architecture allows swapping providers without changing user-visible behavior.
+- A persistent storage layer is available for session state and workspace artifacts.
+- Network connectivity between backend, storage, and providers is stable enough to support long-running sessions; transient failures are surfaced via errors and, where appropriate, automatic retries.

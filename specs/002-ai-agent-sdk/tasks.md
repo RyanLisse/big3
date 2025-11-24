@@ -40,15 +40,15 @@
 - 
 - ### US5 — Code Modernization Support (Priority: P3)
 - 
-- - [ ] T024 [US5] Build code modernization tooling scaffold (src/modernize/index.ts) [P]
-- - [ ] T025 [US5] Document modernization usage and upgrade paths (docs/upgrade.md)
-- - [ ] T026 [US5] Expose results in a contracts/docs section (docs/contracts-usage.md)
+- [X] T024 [US5] Build code modernization tooling scaffold (src/modernize/index.ts) [P]
+- [X] T025 [US5] Document modernization usage and upgrade paths (docs/upgrade.md)
+- [X] T026 [US5] Expose results in a contracts/docs section (docs/contracts-usage.md)
 - 
 - ## Final Phase: Polish & Cross-Cutting
 - 
-- - [ ] T027 Phase Final: Documentation polish and cross-cutting concerns (docs/, README.md)
-- - [ ] T028 Phase Final: Linting/formatting and pre-commit hooks (lint) and CI checks
-- - [ ] T029 Phase Final: Validation checklist generation and summary report (specs/002-ai-agent-sdk/tasks.md)
+- [X] T027 Phase Final: Documentation polish and cross-cutting concerns (docs/, README.md)
+- [X] T028 Phase Final: Linting/formatting and pre-commit hooks (lint) and CI checks
+- [X] T029 Phase Final: Validation checklist generation and summary report (specs/002-ai-agent-sdk/validation-checklist.md)
 - 
 - ## Dependencies & Execution Order
 - 

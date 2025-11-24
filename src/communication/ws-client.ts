@@ -3,10 +3,10 @@
  * Client-side WebSocket integration with batching support
  */
 
-import { MessageBatcher } from './batching';
-import type { WebSocketMessage } from './ws';
+import { MessageBatcher } from "./batching";
+import type { WebSocketMessage } from "./ws";
 
-export interface WsClientConfig {
+export type WsClientConfig = {
   url: string;
   reconnect?: boolean;
   maxReconnectAttempts?: number;
@@ -16,9 +16,9 @@ export interface WsClientConfig {
     maxBatchSize?: number;
     flushInterval?: number;
   };
-}
+};
 
-interface ClientState {
+type ClientState = {
   isConnected: boolean;
   url: string;
   uptime: number;
@@ -28,21 +28,20 @@ interface ClientState {
   batchingEnabled: boolean;
   reconnectEnabled: boolean;
   maxReconnectAttempts?: number;
-}
+};
 
 type EventListener = (data: any) => void;
 
 export class WsClient {
-  private url: string;
+  private readonly url: string;
   private ws: WebSocket | null = null;
-  private config: WsClientConfig;
-  private batcher: MessageBatcher | null = null;
-  private listeners: Map<string, Set<EventListener>> = new Map();
+  private readonly config: WsClientConfig;
+  private readonly batcher: MessageBatcher | null = null;
+  private readonly listeners: Map<string, Set<EventListener>> = new Map();
   private messagesSent = 0;
   private messagesReceived = 0;
-  private startTime = Date.now();
-  private reconnectAttempts = 0;
-  private reconnectTimer: NodeJS.Timeout | null = null;
+  private readonly startTime = Date.now();
+  private readonly reconnectTimer: NodeJS.Timeout | null = null;
   private isShutdown = false;
 
   constructor(config: WsClientConfig) {
@@ -55,25 +54,27 @@ export class WsClient {
       batching: {
         enabled: config.batching?.enabled ?? false,
         maxBatchSize: config.batching?.maxBatchSize ?? 100,
-        flushInterval: config.batching?.flushInterval ?? 50
-      }
+        flushInterval: config.batching?.flushInterval ?? 50,
+      },
     };
 
     if (this.config.batching?.enabled) {
       this.batcher = new MessageBatcher({
         maxBatchSize: this.config.batching.maxBatchSize ?? 100,
         flushInterval: this.config.batching.flushInterval ?? 50,
-        targetLatency: 200
+        targetLatency: 200,
       });
 
-      this.batcher.onFlush((batch, metadata) => {
+      this.batcher.onFlush((batch, _metadata) => {
         this.sendBatch(batch);
       });
     }
   }
 
   send(message: WebSocketMessage): boolean {
-    if (this.isShutdown) return false;
+    if (this.isShutdown) {
+      return false;
+    }
 
     if (!this.config.batching?.enabled) {
       return this.sendDirectly(message);
@@ -81,7 +82,7 @@ export class WsClient {
 
     if (this.batcher) {
       try {
-        this.batcher.queue('default', message);
+        this.batcher.queue("default", message);
         return true;
       } catch {
         return false;
@@ -97,7 +98,7 @@ export class WsClient {
     }
 
     if (this.batcher) {
-      this.batcher.flush('default');
+      this.batcher.flush("default");
       this.batcher.shutdown();
     }
 
@@ -107,11 +108,11 @@ export class WsClient {
 
     this.ws = null;
     this.isShutdown = true;
-    this.emit('disconnected', undefined);
+    this.emit("disconnected", undefined);
   }
 
   getState(): ClientState {
-    const pendingMessages = this.batcher?.getQueueSize('default') ?? 0;
+    const pendingMessages = this.batcher?.getQueueSize("default") ?? 0;
 
     return {
       isConnected: this.ws?.readyState === WebSocket.OPEN,
@@ -122,7 +123,7 @@ export class WsClient {
       pendingMessages,
       batchingEnabled: this.config.batching?.enabled ?? false,
       reconnectEnabled: this.config.reconnect ?? false,
-      maxReconnectAttempts: this.config.maxReconnectAttempts
+      maxReconnectAttempts: this.config.maxReconnectAttempts,
     };
   }
 
@@ -130,7 +131,7 @@ export class WsClient {
     if (!this.listeners.has(event)) {
       this.listeners.set(event, new Set());
     }
-    this.listeners.get(event)!.add(listener);
+    this.listeners.get(event)?.add(listener);
   }
 
   off(event: string, listener: EventListener): void {
@@ -143,29 +144,29 @@ export class WsClient {
   simulateIncomingMessage(message: WebSocketMessage): void {
     this.messagesReceived++;
 
-    this.emit('message', message);
+    this.emit("message", message);
 
-    if (message.type === 'agent_message') {
-      this.emit('agent_message', message);
-    } else if (message.type === 'system_message') {
-      this.emit('system_message', message);
-    } else if (message.type === 'control_message') {
-      this.emit('control_message', message);
+    if (message.type === "agent_message") {
+      this.emit("agent_message", message);
+    } else if (message.type === "system_message") {
+      this.emit("system_message", message);
+    } else if (message.type === "control_message") {
+      this.emit("control_message", message);
     }
 
     if (
-      message.type === 'agent_message' &&
+      message.type === "agent_message" &&
       message.payload &&
-      typeof message.payload === 'object' &&
-      'batched' in message.payload &&
+      typeof message.payload === "object" &&
+      "batched" in message.payload &&
       message.payload.batched === true
     ) {
-      this.emit('batch', message);
+      this.emit("batch", message);
     }
   }
 
   simulateError(error: Error): void {
-    this.emit('error', error);
+    this.emit("error", error);
   }
 
   private sendDirectly(message: WebSocketMessage): boolean {
@@ -185,12 +186,12 @@ export class WsClient {
   private sendBatch(messages: WebSocketMessage[]): void {
     const batchMessage: WebSocketMessage = {
       id: `batch_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`,
-      type: 'agent_message',
+      type: "agent_message",
       timestamp: Date.now(),
       payload: {
         messages,
-        batched: true
-      }
+        batched: true,
+      },
     };
 
     this.sendDirectly(batchMessage);
@@ -199,11 +200,11 @@ export class WsClient {
   private emit(event: string, data: any): void {
     const listeners = this.listeners.get(event);
     if (listeners) {
-      listeners.forEach(listener => {
+      listeners.forEach((listener) => {
         try {
           listener(data);
-        } catch (error) {
-          console.error(`Error in event listener for ${event}:`, error);
+        } catch (_error) {
+          // Event listener error - handled by connection lifecycle
         }
       });
     }

@@ -1,62 +1,68 @@
 #!/usr/bin/env node
 
-import { Effect, Layer, Context } from "effect"
-import { AgentStreamEvent, AgentSessionStatus } from "../backend/agent/domain.js"
-import { StreamManager, StreamEventEmitter } from "../backend/agent/domain.js"
-import { AgentLogger } from "../backend/agent/logging.js"
+import { Context, Effect, Layer } from "effect";
+import {
+  type AgentSessionStatus,
+  type AgentStreamEvent,
+  StreamManager,
+} from "../backend/agent/domain.js";
+import { AgentLogger } from "../backend/agent/logging.js";
 
 // CLI visualization interfaces
-interface StreamVisualization {
-  sessionId: string
-  events: AgentStreamEvent[]
-  currentStatus: AgentSessionStatus
-  activeStep?: string
-  completedSteps: string[]
-  failedSteps: string[]
+type StreamVisualization = {
+  sessionId: string;
+  events: AgentStreamEvent[];
+  currentStatus: AgentSessionStatus;
+  activeStep?: string;
+  completedSteps: string[];
+  failedSteps: string[];
   artifacts: Array<{
-    id: string
-    path: string
-    kind: string
-    size: number
-  }>
+    id: string;
+    path: string;
+    kind: string;
+    size: number;
+  }>;
   logs: Array<{
-    level: string
-    message: string
-    timestamp: Date
-  }>
-}
+    level: string;
+    message: string;
+    timestamp: Date;
+  }>;
+};
 
 // ANSI color codes for terminal output
 const colors = {
-  reset: '\x1b[0m',
-  bright: '\x1b[1m',
-  dim: '\x1b[2m',
-  red: '\x1b[31m',
-  green: '\x1b[32m',
-  yellow: '\x1b[33m',
-  blue: '\x1b[34m',
-  magenta: '\x1b[35m',
-  cyan: '\x1b[36m',
-  white: '\x1b[37m',
-  gray: '\x1b[90m'
-}
+  reset: "\x1b[0m",
+  bright: "\x1b[1m",
+  dim: "\x1b[2m",
+  red: "\x1b[31m",
+  green: "\x1b[32m",
+  yellow: "\x1b[33m",
+  blue: "\x1b[34m",
+  magenta: "\x1b[35m",
+  cyan: "\x1b[36m",
+  white: "\x1b[37m",
+  gray: "\x1b[90m",
+};
 
 // CLI visualization service
-export interface StreamVisualizer {
-  readonly startVisualization: (sessionId: string) => Effect.Effect<void, never>
-  readonly renderEvent: (event: AgentStreamEvent) => Effect.Effect<void, never>
-  readonly renderSummary: (sessionId: string) => Effect.Effect<void, never>
-  readonly stopVisualization: (sessionId: string) => Effect.Effect<void, never>
-}
+export type StreamVisualizer = {
+  readonly startVisualization: (
+    sessionId: string
+  ) => Effect.Effect<void, never>;
+  readonly renderEvent: (event: AgentStreamEvent) => Effect.Effect<void, never>;
+  readonly renderSummary: (sessionId: string) => Effect.Effect<void, never>;
+  readonly stopVisualization: (sessionId: string) => Effect.Effect<void, never>;
+};
 
-export const StreamVisualizer = Context.GenericTag<StreamVisualizer>("StreamVisualizer")
+export const StreamVisualizer =
+  Context.GenericTag<StreamVisualizer>("StreamVisualizer");
 
 // Live implementation
 export const StreamVisualizerLive = Layer.effect(
   StreamVisualizer,
   Effect.gen(function* (_) {
     const streamManager = yield* StreamManager
-    const logger = yield* AgentLogger
+    const _logger = yield* AgentLogger
     
     // Active visualizations
     const activeVisualizations = new Map<string, StreamVisualization>()
@@ -118,7 +124,7 @@ export const StreamVisualizerLive = Layer.effect(
       renderSummary: (sessionId: string) =>
         Effect.gen(function* (_) {
           const viz = activeVisualizations.get(sessionId)
-          if (!viz) return
+          if (!viz) { return }
 
           console.clear()
           console.log(`${colors.cyan}${colors.bright}📊 Session Summary${colors.reset}`)
@@ -165,7 +171,7 @@ export const StreamVisualizerLive = Layer.effect(
             })
           }
 
-          console.log('\n' + '─'.repeat(80))
+          console.log(`\n${'─'.repeat(80)}`)
           console.log(`${colors.gray}Session completed at: ${new Date().toISOString()}${colors.reset}`)
         }),
 
@@ -183,7 +189,7 @@ function renderEventInTerminal(event: AgentStreamEvent): void {
   const prefix = `${colors.gray}[${timestamp}]${colors.reset}`
 
   switch (event.type) {
-    case "status_change":
+    case "status_change": {
       const fromStatus = getStatusColor(event.content.status_change?.fromStatus || "") + (event.content.status_change?.fromStatus || "")
       const toStatus = getStatusColor(event.content.status_change?.toStatus || "") + (event.content.status_change?.toStatus || "")
       console.log(`${prefix} 🔄 Status: ${fromStatus} → ${toStatus}`)
@@ -191,8 +197,9 @@ function renderEventInTerminal(event: AgentStreamEvent): void {
         console.log(`   ${colors.dim}${event.content.status_change.reason}${colors.reset}`)
       }
       break
+    }
 
-    case "plan_update":
+    case "plan_update": {
       const plan = event.content.plan_update
       console.log(`${prefix} 📋 Plan: ${plan?.title} (${plan?.status})`)
       if (plan?.currentStep) {
@@ -206,13 +213,15 @@ function renderEventInTerminal(event: AgentStreamEvent): void {
         })
       }
       break
+    }
 
-    case "tool_started":
+    case "tool_started": {
       const toolStarted = event.content.tool_started
       console.log(`${prefix} 🔧 Starting: ${toolStarted?.toolName} - ${toolStarted?.instruction}`)
       break
+    }
 
-    case "tool_finished":
+    case "tool_finished": {
       const toolFinished = event.content.tool_finished
       const status = toolFinished?.success ? "✅" : "❌"
       const resultColor = toolFinished?.success ? colors.green : colors.red
@@ -225,23 +234,27 @@ function renderEventInTerminal(event: AgentStreamEvent): void {
         console.log(`   ${resultColor}Error: ${toolFinished.error}${colors.reset}`)
       }
       break
+    }
 
-    case "artifact_created":
+    case "artifact_created": {
       const artifact = event.content.artifact_created
       const artifactIcon = getArtifactIcon(artifact?.kind || "")
       console.log(`${prefix} ${artifactIcon} Created: ${artifact?.path} (${artifact?.size} bytes)`)
       break
+    }
 
-    case "checkpoint":
+    case "checkpoint": {
       const checkpoint = event.content.checkpoint
       console.log(`${prefix} 💾 Checkpoint: ${checkpoint?.type} (${checkpoint?.checkpointId})`)
       break
+    }
 
-    case "log":
+    case "log": {
       const log = event.content.log
       const levelColor = getLogLevelColor(log?.level || "")
       console.log(`${prefix} ${levelColor}${log?.level?.toUpperCase()}${colors.reset}: ${log?.message}`)
       break
+    }
 
     default:
       console.log(`${prefix} 📡 Event: ${event.type}`)
@@ -256,7 +269,7 @@ function updateVisualizationState(viz: StreamVisualization, event: AgentStreamEv
       }
       break
 
-    case "plan_update":
+    case "plan_update": {
       const plan = event.content.plan_update
       if (plan?.steps) {
         plan.steps.forEach(step => {
@@ -268,8 +281,9 @@ function updateVisualizationState(viz: StreamVisualization, event: AgentStreamEv
         })
       }
       break
+    }
 
-    case "artifact_created":
+    case "artifact_created": {
       const artifact = event.content.artifact_created
       if (artifact) {
         viz.artifacts.push({
@@ -280,8 +294,9 @@ function updateVisualizationState(viz: StreamVisualization, event: AgentStreamEv
         })
       }
       break
+    }
 
-    case "log":
+    case "log": {
       const log = event.content.log
       if (log) {
         viz.logs.push({
@@ -291,6 +306,7 @@ function updateVisualizationState(viz: StreamVisualization, event: AgentStreamEv
         })
       }
       break
+    }
   }
 }
 

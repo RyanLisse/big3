@@ -1,10 +1,5 @@
-
-import { Chat } from '@/components/Chat';
+import { CodexInterface } from "@/components/CodexInterface";
 
 export default function Home() {
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 bg-background">
-      <Chat />
-    </main>
-  );
+  return <CodexInterface />;
 }

@@ -5,23 +5,23 @@
  * resilient autonomous workflow execution with state recovery.
  */
 
-import { WorkflowError } from '../core/errors';
-import { WorkflowPlan, WorkflowStepDefinition } from './plan';
+import { WorkflowError } from "../core/errors";
+import type { WorkflowPlan, WorkflowStepDefinition } from "./plan";
 
-export interface WorkflowCheckpoint {
+export type WorkflowCheckpoint = {
   id: string;
   planId: string;
   completedSteps: string[];
   timestamp: number;
   metadata: Record<string, unknown>;
-}
+};
 
 export type CheckpointStore = Map<string, WorkflowCheckpoint>;
 
-export interface CleanupOptions {
+export type CleanupOptions = {
   maxAge?: number;
   keep?: number;
-}
+};
 
 /**
  * Create a checkpoint representing current plan state
@@ -64,7 +64,7 @@ export async function loadCheckpoint(
  * RecoveryManager handles checkpoint lifecycle and recovery operations
  */
 export class RecoveryManager {
-  private store: CheckpointStore;
+  private readonly store: CheckpointStore;
 
   constructor(store: CheckpointStore) {
     this.store = store;
@@ -86,7 +86,9 @@ export class RecoveryManager {
   /**
    * Get the most recent checkpoint for a plan
    */
-  async getLatestCheckpoint(planId: string): Promise<WorkflowCheckpoint | null> {
+  async getLatestCheckpoint(
+    planId: string
+  ): Promise<WorkflowCheckpoint | null> {
     let latest: WorkflowCheckpoint | null = null;
     let latestTime = 0;
 
@@ -138,9 +140,9 @@ export class RecoveryManager {
 
     for (const step of plan.steps) {
       if (completedStepIds.has(step.id)) {
-        step.status = 'completed';
+        step.status = "completed";
       } else {
-        step.status = 'pending';
+        step.status = "pending";
       }
     }
 
@@ -153,10 +155,10 @@ export class RecoveryManager {
   async createPeriodicCheckpoint(
     plan: WorkflowPlan,
     completedSteps: WorkflowStepDefinition[],
-    interval: number = 60000
+    interval = 60_000
   ): Promise<WorkflowCheckpoint> {
     return this.createRecoveryPoint(plan, completedSteps, {
-      reason: 'periodic',
+      reason: "periodic",
       interval,
     });
   }
@@ -170,7 +172,7 @@ export class RecoveryManager {
     error: Error
   ): Promise<WorkflowCheckpoint> {
     return this.createRecoveryPoint(plan, completedSteps, {
-      reason: 'error_recovery',
+      reason: "error_recovery",
       error: error.message,
       timestamp: Date.now(),
     });
@@ -196,8 +198,8 @@ export class RecoveryManager {
       return;
     }
 
-    const maxAge = options.maxAge ?? Infinity;
-    const keep = options.keep ?? Infinity;
+    const maxAge = options.maxAge ?? Number.POSITIVE_INFINITY;
+    const keep = options.keep ?? Number.POSITIVE_INFINITY;
 
     const now = Date.now();
     const toDelete: string[] = [];
@@ -248,7 +250,7 @@ export class RecoveryManager {
     return {
       totalCheckpoints: checkpoints.length,
       oldestCheckpoint: checkpoints[0].timestamp,
-      newestCheckpoint: checkpoints[checkpoints.length - 1].timestamp,
+      newestCheckpoint: checkpoints.at(-1)?.timestamp ?? Date.now(),
       averageAge,
     };
   }
@@ -289,7 +291,7 @@ export class RecoveryManager {
     const checkpoint = await loadCheckpoint(this.store, checkpointId);
 
     if (!checkpoint) {
-      throw new WorkflowError('Checkpoint not found', { checkpointId });
+      throw new WorkflowError("Checkpoint not found", { checkpointId });
     }
 
     return JSON.stringify(checkpoint);
@@ -303,15 +305,21 @@ export class RecoveryManager {
       const checkpoint = JSON.parse(json) as WorkflowCheckpoint;
 
       // Basic validation
-      if (!checkpoint.id || !checkpoint.planId || !Array.isArray(checkpoint.completedSteps)) {
-        throw new WorkflowError('Invalid checkpoint format');
+      if (
+        !(
+          checkpoint.id &&
+          checkpoint.planId &&
+          Array.isArray(checkpoint.completedSteps)
+        )
+      ) {
+        throw new WorkflowError("Invalid checkpoint format");
       }
 
       await saveCheckpoint(this.store, checkpoint);
       return checkpoint;
     } catch (error) {
-      throw new WorkflowError('Failed to import checkpoint', {
-        error: error instanceof Error ? error.message : 'Unknown error',
+      throw new WorkflowError("Failed to import checkpoint", {
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }

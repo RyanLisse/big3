@@ -7,11 +7,10 @@
     "vitest.config.ts"
   ],
   "compilerOptions": {
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "tsBuildInfoFile": ".tsbuildinfo/scripts.tsbuildinfo",
     "rootDir": ".",
-    "noEmit": true
+    "noEmit": true,
+    "strictNullChecks": true
   }
 }

@@ -3,643 +3,643 @@
  * Do not make direct changes to the file.
  */
 
-export interface paths {
-    "/agents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a new agent instance */
-        post: operations["createAgent"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+export type paths = {
+  "/agents": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/agents/{agentId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get agent instance details */
-        get: operations["getAgent"];
-        /** Update agent configuration */
-        put: operations["updateAgent"];
-        post?: never;
-        /** Delete agent instance */
-        delete: operations["deleteAgent"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Create a new agent instance */
+    post: operations["createAgent"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/agents/{agentId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/agents/{agentId}/messages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get agent message history */
-        get: operations["getMessageHistory"];
-        put?: never;
-        /** Send message to agent */
-        post: operations["sendMessage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get agent instance details */
+    get: operations["getAgent"];
+    /** Update agent configuration */
+    put: operations["updateAgent"];
+    post?: never;
+    /** Delete agent instance */
+    delete: operations["deleteAgent"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/agents/{agentId}/messages": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/agents/{agentId}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get agent performance metrics */
-        get: operations["getAgentMetrics"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get agent message history */
+    get: operations["getMessageHistory"];
+    put?: never;
+    /** Send message to agent */
+    post: operations["sendMessage"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/agents/{agentId}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-}
+    /** Get agent performance metrics */
+    get: operations["getAgentMetrics"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+};
 export type webhooks = Record<string, never>;
-export interface components {
-    schemas: {
-        CreateAgentRequest: {
-            /** @description Unique identifier for the agent */
-            name: string;
-            model: {
-                /**
-                 * @description AI model provider
-                 * @enum {string}
-                 */
-                provider: "openai" | "anthropic" | "google";
-                /** @description Model name */
-                name: string;
-                /** @description Model version */
-                version?: string;
-                /** @description Model-specific parameters */
-                parameters?: Record<string, never>;
-            };
-            capabilities?: {
-                /** @description Whether model supports streaming */
-                streaming?: boolean;
-                /** @description Whether model supports function calling */
-                functions?: boolean;
-                /** @description Maximum concurrent operations */
-                maxConcurrency?: number;
-            };
-            configuration?: {
-                performance?: {
-                    /**
-                     * @description Performance optimization strategy
-                     * @enum {string}
-                     */
-                    optimization?: "cost" | "speed" | "balanced";
-                    /** @description Maximum tokens per operation */
-                    maxTokens?: number;
-                };
-                communication?: {
-                    /** @description Maximum acceptable latency in milliseconds */
-                    maxLatency?: number;
-                    /**
-                     * @description Communication protocol
-                     * @enum {string}
-                     */
-                    protocol?: "websocket" | "sse" | "long_polling";
-                };
-                errorHandling?: {
-                    /** @description Number of retry attempts */
-                    retryAttempts?: number;
-                    /**
-                     * @description Action on failure
-                     * @enum {string}
-                     */
-                    fallbackAction?: "abort" | "retry" | "human_intervention";
-                };
-            };
+export type components = {
+  schemas: {
+    CreateAgentRequest: {
+      /** @description Unique identifier for the agent */
+      name: string;
+      model: {
+        /**
+         * @description AI model provider
+         * @enum {string}
+         */
+        provider: "openai" | "anthropic" | "google";
+        /** @description Model name */
+        name: string;
+        /** @description Model version */
+        version?: string;
+        /** @description Model-specific parameters */
+        parameters?: Record<string, never>;
+      };
+      capabilities?: {
+        /** @description Whether model supports streaming */
+        streaming?: boolean;
+        /** @description Whether model supports function calling */
+        functions?: boolean;
+        /** @description Maximum concurrent operations */
+        maxConcurrency?: number;
+      };
+      configuration?: {
+        performance?: {
+          /**
+           * @description Performance optimization strategy
+           * @enum {string}
+           */
+          optimization?: "cost" | "speed" | "balanced";
+          /** @description Maximum tokens per operation */
+          maxTokens?: number;
         };
-        UpdateAgentRequest: {
-            model?: {
-                /** @enum {string} */
-                provider?: "openai" | "anthropic" | "google";
-                name?: string;
-                version?: string;
-                parameters?: Record<string, never>;
-            };
-            configuration?: {
-                performance?: Record<string, never>;
-                communication?: Record<string, never>;
-            };
+        communication?: {
+          /** @description Maximum acceptable latency in milliseconds */
+          maxLatency?: number;
+          /**
+           * @description Communication protocol
+           * @enum {string}
+           */
+          protocol?: "websocket" | "sse" | "long_polling";
         };
-        AgentInstance: {
-            /**
-             * Format: uuid
-             * @description Unique agent identifier
-             */
-            id: string;
-            /** @description Agent name */
-            name: string;
-            model: {
-                /** @enum {string} */
-                provider?: "openai" | "anthropic" | "google";
-                name?: string;
-                version?: string;
-            };
-            /**
-             * @description Current agent state
-             * @enum {string}
-             */
-            state?: "idle" | "processing" | "error" | "paused";
-            context?: {
-                /** @description Current session identifier */
-                sessionId?: string;
-                /** @description Associated user identifier */
-                userId?: string;
-            };
-            performance?: {
-                /** @description Average response time in milliseconds */
-                responseTime?: number;
-                /** @description Total tokens consumed */
-                tokensUsed?: number;
-                /** @description Number of completed requests */
-                requestsCompleted?: number;
-                /** @description Error rate as percentage */
-                errorRate?: number;
-                /** @description Uptime percentage */
-                uptime?: number;
-            };
-            /**
-             * Format: date-time
-             * @description Agent creation timestamp
-             */
-            createdAt: string;
-            /**
-             * Format: date-time
-             * @description Last activity timestamp
-             */
-            lastActivity?: string;
+        errorHandling?: {
+          /** @description Number of retry attempts */
+          retryAttempts?: number;
+          /**
+           * @description Action on failure
+           * @enum {string}
+           */
+          fallbackAction?: "abort" | "retry" | "human_intervention";
         };
-        MessageRequest: {
-            /** @description Message content */
-            content: string;
-            /**
-             * @description Message type
-             * @enum {string}
-             */
-            type: "user" | "agent" | "system" | "error";
-            /** @description Additional message metadata */
-            metadata?: Record<string, never>;
-            /** @description Enable streaming response */
-            streaming?: boolean;
-            /** @description Message priority (1=high, 10=low) */
-            priority?: number;
-        };
-        MessageResponse: {
-            /**
-             * Format: uuid
-             * @description Message identifier
-             */
-            id: string;
-            /** @description Response content */
-            content: string;
-            /**
-             * @description Message type
-             * @enum {string}
-             */
-            type?: "user" | "agent" | "system" | "error";
-            /**
-             * Format: date-time
-             * @description Response timestamp
-             */
-            timestamp: string;
-            /** @description Responding agent identifier */
-            agentId?: string;
-            /** @description Response confidence score */
-            confidence?: number;
-            /** @description Response metadata */
-            metadata?: Record<string, never>;
-            /** @description Whether response is streaming */
-            streaming?: boolean;
-        };
-        MessageHistoryResponse: {
-            /** @description Array of historical messages */
-            messages: components["schemas"]["MessageResponse"][];
-            /** @description Total number of messages */
-            total: number;
-            /** @description Maximum messages returned */
-            limit?: number;
-            /** @description Number of messages skipped */
-            offset?: number;
-        };
-        PerformanceMetrics: {
-            responseTime: {
-                /** @description Average response time in milliseconds */
-                average?: number;
-                /** @description 95th percentile response time */
-                p95?: number;
-                /** @description 99th percentile response time */
-                p99?: number;
-            };
-            throughput: {
-                /** @description Requests processed per second */
-                requestsPerSecond?: number;
-                /** @description Messages processed per minute */
-                messagesPerMinute?: number;
-            };
-            /** @description Error rate as percentage */
-            errorRate: number;
-            /** @description Uptime percentage */
-            uptime?: number;
-            resourceUsage?: {
-                /** @description CPU usage percentage */
-                cpu?: number;
-                /** @description Memory usage percentage */
-                memory?: number;
-                /** @description Active connections count */
-                connections?: number;
-            };
-        };
-        SuccessResponse: {
-            /** @description Operation success status */
-            success: boolean;
-            /** @description Success message */
-            message?: string;
-        };
-        Error: {
-            /** @description Error code */
-            code: string;
-            /** @description Error description */
-            message: string;
-            /** @description Additional error details */
-            details?: Record<string, never>;
-            /** @description Suggested resolutions */
-            suggestions?: string[];
-        };
+      };
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
-}
+    UpdateAgentRequest: {
+      model?: {
+        /** @enum {string} */
+        provider?: "openai" | "anthropic" | "google";
+        name?: string;
+        version?: string;
+        parameters?: Record<string, never>;
+      };
+      configuration?: {
+        performance?: Record<string, never>;
+        communication?: Record<string, never>;
+      };
+    };
+    AgentInstance: {
+      /**
+       * Format: uuid
+       * @description Unique agent identifier
+       */
+      id: string;
+      /** @description Agent name */
+      name: string;
+      model: {
+        /** @enum {string} */
+        provider?: "openai" | "anthropic" | "google";
+        name?: string;
+        version?: string;
+      };
+      /**
+       * @description Current agent state
+       * @enum {string}
+       */
+      state?: "idle" | "processing" | "error" | "paused";
+      context?: {
+        /** @description Current session identifier */
+        sessionId?: string;
+        /** @description Associated user identifier */
+        userId?: string;
+      };
+      performance?: {
+        /** @description Average response time in milliseconds */
+        responseTime?: number;
+        /** @description Total tokens consumed */
+        tokensUsed?: number;
+        /** @description Number of completed requests */
+        requestsCompleted?: number;
+        /** @description Error rate as percentage */
+        errorRate?: number;
+        /** @description Uptime percentage */
+        uptime?: number;
+      };
+      /**
+       * Format: date-time
+       * @description Agent creation timestamp
+       */
+      createdAt: string;
+      /**
+       * Format: date-time
+       * @description Last activity timestamp
+       */
+      lastActivity?: string;
+    };
+    MessageRequest: {
+      /** @description Message content */
+      content: string;
+      /**
+       * @description Message type
+       * @enum {string}
+       */
+      type: "user" | "agent" | "system" | "error";
+      /** @description Additional message metadata */
+      metadata?: Record<string, never>;
+      /** @description Enable streaming response */
+      streaming?: boolean;
+      /** @description Message priority (1=high, 10=low) */
+      priority?: number;
+    };
+    MessageResponse: {
+      /**
+       * Format: uuid
+       * @description Message identifier
+       */
+      id: string;
+      /** @description Response content */
+      content: string;
+      /**
+       * @description Message type
+       * @enum {string}
+       */
+      type?: "user" | "agent" | "system" | "error";
+      /**
+       * Format: date-time
+       * @description Response timestamp
+       */
+      timestamp: string;
+      /** @description Responding agent identifier */
+      agentId?: string;
+      /** @description Response confidence score */
+      confidence?: number;
+      /** @description Response metadata */
+      metadata?: Record<string, never>;
+      /** @description Whether response is streaming */
+      streaming?: boolean;
+    };
+    MessageHistoryResponse: {
+      /** @description Array of historical messages */
+      messages: components["schemas"]["MessageResponse"][];
+      /** @description Total number of messages */
+      total: number;
+      /** @description Maximum messages returned */
+      limit?: number;
+      /** @description Number of messages skipped */
+      offset?: number;
+    };
+    PerformanceMetrics: {
+      responseTime: {
+        /** @description Average response time in milliseconds */
+        average?: number;
+        /** @description 95th percentile response time */
+        p95?: number;
+        /** @description 99th percentile response time */
+        p99?: number;
+      };
+      throughput: {
+        /** @description Requests processed per second */
+        requestsPerSecond?: number;
+        /** @description Messages processed per minute */
+        messagesPerMinute?: number;
+      };
+      /** @description Error rate as percentage */
+      errorRate: number;
+      /** @description Uptime percentage */
+      uptime?: number;
+      resourceUsage?: {
+        /** @description CPU usage percentage */
+        cpu?: number;
+        /** @description Memory usage percentage */
+        memory?: number;
+        /** @description Active connections count */
+        connections?: number;
+      };
+    };
+    SuccessResponse: {
+      /** @description Operation success status */
+      success: boolean;
+      /** @description Success message */
+      message?: string;
+    };
+    Error: {
+      /** @description Error code */
+      code: string;
+      /** @description Error description */
+      message: string;
+      /** @description Additional error details */
+      details?: Record<string, never>;
+      /** @description Suggested resolutions */
+      suggestions?: string[];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
+};
 export type $defs = Record<string, never>;
-export interface operations {
-    createAgent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateAgentRequest"];
-            };
-        };
-        responses: {
-            /** @description Agent created successfully */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgentInstance"];
-                };
-            };
-            /** @description Invalid request parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Rate limit exceeded */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+export type operations = {
+  createAgent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getAgent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Agent details retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgentInstance"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateAgentRequest"];
+      };
     };
-    updateAgent: {
-        parameters: {
-            query?: {
-                configuration?: {
-                    model?: {
-                        /** @enum {string} */
-                        provider?: "openai" | "anthropic" | "google";
-                        name?: string;
-                        version?: string;
-                    };
-                    performance?: {
-                        maxConcurrency?: number;
-                        maxTokens?: number;
-                    };
-                    communication?: {
-                        maxLatency?: number;
-                    };
-                };
-            };
-            header?: never;
-            path: {
-                agentId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Agent created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateAgentRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["AgentInstance"];
         };
-        responses: {
-            /** @description Agent updated successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AgentInstance"];
-                };
-            };
-            /** @description Invalid request parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    deleteAgent: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Agent deleted successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuccessResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  getAgent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        agentId: string;
+      };
+      cookie?: never;
     };
-    getMessageHistory: {
-        parameters: {
-            query?: {
-                limit?: number;
-                offset?: number;
-            };
-            header?: never;
-            path: {
-                agentId: string;
-            };
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Agent details retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Message history retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageHistoryResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["AgentInstance"];
         };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    sendMessage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+  };
+  updateAgent: {
+    parameters: {
+      query?: {
+        configuration?: {
+          model?: {
+            /** @enum {string} */
+            provider?: "openai" | "anthropic" | "google";
+            name?: string;
+            version?: string;
+          };
+          performance?: {
+            maxConcurrency?: number;
+            maxTokens?: number;
+          };
+          communication?: {
+            maxLatency?: number;
+          };
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["MessageRequest"];
-            };
-        };
-        responses: {
-            /** @description Message processed successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["MessageResponse"];
-                };
-            };
-            /** @description Invalid message format */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Rate limit exceeded */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+      };
+      header?: never;
+      path: {
+        agentId: string;
+      };
+      cookie?: never;
     };
-    getAgentMetrics: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                agentId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Performance metrics retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PerformanceMetrics"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Agent not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateAgentRequest"];
+      };
     };
-}
+    responses: {
+      /** @description Agent updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["AgentInstance"];
+        };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  deleteAgent: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        agentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Agent deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  getMessageHistory: {
+    parameters: {
+      query?: {
+        limit?: number;
+        offset?: number;
+      };
+      header?: never;
+      path: {
+        agentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Message history retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MessageHistoryResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  sendMessage: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["MessageRequest"];
+      };
+    };
+    responses: {
+      /** @description Message processed successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["MessageResponse"];
+        };
+      };
+      /** @description Invalid message format */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  getAgentMetrics: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        agentId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Performance metrics retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["PerformanceMetrics"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Agent not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+};

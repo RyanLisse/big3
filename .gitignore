@@ -58,3 +58,8 @@ playwright/.cache/
 # OS patterns
 Thumbs.db
 Desktop.ini
+encore.gen.go
+encore.gen.cue
+/.encore
+/encore.gen
+.env.test

@@ -1,0 +1,7 @@
+{
+  "session_id": "956f4b55-427d-4779-a491-4b5b4c351743",
+  "prompts": [
+    "/check [ ] Fix TypeScript compilation errors in backend agent files\n[ ] Fix missing semicolons in return statements\n[ ] Fix Effect.gen syntax errors in browser.ts\n[ ] Fix missing imports and type definitions\n[ ] Fix duplicate service declarations\n[ ] Fix unused variables and console.log warnings\n[ ] Run tests to verify fixes"
+  ],
+  "agent_name": "Aurora"
+}

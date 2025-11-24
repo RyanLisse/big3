@@ -3,11 +3,11 @@
  * Based on contracts/workflow-api.yaml
  */
 
-export interface WorkflowStep {
+export type WorkflowStep = {
   id: string;
   name: string;
   description: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
+  status: "pending" | "running" | "completed" | "failed" | "paused";
   input?: any;
   output?: any;
   error?: {
@@ -18,16 +18,16 @@ export interface WorkflowStep {
   startTime?: number;
   endTime?: number;
   duration?: number;
-}
+};
 
-export interface WorkflowPlanConfig {
+export type WorkflowPlanConfig = {
   maxSteps?: number;
   timeout?: number;
   retryAttempts?: number;
   retryDelay?: number;
-}
+};
 
-export interface WorkflowPlan {
+export type WorkflowPlan = {
   id: string;
   name: string;
   description: string;
@@ -35,33 +35,33 @@ export interface WorkflowPlan {
   config?: WorkflowPlanConfig;
   createdAt: number;
   updatedAt: number;
-  status?: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
-}
+  status?: "pending" | "running" | "completed" | "failed" | "paused";
+};
 
-export interface CreateWorkflowPlanRequest {
+export type CreateWorkflowPlanRequest = {
   name: string;
   description?: string;
   config?: WorkflowPlanConfig;
-}
+};
 
-export interface ExecuteWorkflowRequest {
+export type ExecuteWorkflowRequest = {
   agentId?: string;
   context?: Record<string, any>;
-}
+};
 
-export interface WorkflowExecutionStatus {
+export type WorkflowExecutionStatus = {
   executionId: string;
   planId: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
+  status: "pending" | "running" | "completed" | "failed" | "paused";
   steps: WorkflowStep[];
   startedAt: number;
   currentStep?: number;
   completedAt?: number;
   estimatedCompletion?: number;
-}
+};
 
-export interface WorkflowUpdateMessage {
-  type: 'step_update' | 'workflow_completed' | 'workflow_failed';
+export type WorkflowUpdateMessage = {
+  type: "step_update" | "workflow_completed" | "workflow_failed";
   executionId: string;
   stepId?: string;
   status?: string;
@@ -72,4 +72,4 @@ export interface WorkflowUpdateMessage {
     details?: any;
   };
   timestamp: number;
-}
+};

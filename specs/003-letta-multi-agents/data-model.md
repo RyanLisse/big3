@@ -7,6 +7,14 @@
 
 The Letta Multi-Agent System extends the core agent model to support teams of collaborating agents with shared memory, cross-agent communication, and workflow orchestration through tool rules. This document outlines the core entities and their relationships.
 
+## Implementation Strategy
+
+All entities defined in this data model will be implemented using **Effect Schema** (`@effect/schema`). This ensures:
+
+- **Runtime Validation**: Automatic validation of data entering and leaving the system.
+- **Static Type Generation**: TypeScript types are derived directly from the schemas, ensuring a single source of truth.
+- **Transformation**: Easy transformation between wire formats (JSON) and domain objects.
+
 ## Core Entities
 
 ### MultiAgentTeam
@@ -14,6 +22,7 @@ The Letta Multi-Agent System extends the core agent model to support teams of co
 Represents a logical grouping of agents that work together on shared objectives.
 
 - **Fields**:
+
   - `id` (string): Unique team identifier.
   - `name` (string): Human-readable team name.
   - `description` (string): Team purpose and scope.
@@ -31,6 +40,7 @@ Represents a logical grouping of agents that work together on shared objectives.
 Extended agent entity that participates in multi-agent systems.
 
 - **Fields**:
+
   - `id` (string): Unique agent identifier.
   - `teamId` (string) → `MultiAgentTeam.id`.
   - `name` (string): Agent name/role.
@@ -52,6 +62,7 @@ Extended agent entity that participates in multi-agent systems.
 Memory blocks that can be accessed by multiple agents within a team.
 
 - **Fields**:
+
   - `id` (string): Unique memory block identifier.
   - `teamId` (string) → `MultiAgentTeam.id`.
   - `label` (string): Memory block label (e.g., "project_requirements", "architecture_decisions").
@@ -72,6 +83,7 @@ Memory blocks that can be accessed by multiple agents within a team.
 Individual agent's private memory blocks.
 
 - **Fields**:
+
   - `id` (string): Unique memory block identifier.
   - `agentId` (string) → `Agent.id`.
   - `label` (string): Memory block label (human, persona, project, custom).
@@ -90,6 +102,7 @@ Individual agent's private memory blocks.
 Cross-agent communication messages.
 
 - **Fields**:
+
   - `id` (string): Unique message identifier.
   - `fromAgentId` (string) → `Agent.id`.
   - `toAgentId` (string) → `Agent.id`.
@@ -112,6 +125,7 @@ Cross-agent communication messages.
 Rules governing tool execution order and constraints.
 
 - **Fields**:
+
   - `id` (string): Unique rule identifier.
   - `teamId` (string) → `MultiAgentTeam.id`.
   - `name` (string): Rule name.
@@ -130,6 +144,7 @@ Rules governing tool execution order and constraints.
 Record of tool execution with rule enforcement.
 
 - **Fields**:
+
   - `id` (string): Unique execution identifier.
   - `agentId` (string) → `Agent.id`.
   - `toolName` (string): Name of the tool executed.
@@ -149,6 +164,7 @@ Record of tool execution with rule enforcement.
 Reusable agent configuration templates.
 
 - **Fields**:
+
   - `id` (string): Unique template identifier.
   - `name` (string): Template name.
   - `description` (string): Template description and use case.
@@ -168,6 +184,7 @@ Reusable agent configuration templates.
 Audit log for shared memory access.
 
 - **Fields**:
+
   - `id` (string): Unique log entry identifier.
   - `sharedBlockId` (string) → `SharedMemoryBlock.id`.
   - `agentId` (string) → `Agent.id`.
@@ -221,21 +238,25 @@ Predefined roles that agents can fulfill within a team.
 ## State Transitions
 
 ### Agent Lifecycle
+
 ```
 created → active → (paused ↔ active) → error/offline → archived
 ```
 
 ### Message Lifecycle
+
 ```
 pending → delivered → read → (optional: failed)
 ```
 
 ### Tool Execution with Rules
+
 ```
 requested → (rule_check) → (blocked | running) → completed/failed
 ```
 
 ### Shared Memory Updates
+
 ```
 requested → (access_check) → (denied | in_progress) → completed/failed
 ```
@@ -243,18 +264,21 @@ requested → (access_check) → (denied | in_progress) → completed/failed
 ## Performance Considerations
 
 ### Indexing Strategy
+
 - `Agent.teamId`, `Agent.status` for team-based queries
 - `AgentMessage.toAgentId`, `AgentMessage.status` for message routing
 - `SharedMemoryBlock.teamId`, `SharedMemoryBlock.type` for memory access
 - `ToolExecution.agentId`, `ToolExecution.status` for execution monitoring
 
 ### Caching Strategy
+
 - Frequently accessed shared memory blocks
 - Agent capability and role definitions
 - Active tool rules for teams
 - Message routing information
 
 ### Scaling Patterns
+
 - Horizontal scaling for agent execution
 - Message queues for cross-agent communication
 - Distributed locking for shared memory updates
@@ -263,12 +287,14 @@ requested → (access_check) → (denied | in_progress) → completed/failed
 ## Security Model
 
 ### Access Control
+
 - Team-based isolation
 - Role-based permissions for memory access
 - Tool execution restrictions based on agent capabilities
 - Message routing controls
 
 ### Audit Trail
+
 - Complete audit log for shared memory access
 - Message history for compliance
 - Tool execution logs for debugging
@@ -277,12 +303,14 @@ requested → (access_check) → (denied | in_progress) → completed/failed
 ## Integration Points
 
 ### Letta Core Integration
+
 - Extends core `Agent` model with team relationships
 - Leverages existing `MemoryBlock` infrastructure
 - Integrates with tool execution system
 - Uses existing authentication and authorization
 
 ### External Systems
+
 - Message queuing systems for cross-agent communication
 - Distributed caching for shared memory
 - Monitoring and logging systems

@@ -3,781 +3,793 @@
  * Do not make direct changes to the file.
  */
 
-export interface paths {
-    "/workflows": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a new workflow */
-        post: operations["createWorkflow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+export type paths = {
+  "/workflows": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get workflow definition */
-        get: operations["getWorkflow"];
-        /** Update workflow definition */
-        put: operations["updateWorkflow"];
-        post?: never;
-        /** Delete workflow */
-        delete: operations["deleteWorkflow"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Create a new workflow */
+    post: operations["createWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}/execute": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Execute workflow */
-        post: operations["executeWorkflow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get workflow definition */
+    get: operations["getWorkflow"];
+    /** Update workflow definition */
+    put: operations["updateWorkflow"];
+    post?: never;
+    /** Delete workflow */
+    delete: operations["deleteWorkflow"];
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}/execute": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}/status": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get workflow execution status */
-        get: operations["getWorkflowStatus"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Execute workflow */
+    post: operations["executeWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}/status": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}/pause": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Pause workflow execution */
-        post: operations["pauseWorkflow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    /** Get workflow execution status */
+    get: operations["getWorkflowStatus"];
+    put?: never;
+    post?: never;
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}/pause": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}/resume": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Resume workflow execution */
-        post: operations["resumeWorkflow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Pause workflow execution */
+    post: operations["pauseWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}/resume": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    "/workflows/{workflowId}/cancel": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Cancel workflow execution */
-        post: operations["cancelWorkflow"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
+    get?: never;
+    put?: never;
+    /** Resume workflow execution */
+    post: operations["resumeWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+  "/workflows/{workflowId}/cancel": {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-}
+    get?: never;
+    put?: never;
+    /** Cancel workflow execution */
+    post: operations["cancelWorkflow"];
+    delete?: never;
+    options?: never;
+    head?: never;
+    patch?: never;
+    trace?: never;
+  };
+};
 export type webhooks = Record<string, never>;
-export interface components {
-    schemas: {
-        CreateWorkflowRequest: {
-            /** @description Unique workflow name */
-            name: string;
-            /** @description Workflow description */
-            description: string;
-            /** @description Workflow steps array */
-            steps: components["schemas"]["WorkflowStep"][];
-            /** @description Workflow triggers */
-            triggers?: components["schemas"]["WorkflowTrigger"][];
-            errorHandling?: {
-                /** @description Number of retry attempts */
-                retryAttempts?: number;
-                /**
-                 * @description Action on failure
-                 * @enum {string}
-                 */
-                fallbackAction?: "abort" | "retry" | "human_intervention";
-                circuitBreaker?: {
-                    /** @description Failure threshold for circuit breaking */
-                    failureThreshold?: number;
-                    /** @description Recovery timeout in milliseconds */
-                    recoveryTimeout?: number;
-                };
-            };
+export type components = {
+  schemas: {
+    CreateWorkflowRequest: {
+      /** @description Unique workflow name */
+      name: string;
+      /** @description Workflow description */
+      description: string;
+      /** @description Workflow steps array */
+      steps: components["schemas"]["WorkflowStep"][];
+      /** @description Workflow triggers */
+      triggers?: components["schemas"]["WorkflowTrigger"][];
+      errorHandling?: {
+        /** @description Number of retry attempts */
+        retryAttempts?: number;
+        /**
+         * @description Action on failure
+         * @enum {string}
+         */
+        fallbackAction?: "abort" | "retry" | "human_intervention";
+        circuitBreaker?: {
+          /** @description Failure threshold for circuit breaking */
+          failureThreshold?: number;
+          /** @description Recovery timeout in milliseconds */
+          recoveryTimeout?: number;
         };
-        UpdateWorkflowRequest: {
-            /** @description Updated workflow name */
-            name?: string;
-            /** @description Updated workflow description */
-            description?: string;
-            /** @description Updated workflow steps */
-            steps?: components["schemas"]["WorkflowStep"][];
-            /** @description Updated workflow triggers */
-            triggers?: components["schemas"]["WorkflowTrigger"][];
-            errorHandling?: {
-                /** @description Number of retry attempts */
-                retryAttempts?: number;
-                /**
-                 * @description Action on failure
-                 * @enum {string}
-                 */
-                fallbackAction?: "abort" | "retry" | "human_intervention";
-                circuitBreaker?: {
-                    /** @description Failure threshold for circuit breaking */
-                    failureThreshold?: number;
-                    /** @description Recovery timeout in milliseconds */
-                    recoveryTimeout?: number;
-                };
-            };
-        };
-        ExecuteWorkflowRequest: {
-            /** @description Input data for workflow execution */
-            input: Record<string, never>;
-            /**
-             * @description Enable autonomous execution
-             * @default true
-             */
-            autonomous: boolean;
-            context?: {
-                /** @description Session identifier */
-                sessionId?: string;
-                /** @description User identifier */
-                userId?: string;
-                /** @description Execution timeout in milliseconds */
-                timeout?: number;
-            };
-            /**
-             * @description Execution priority
-             * @default normal
-             * @enum {string}
-             */
-            priority: "low" | "normal" | "high";
-        };
-        WorkflowDefinition: {
-            /**
-             * Format: uuid
-             * @description Unique workflow identifier
-             */
-            id: string;
-            /** @description Workflow name */
-            name: string;
-            /** @description Workflow description */
-            description: string;
-            /** @description Workflow steps array */
-            steps: components["schemas"]["WorkflowStep"][];
-            /** @description Workflow triggers */
-            triggers?: components["schemas"]["WorkflowTrigger"][];
-            errorHandling?: {
-                /** @description Number of retry attempts */
-                retryAttempts?: number;
-                /**
-                 * @description Action on failure
-                 * @enum {string}
-                 */
-                fallbackAction?: "abort" | "retry" | "human_intervention";
-                circuitBreaker?: {
-                    /** @description Failure threshold for circuit breaking */
-                    failureThreshold?: number;
-                    /** @description Recovery timeout in milliseconds */
-                    recoveryTimeout?: number;
-                };
-            };
-            /**
-             * @description Enable parallel step execution
-             * @default false
-             */
-            parallel: boolean;
-        };
-        WorkflowStep: {
-            /**
-             * Format: uuid
-             * @description Unique step identifier
-             */
-            id: string;
-            /** @description Step name */
-            name: string;
-            /**
-             * @description Step type
-             * @enum {string}
-             */
-            type: "task" | "decision" | "parallel" | "subgraph";
-            /** @description Step-specific configuration */
-            configuration?: Record<string, never>;
-            /** @description Expected input data structure */
-            inputs?: Record<string, never>;
-            /** @description Expected output data structure */
-            outputs?: Record<string, never>;
-            /** @description Step dependencies */
-            dependencies?: string[];
-            /** @description Step timeout in milliseconds */
-            timeout?: number;
-            retryPolicy?: {
-                /** @description Maximum retry attempts */
-                maxAttempts?: number;
-                /** @description Base delay in milliseconds */
-                baseDelay?: number;
-                /** @description Maximum delay in milliseconds */
-                maxDelay?: number;
-                /** @description Add jitter to retry delays */
-                jitter?: boolean;
-            };
-        };
-        WorkflowTrigger: {
-            /**
-             * @description Trigger type
-             * @enum {string}
-             */
-            type: "manual" | "schedule" | "event" | "webhook";
-            /** @description Trigger-specific configuration */
-            configuration?: Record<string, never>;
-            /** @description Trigger conditions */
-            conditions?: Record<string, never>;
-        };
-        WorkflowExecution: {
-            /**
-             * Format: uuid
-             * @description Unique execution identifier
-             */
-            executionId: string;
-            /**
-             * Format: uuid
-             * @description Workflow identifier
-             */
-            workflowId?: string;
-            /**
-             * @description Current execution status
-             * @enum {string}
-             */
-            status: "pending" | "running" | "completed" | "failed" | "paused" | "cancelled";
-            /** @description Currently executing step */
-            currentStep?: string;
-            /**
-             * Format: date-time
-             * @description Execution start time
-             */
-            startTime?: string;
-            /**
-             * Format: date-time
-             * @description Execution end time
-             */
-            endTime?: string;
-            progress?: {
-                /** @description Percentage completed */
-                completed?: number;
-                /** @description Current step name */
-                currentStep?: string;
-            };
-            /** @description Execution results */
-            results?: Record<string, never>;
-            /** @description Execution errors */
-            errors?: components["schemas"]["Error"][];
-        };
-        WorkflowExecutionStatus: {
-            /**
-             * Format: uuid
-             * @description Unique execution identifier
-             */
-            executionId: string;
-            /**
-             * @description Current execution status
-             * @enum {string}
-             */
-            status: "pending" | "running" | "completed" | "failed" | "paused" | "cancelled";
-            /** @description Currently executing step */
-            currentStep?: string;
-            progress?: {
-                /** @description Percentage completed */
-                completed?: number;
-                /** @description Current step name */
-                currentStep?: string;
-            };
-            metrics?: {
-                /** @description Execution time in milliseconds */
-                executionTime?: number;
-                /** @description Number of steps completed */
-                stepsCompleted?: number;
-                /** @description Number of errors encountered */
-                errorsEncountered?: number;
-            };
-        };
-        SuccessResponse: {
-            /** @description Operation success status */
-            success: boolean;
-            /** @description Success message */
-            message?: string;
-        };
-        Error: {
-            /** @description Error code */
-            code: string;
-            /** @description Error description */
-            message: string;
-            /** @description Additional error details */
-            details?: Record<string, never>;
-            /** @description Suggested resolutions */
-            suggestions?: string[];
-        };
+      };
     };
-    responses: never;
-    parameters: never;
-    requestBodies: never;
-    headers: never;
-    pathItems: never;
-}
+    UpdateWorkflowRequest: {
+      /** @description Updated workflow name */
+      name?: string;
+      /** @description Updated workflow description */
+      description?: string;
+      /** @description Updated workflow steps */
+      steps?: components["schemas"]["WorkflowStep"][];
+      /** @description Updated workflow triggers */
+      triggers?: components["schemas"]["WorkflowTrigger"][];
+      errorHandling?: {
+        /** @description Number of retry attempts */
+        retryAttempts?: number;
+        /**
+         * @description Action on failure
+         * @enum {string}
+         */
+        fallbackAction?: "abort" | "retry" | "human_intervention";
+        circuitBreaker?: {
+          /** @description Failure threshold for circuit breaking */
+          failureThreshold?: number;
+          /** @description Recovery timeout in milliseconds */
+          recoveryTimeout?: number;
+        };
+      };
+    };
+    ExecuteWorkflowRequest: {
+      /** @description Input data for workflow execution */
+      input: Record<string, never>;
+      /**
+       * @description Enable autonomous execution
+       * @default true
+       */
+      autonomous: boolean;
+      context?: {
+        /** @description Session identifier */
+        sessionId?: string;
+        /** @description User identifier */
+        userId?: string;
+        /** @description Execution timeout in milliseconds */
+        timeout?: number;
+      };
+      /**
+       * @description Execution priority
+       * @default normal
+       * @enum {string}
+       */
+      priority: "low" | "normal" | "high";
+    };
+    WorkflowDefinition: {
+      /**
+       * Format: uuid
+       * @description Unique workflow identifier
+       */
+      id: string;
+      /** @description Workflow name */
+      name: string;
+      /** @description Workflow description */
+      description: string;
+      /** @description Workflow steps array */
+      steps: components["schemas"]["WorkflowStep"][];
+      /** @description Workflow triggers */
+      triggers?: components["schemas"]["WorkflowTrigger"][];
+      errorHandling?: {
+        /** @description Number of retry attempts */
+        retryAttempts?: number;
+        /**
+         * @description Action on failure
+         * @enum {string}
+         */
+        fallbackAction?: "abort" | "retry" | "human_intervention";
+        circuitBreaker?: {
+          /** @description Failure threshold for circuit breaking */
+          failureThreshold?: number;
+          /** @description Recovery timeout in milliseconds */
+          recoveryTimeout?: number;
+        };
+      };
+      /**
+       * @description Enable parallel step execution
+       * @default false
+       */
+      parallel: boolean;
+    };
+    WorkflowStep: {
+      /**
+       * Format: uuid
+       * @description Unique step identifier
+       */
+      id: string;
+      /** @description Step name */
+      name: string;
+      /**
+       * @description Step type
+       * @enum {string}
+       */
+      type: "task" | "decision" | "parallel" | "subgraph";
+      /** @description Step-specific configuration */
+      configuration?: Record<string, never>;
+      /** @description Expected input data structure */
+      inputs?: Record<string, never>;
+      /** @description Expected output data structure */
+      outputs?: Record<string, never>;
+      /** @description Step dependencies */
+      dependencies?: string[];
+      /** @description Step timeout in milliseconds */
+      timeout?: number;
+      retryPolicy?: {
+        /** @description Maximum retry attempts */
+        maxAttempts?: number;
+        /** @description Base delay in milliseconds */
+        baseDelay?: number;
+        /** @description Maximum delay in milliseconds */
+        maxDelay?: number;
+        /** @description Add jitter to retry delays */
+        jitter?: boolean;
+      };
+    };
+    WorkflowTrigger: {
+      /**
+       * @description Trigger type
+       * @enum {string}
+       */
+      type: "manual" | "schedule" | "event" | "webhook";
+      /** @description Trigger-specific configuration */
+      configuration?: Record<string, never>;
+      /** @description Trigger conditions */
+      conditions?: Record<string, never>;
+    };
+    WorkflowExecution: {
+      /**
+       * Format: uuid
+       * @description Unique execution identifier
+       */
+      executionId: string;
+      /**
+       * Format: uuid
+       * @description Workflow identifier
+       */
+      workflowId?: string;
+      /**
+       * @description Current execution status
+       * @enum {string}
+       */
+      status:
+        | "pending"
+        | "running"
+        | "completed"
+        | "failed"
+        | "paused"
+        | "cancelled";
+      /** @description Currently executing step */
+      currentStep?: string;
+      /**
+       * Format: date-time
+       * @description Execution start time
+       */
+      startTime?: string;
+      /**
+       * Format: date-time
+       * @description Execution end time
+       */
+      endTime?: string;
+      progress?: {
+        /** @description Percentage completed */
+        completed?: number;
+        /** @description Current step name */
+        currentStep?: string;
+      };
+      /** @description Execution results */
+      results?: Record<string, never>;
+      /** @description Execution errors */
+      errors?: components["schemas"]["Error"][];
+    };
+    WorkflowExecutionStatus: {
+      /**
+       * Format: uuid
+       * @description Unique execution identifier
+       */
+      executionId: string;
+      /**
+       * @description Current execution status
+       * @enum {string}
+       */
+      status:
+        | "pending"
+        | "running"
+        | "completed"
+        | "failed"
+        | "paused"
+        | "cancelled";
+      /** @description Currently executing step */
+      currentStep?: string;
+      progress?: {
+        /** @description Percentage completed */
+        completed?: number;
+        /** @description Current step name */
+        currentStep?: string;
+      };
+      metrics?: {
+        /** @description Execution time in milliseconds */
+        executionTime?: number;
+        /** @description Number of steps completed */
+        stepsCompleted?: number;
+        /** @description Number of errors encountered */
+        errorsEncountered?: number;
+      };
+    };
+    SuccessResponse: {
+      /** @description Operation success status */
+      success: boolean;
+      /** @description Success message */
+      message?: string;
+    };
+    Error: {
+      /** @description Error code */
+      code: string;
+      /** @description Error description */
+      message: string;
+      /** @description Additional error details */
+      details?: Record<string, never>;
+      /** @description Suggested resolutions */
+      suggestions?: string[];
+    };
+  };
+  responses: never;
+  parameters: never;
+  requestBodies: never;
+  headers: never;
+  pathItems: never;
+};
 export type $defs = Record<string, never>;
-export interface operations {
-    createWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateWorkflowRequest"];
-            };
-        };
-        responses: {
-            /** @description Workflow created successfully */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WorkflowDefinition"];
-                };
-            };
-            /** @description Invalid request parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Rate limit exceeded */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+export type operations = {
+  createWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
     };
-    getWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Workflow retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WorkflowDefinition"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["CreateWorkflowRequest"];
+      };
     };
-    updateWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Workflow created successfully */
+      201: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateWorkflowRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["WorkflowDefinition"];
         };
-        responses: {
-            /** @description Workflow updated successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WorkflowDefinition"];
-                };
-            };
-            /** @description Invalid request parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    deleteWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Workflow deleted successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuccessResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  getWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
     };
-    executeWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
+    requestBody?: never;
+    responses: {
+      /** @description Workflow retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ExecuteWorkflowRequest"];
-            };
+        content: {
+          "application/json": components["schemas"]["WorkflowDefinition"];
         };
-        responses: {
-            /** @description Workflow execution started */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WorkflowExecution"];
-                };
-            };
-            /** @description Invalid request parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Rate limit exceeded */
-            429: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
         };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    getWorkflowStatus: {
-        parameters: {
-            query?: {
-                executionId?: string;
-            };
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Execution status retrieved successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["WorkflowExecutionStatus"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow execution not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  updateWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
     };
-    pauseWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Workflow paused successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuccessResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow execution not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["UpdateWorkflowRequest"];
+      };
     };
-    resumeWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
+    responses: {
+      /** @description Workflow updated successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
         };
-        requestBody?: never;
-        responses: {
-            /** @description Workflow resumed successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuccessResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow execution not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
+        content: {
+          "application/json": components["schemas"]["WorkflowDefinition"];
         };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
     };
-    cancelWorkflow: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                workflowId: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Workflow cancelled successfully */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SuccessResponse"];
-                };
-            };
-            /** @description Authentication failed */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-            /** @description Workflow execution not found */
-            404: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
+  };
+  deleteWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
     };
-}
+    requestBody?: never;
+    responses: {
+      /** @description Workflow deleted successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  executeWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path?: never;
+      cookie?: never;
+    };
+    requestBody: {
+      content: {
+        "application/json": components["schemas"]["ExecuteWorkflowRequest"];
+      };
+    };
+    responses: {
+      /** @description Workflow execution started */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WorkflowExecution"];
+        };
+      };
+      /** @description Invalid request parameters */
+      400: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  getWorkflowStatus: {
+    parameters: {
+      query?: {
+        executionId?: string;
+      };
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Execution status retrieved successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["WorkflowExecutionStatus"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow execution not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  pauseWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workflow paused successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow execution not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  resumeWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workflow resumed successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow execution not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+  cancelWorkflow: {
+    parameters: {
+      query?: never;
+      header?: never;
+      path: {
+        workflowId: string;
+      };
+      cookie?: never;
+    };
+    requestBody?: never;
+    responses: {
+      /** @description Workflow cancelled successfully */
+      200: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["SuccessResponse"];
+        };
+      };
+      /** @description Authentication failed */
+      401: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+      /** @description Workflow execution not found */
+      404: {
+        headers: {
+          [name: string]: unknown;
+        };
+        content: {
+          "application/json": components["schemas"]["Error"];
+        };
+      };
+    };
+  };
+};

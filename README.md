@@ -4,17 +4,36 @@ A sophisticated multi-agent orchestration system that combines OpenAI Realtime (
 
 ## 🚀 Quick Start
 
+### One-Command Setup
 ```bash
-# Install and run
-pnpm install
-pnpm build
-cd backend && encore dev
+# Complete setup from scratch
+make quickstart
 
-# Start using immediately
-npm run visualize-stream <session-id>
+# Start all services (Backend + Frontend + Redis)
+make dev
 ```
 
-**📖 Full Documentation**: See our [Quick Start Guide](./docs/quickstart.md) for complete setup and usage instructions.
+### Manual Setup
+```bash
+# 1. Install dependencies
+make install
+
+# 2. Setup environment files
+make setup-env
+# Then edit .env with your API keys
+
+# 3. Start all services
+make dev
+# Or use: pnpm start or ./start.sh
+```
+
+**Your app is now running at:**
+- 🌐 **Frontend**: http://localhost:3000
+- 🔧 **Backend API**: http://localhost:4000
+- 📚 **API Docs**: http://localhost:4000/_docs
+- 🤖 **Multi-Agent API**: http://localhost:4000/v2/multi-agent/health
+
+**📖 Full Documentation**: See [RUNNING.md](./RUNNING.md) for detailed setup, troubleshooting, and all available commands.
 
 ## 🏗️ Architecture Overview
 

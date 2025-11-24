@@ -3,28 +3,27 @@
  * Tests for checkpointing mechanism and state persistence
  */
 
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { beforeEach, describe, expect, it } from "vitest";
+import { addStepToPlan, createWorkflowPlan } from "../../src/workflow/plan";
 import {
-  WorkflowCheckpoint,
-  CheckpointStore,
+  type CheckpointStore,
   createCheckpoint,
-  saveCheckpoint,
   loadCheckpoint,
   RecoveryManager,
-} from '../../src/workflow/recovery';
-import { createWorkflowPlan, addStepToPlan } from '../../src/workflow/plan';
+  saveCheckpoint,
+} from "../../src/workflow/recovery";
 
-describe('Checkpoint Management', () => {
+describe("Checkpoint Management", () => {
   let store: CheckpointStore;
 
   beforeEach(() => {
     store = new Map();
   });
 
-  describe('createCheckpoint', () => {
-    it('should create a checkpoint with current state', () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("createCheckpoint", () => {
+    it("should create a checkpoint with current state", () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step], {
         lastCompletedStepId: step.id,
@@ -40,10 +39,10 @@ describe('Checkpoint Management', () => {
       expect(checkpoint.metadata.executionTime).toBe(100);
     });
 
-    it('should include multiple completed steps', () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step1 = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
-      const step2 = addStepToPlan(plan, { name: 'Step 2', type: 'action' });
+    it("should include multiple completed steps", () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step1 = addStepToPlan(plan, { name: "Step 1", type: "action" });
+      const step2 = addStepToPlan(plan, { name: "Step 2", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step1, step2], {});
 
@@ -52,9 +51,9 @@ describe('Checkpoint Management', () => {
       expect(checkpoint.completedSteps).toHaveLength(2);
     });
 
-    it('should preserve plan state at checkpoint time', () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step1 = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+    it("should preserve plan state at checkpoint time", () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step1 = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step1], {
         planSnapshot: { stepsCompleted: 1 },
@@ -64,10 +63,10 @@ describe('Checkpoint Management', () => {
     });
   });
 
-  describe('saveCheckpoint', () => {
-    it('should save checkpoint to store', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("saveCheckpoint", () => {
+    it("should save checkpoint to store", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step], {});
 
@@ -77,27 +76,29 @@ describe('Checkpoint Management', () => {
       expect(store.get(checkpoint.id)).toEqual(checkpoint);
     });
 
-    it('should overwrite existing checkpoint with same id', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step1 = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
-      const step2 = addStepToPlan(plan, { name: 'Step 2', type: 'action' });
+    it("should overwrite existing checkpoint with same id", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step1 = addStepToPlan(plan, { name: "Step 1", type: "action" });
+      const step2 = addStepToPlan(plan, { name: "Step 2", type: "action" });
 
       const checkpoint1 = createCheckpoint(plan, [step1], { version: 1 });
-      const checkpoint2 = createCheckpoint(plan, [step1, step2], { version: 2 });
+      const checkpoint2 = createCheckpoint(plan, [step1, step2], {
+        version: 2,
+      });
       checkpoint2.id = checkpoint1.id;
 
       await saveCheckpoint(store, checkpoint1);
       await saveCheckpoint(store, checkpoint2);
 
       expect(store.size).toBe(1);
-      expect(store.get(checkpoint1.id)!.metadata.version).toBe(2);
+      expect(store.get(checkpoint1.id)?.metadata.version).toBe(2);
     });
   });
 
-  describe('loadCheckpoint', () => {
-    it('should load checkpoint from store', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("loadCheckpoint", () => {
+    it("should load checkpoint from store", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step], {});
       await saveCheckpoint(store, checkpoint);
@@ -105,35 +106,35 @@ describe('Checkpoint Management', () => {
       const loaded = await loadCheckpoint(store, checkpoint.id);
 
       expect(loaded).toBeDefined();
-      expect(loaded!.id).toBe(checkpoint.id);
-      expect(loaded!.planId).toBe(checkpoint.planId);
+      expect(loaded?.id).toBe(checkpoint.id);
+      expect(loaded?.planId).toBe(checkpoint.planId);
     });
 
-    it('should return null if checkpoint does not exist', async () => {
-      const loaded = await loadCheckpoint(store, 'nonexistent');
+    it("should return null if checkpoint does not exist", async () => {
+      const loaded = await loadCheckpoint(store, "nonexistent");
 
       expect(loaded).toBeNull();
     });
 
-    it('should preserve metadata on load', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+    it("should preserve metadata on load", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = createCheckpoint(plan, [step], {
-        customField: 'custom_value',
-        nested: { field: 'value' },
+        customField: "custom_value",
+        nested: { field: "value" },
       });
       await saveCheckpoint(store, checkpoint);
 
       const loaded = await loadCheckpoint(store, checkpoint.id);
 
-      expect(loaded!.metadata.customField).toBe('custom_value');
-      expect(loaded!.metadata.nested.field).toBe('value');
+      expect(loaded?.metadata.customField).toBe("custom_value");
+      expect(loaded?.metadata.nested.field).toBe("value");
     });
   });
 });
 
-describe('RecoveryManager', () => {
+describe("RecoveryManager", () => {
   let manager: RecoveryManager;
   let store: CheckpointStore;
 
@@ -142,13 +143,13 @@ describe('RecoveryManager', () => {
     manager = new RecoveryManager(store);
   });
 
-  describe('createRecoveryPoint', () => {
-    it('should create and store a recovery point', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("createRecoveryPoint", () => {
+    it("should create and store a recovery point", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = await manager.createRecoveryPoint(plan, [step], {
-        reason: 'periodic',
+        reason: "periodic",
       });
 
       expect(checkpoint).toBeDefined();
@@ -158,36 +159,36 @@ describe('RecoveryManager', () => {
       expect(loaded).toBeDefined();
     });
 
-    it('should include reason in metadata', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+    it("should include reason in metadata", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = await manager.createRecoveryPoint(plan, [step], {
-        reason: 'error_recovery',
+        reason: "error_recovery",
       });
 
-      expect(checkpoint.metadata.reason).toBe('error_recovery');
+      expect(checkpoint.metadata.reason).toBe("error_recovery");
     });
   });
 
-  describe('getLatestCheckpoint', () => {
-    it('should return the most recent checkpoint', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step1 = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
-      const step2 = addStepToPlan(plan, { name: 'Step 2', type: 'action' });
+  describe("getLatestCheckpoint", () => {
+    it("should return the most recent checkpoint", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step1 = addStepToPlan(plan, { name: "Step 1", type: "action" });
+      const step2 = addStepToPlan(plan, { name: "Step 2", type: "action" });
 
-      const ckpt1 = await manager.createRecoveryPoint(plan, [step1], {});
+      const _ckpt1 = await manager.createRecoveryPoint(plan, [step1], {});
       await new Promise((resolve) => setTimeout(resolve, 10));
       const ckpt2 = await manager.createRecoveryPoint(plan, [step1, step2], {});
 
       const latest = await manager.getLatestCheckpoint(plan.id);
 
-      expect(latest!.id).toBe(ckpt2.id);
-      expect(latest!.completedSteps).toContain(step2.id);
+      expect(latest?.id).toBe(ckpt2.id);
+      expect(latest?.completedSteps).toContain(step2.id);
     });
 
-    it('should return null if no checkpoints exist', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
+    it("should return null if no checkpoints exist", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
 
       const latest = await manager.getLatestCheckpoint(plan.id);
 
@@ -195,10 +196,10 @@ describe('RecoveryManager', () => {
     });
   });
 
-  describe('getPreviousCheckpoints', () => {
-    it('should return all checkpoints for a plan', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("getPreviousCheckpoints", () => {
+    it("should return all checkpoints for a plan", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       await manager.createRecoveryPoint(plan, [step], { version: 1 });
       await new Promise((resolve) => setTimeout(resolve, 5));
@@ -211,13 +212,13 @@ describe('RecoveryManager', () => {
       expect(checkpoints[1].metadata.version).toBe(2);
     });
 
-    it('should return checkpoints sorted by timestamp', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+    it("should return checkpoints sorted by timestamp", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
-      const ckpt1 = await manager.createRecoveryPoint(plan, [step], {});
+      const _ckpt1 = await manager.createRecoveryPoint(plan, [step], {});
       await new Promise((resolve) => setTimeout(resolve, 10));
-      const ckpt2 = await manager.createRecoveryPoint(plan, [step], {});
+      const _ckpt2 = await manager.createRecoveryPoint(plan, [step], {});
 
       const checkpoints = await manager.getPreviousCheckpoints(plan.id);
 
@@ -227,12 +228,12 @@ describe('RecoveryManager', () => {
     });
   });
 
-  describe('rollbackToCheckpoint', () => {
-    it('should identify remaining steps after rollback', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step1 = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
-      const step2 = addStepToPlan(plan, { name: 'Step 2', type: 'action' });
-      const step3 = addStepToPlan(plan, { name: 'Step 3', type: 'action' });
+  describe("rollbackToCheckpoint", () => {
+    it("should identify remaining steps after rollback", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step1 = addStepToPlan(plan, { name: "Step 1", type: "action" });
+      const step2 = addStepToPlan(plan, { name: "Step 2", type: "action" });
+      const step3 = addStepToPlan(plan, { name: "Step 3", type: "action" });
 
       const checkpoint = await manager.createRecoveryPoint(
         plan,
@@ -248,10 +249,10 @@ describe('RecoveryManager', () => {
     });
   });
 
-  describe('deleteCheckpoint', () => {
-    it('should delete a checkpoint', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("deleteCheckpoint", () => {
+    it("should delete a checkpoint", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const checkpoint = await manager.createRecoveryPoint(plan, [step], {});
 
@@ -261,17 +262,17 @@ describe('RecoveryManager', () => {
       expect(loaded).toBeNull();
     });
 
-    it('should not throw if checkpoint does not exist', async () => {
+    it("should not throw if checkpoint does not exist", async () => {
       await expect(
-        manager.deleteCheckpoint('nonexistent')
+        manager.deleteCheckpoint("nonexistent")
       ).resolves.not.toThrow();
     });
   });
 
-  describe('cleanup', () => {
-    it('should delete old checkpoints', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+  describe("cleanup", () => {
+    it("should delete old checkpoints", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
       const ckpt1 = await manager.createRecoveryPoint(plan, [step], {});
       await new Promise((resolve) => setTimeout(resolve, 50));
@@ -285,12 +286,12 @@ describe('RecoveryManager', () => {
       expect(remaining.some((c) => c.id === ckpt2.id)).toBe(true);
     });
 
-    it('should keep specified number of recent checkpoints', async () => {
-      const plan = createWorkflowPlan({ name: 'Test' });
-      const step = addStepToPlan(plan, { name: 'Step 1', type: 'action' });
+    it("should keep specified number of recent checkpoints", async () => {
+      const plan = createWorkflowPlan({ name: "Test" });
+      const step = addStepToPlan(plan, { name: "Step 1", type: "action" });
 
-      const ckpt1 = await manager.createRecoveryPoint(plan, [step], {});
-      const ckpt2 = await manager.createRecoveryPoint(plan, [step], {});
+      const _ckpt1 = await manager.createRecoveryPoint(plan, [step], {});
+      const _ckpt2 = await manager.createRecoveryPoint(plan, [step], {});
       const ckpt3 = await manager.createRecoveryPoint(plan, [step], {});
 
       await manager.cleanupOldCheckpoints(plan.id, { keep: 2 });

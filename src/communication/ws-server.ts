@@ -3,28 +3,28 @@
  * Real-time agent messaging and connection management
  */
 
-import { WebSocket, WebSocketServer } from 'ws';
-import type { WebSocketMessage } from './ws';
+import { WebSocket, WebSocketServer } from "ws";
+import type { WebSocketMessage } from "./ws";
 
-export interface WsServerConfig {
+export type WsServerConfig = {
   port?: number;
   path?: string;
   hostname?: string;
-}
+};
 
-interface ConnectionState {
+type ConnectionState = {
   connectionId: string;
   isActive: boolean;
   connectedAt: number;
   lastMessageAt: number;
   messageCount: number;
-}
+};
 
-interface ServerHealth {
+type ServerHealth = {
   active: number;
   totalConnections: number;
   uptime: number;
-}
+};
 
 type MessageHandler = (message: WebSocketMessage, connectionId: string) => void;
 type DisconnectHandler = (connectionId: string) => void;
@@ -32,33 +32,35 @@ type ErrorHandler = (connectionId: string, error: Error) => void;
 
 export class WsServer {
   private server: WebSocketServer | null = null;
-  private connections: Map<string, WebSocket> = new Map();
-  private connectionStates: Map<string, ConnectionState> = new Map();
-  private config: WsServerConfig;
-  private messageHandlers: MessageHandler[] = [];
-  private disconnectHandlers: DisconnectHandler[] = [];
-  private errorHandlers: ErrorHandler[] = [];
-  private startTime = Date.now();
+  private readonly connections: Map<string, WebSocket> = new Map();
+  private readonly connectionStates: Map<string, ConnectionState> = new Map();
+  private readonly config: WsServerConfig;
+  private readonly messageHandlers: MessageHandler[] = [];
+  private readonly disconnectHandlers: DisconnectHandler[] = [];
+  private readonly errorHandlers: ErrorHandler[] = [];
+  private readonly startTime = Date.now();
   private isRunning = false;
 
   constructor(config: WsServerConfig = {}) {
     this.config = {
       port: config.port ?? 8080,
-      path: config.path ?? '/ws',
-      hostname: config.hostname ?? 'localhost'
+      path: config.path ?? "/ws",
+      hostname: config.hostname ?? "localhost",
     };
   }
 
   async start(): Promise<void> {
-    if (this.isRunning) return;
+    if (this.isRunning) {
+      return;
+    }
 
     try {
       this.server = new WebSocketServer({
         port: this.config.port,
-        path: this.config.path
+        path: this.config.path,
       });
 
-      this.server.on('connection', (ws: WebSocket) => {
+      this.server.on("connection", (ws: WebSocket) => {
         this.handleConnection(ws);
       });
 
@@ -69,7 +71,9 @@ export class WsServer {
   }
 
   async shutdown(): Promise<void> {
-    if (!this.isRunning) return;
+    if (!this.isRunning) {
+      return;
+    }
 
     for (const ws of this.connections.values()) {
       if (ws.readyState === WebSocket.OPEN) {
@@ -94,7 +98,7 @@ export class WsServer {
         isActive: true,
         connectedAt: Date.now(),
         lastMessageAt: Date.now(),
-        messageCount: 0
+        messageCount: 0,
       };
       this.connectionStates.set(connectionId, state);
     }
@@ -102,7 +106,7 @@ export class WsServer {
     state.lastMessageAt = Date.now();
     state.messageCount++;
 
-    this.messageHandlers.forEach(handler => {
+    this.messageHandlers.forEach((handler) => {
       handler(message, connectionId);
     });
   }
@@ -116,13 +120,13 @@ export class WsServer {
     this.connections.delete(connectionId);
     this.connectionStates.delete(connectionId);
 
-    this.disconnectHandlers.forEach(handler => {
+    this.disconnectHandlers.forEach((handler) => {
       handler(connectionId);
     });
   }
 
   handleError(connectionId: string, error: Error): void {
-    this.errorHandlers.forEach(handler => {
+    this.errorHandlers.forEach((handler) => {
       handler(connectionId, error);
     });
   }
@@ -149,13 +153,14 @@ export class WsServer {
   }
 
   getHealth(): ServerHealth {
-    const active = Array.from(this.connectionStates.values())
-      .filter(s => s.isActive).length;
+    const active = Array.from(this.connectionStates.values()).filter(
+      (s) => s.isActive
+    ).length;
 
     return {
       active,
       totalConnections: this.connectionStates.size,
-      uptime: Date.now() - this.startTime
+      uptime: Date.now() - this.startTime,
     };
   }
 
@@ -180,24 +185,27 @@ export class WsServer {
       isActive: true,
       connectedAt: Date.now(),
       lastMessageAt: Date.now(),
-      messageCount: 0
+      messageCount: 0,
     };
     this.connectionStates.set(connectionId, state);
 
-    ws.on('message', (data: Buffer) => {
+    ws.on("message", (data: Buffer) => {
       try {
-        const message = JSON.parse(data.toString('utf-8')) as WebSocketMessage;
+        const message = JSON.parse(data.toString("utf-8")) as WebSocketMessage;
         this.handleIncomingMessage(message, connectionId);
       } catch (error) {
-        this.handleError(connectionId, new Error(`Failed to parse message: ${error}`));
+        this.handleError(
+          connectionId,
+          new Error(`Failed to parse message: ${error}`)
+        );
       }
     });
 
-    ws.on('close', () => {
+    ws.on("close", () => {
       this.handleDisconnect(connectionId);
     });
 
-    ws.on('error', (error: Error) => {
+    ws.on("error", (error: Error) => {
       this.handleError(connectionId, error);
     });
   }

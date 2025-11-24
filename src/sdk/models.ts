@@ -7,67 +7,68 @@
  * - Performance mode optimization (speed, cost, balanced)
  */
 
-import { AIAgentSDK, Agent, CreateAgentRequest } from './index'
-import { AgentConfig } from '../config/types'
-import { ModelError } from '../core/errors'
+import type { AgentConfig } from "../config/types";
+import { ModelError } from "../core/errors";
+import type { Agent, AIAgentSDK, CreateAgentRequest } from "./index";
 
-export type ModelProvider = 'openai' | 'anthropic' | 'google'
-export type PerformanceMode = 'speed' | 'cost' | 'balanced'
+export type ModelProvider = "openai" | "anthropic" | "google";
+export type PerformanceMode = "speed" | "cost" | "balanced";
 
-export interface ProviderModelConfig {
-  readonly provider: ModelProvider
-  readonly modelId: string
-  readonly apiKey: string
-}
+export type ProviderModelConfig = {
+  readonly provider: ModelProvider;
+  readonly modelId: string;
+  readonly apiKey: string;
+};
 
-export interface ModelConfig {
-  readonly primary: ProviderModelConfig
-  readonly fallbacks?: readonly ProviderModelConfig[]
-  readonly performanceMode?: PerformanceMode
-}
+export type ModelConfig = {
+  readonly primary: ProviderModelConfig;
+  readonly fallbacks?: readonly ProviderModelConfig[];
+  readonly performanceMode?: PerformanceMode;
+};
 
-export interface CreateMultiModelAgentRequest {
-  readonly config: AgentConfig
-  readonly modelConfig: ModelConfig
-}
+export type CreateMultiModelAgentRequest = {
+  readonly config: AgentConfig;
+  readonly modelConfig: ModelConfig;
+};
 
 // Model validation mapping
 const PROVIDER_MODELS: Record<ModelProvider, readonly string[]> = {
-  openai: ['gpt-4', 'gpt-3.5-turbo'],
-  anthropic: ['claude-3.5', 'claude-3-opus'],
-  google: ['gemini-pro', 'gemini-ultra']
-}
+  openai: ["gpt-4", "gpt-3.5-turbo"],
+  anthropic: ["claude-3.5", "claude-3-opus"],
+  google: ["gemini-pro", "gemini-ultra"],
+};
 
-const VALID_PROVIDERS: readonly ModelProvider[] = ['openai', 'anthropic', 'google']
+const VALID_PROVIDERS: readonly ModelProvider[] = [
+  "openai",
+  "anthropic",
+  "google",
+];
 
 function isValidProvider(provider: unknown): provider is ModelProvider {
-  return VALID_PROVIDERS.includes(provider as ModelProvider)
+  return VALID_PROVIDERS.includes(provider as ModelProvider);
 }
 
 function isValidPerformanceMode(mode: unknown): mode is PerformanceMode {
-  return mode === 'speed' || mode === 'cost' || mode === 'balanced'
+  return mode === "speed" || mode === "cost" || mode === "balanced";
 }
 
 const isValidModelForProvider = (
   provider: ModelProvider,
   modelId: string
-): boolean => {
-  return PROVIDER_MODELS[provider].includes(modelId)
-}
+): boolean => PROVIDER_MODELS[provider].includes(modelId);
 
 const validateProviderModelConfig = (config: ProviderModelConfig): void => {
   if (!isValidProvider(config.provider)) {
     throw new ModelError(
-      `Invalid provider: ${config.provider}. Supported providers: ${VALID_PROVIDERS.join(', ')}`,
+      `Invalid provider: ${config.provider}. Supported providers: ${VALID_PROVIDERS.join(", ")}`,
       { provider: config.provider }
-    )
+    );
   }
 
-  if (!config.modelId || typeof config.modelId !== 'string') {
-    throw new ModelError(
-      'Model ID must be a non-empty string',
-      { modelId: config.modelId }
-    )
+  if (!config.modelId || typeof config.modelId !== "string") {
+    throw new ModelError("Model ID must be a non-empty string", {
+      modelId: config.modelId,
+    });
   }
 
   if (!isValidModelForProvider(config.provider, config.modelId)) {
@@ -76,42 +77,44 @@ const validateProviderModelConfig = (config: ProviderModelConfig): void => {
       {
         provider: config.provider,
         modelId: config.modelId,
-        supportedModels: PROVIDER_MODELS[config.provider]
+        supportedModels: PROVIDER_MODELS[config.provider],
       }
-    )
+    );
   }
 
   if (!config.apiKey || config.apiKey.trim().length === 0) {
-    throw new ModelError(
-      'API key is required for primary model',
-      { provider: config.provider }
-    )
+    throw new ModelError("API key is required for primary model", {
+      provider: config.provider,
+    });
   }
-}
+};
 
 const validateModelConfig = (modelConfig: ModelConfig): void => {
-  validateProviderModelConfig(modelConfig.primary)
+  validateProviderModelConfig(modelConfig.primary);
 
   if (modelConfig.fallbacks) {
     modelConfig.fallbacks.forEach((fallback, index) => {
       try {
-        validateProviderModelConfig(fallback)
+        validateProviderModelConfig(fallback);
       } catch (error) {
         throw new ModelError(
           `Fallback model ${index} configuration is invalid`,
           { index, originalError: error }
-        )
+        );
       }
-    })
+    });
   }
 
-  if (modelConfig.performanceMode && !isValidPerformanceMode(modelConfig.performanceMode)) {
+  if (
+    modelConfig.performanceMode &&
+    !isValidPerformanceMode(modelConfig.performanceMode)
+  ) {
     throw new ModelError(
       `Invalid performance mode: ${modelConfig.performanceMode}. Supported modes: speed, cost, balanced`,
       { performanceMode: modelConfig.performanceMode }
-    )
+    );
   }
-}
+};
 
 /**
  * Create a multi-model agent with configuration and fallback support
@@ -125,19 +128,19 @@ export function createMultiModelAgent(
   sdk: AIAgentSDK,
   request: CreateMultiModelAgentRequest
 ): Agent {
-  validateModelConfig(request.modelConfig)
+  validateModelConfig(request.modelConfig);
 
-  const performanceMode = request.modelConfig.performanceMode ?? 'balanced'
+  const performanceMode = request.modelConfig.performanceMode ?? "balanced";
 
   const createRequest: CreateAgentRequest = {
     config: {
       ...request.config,
-      model: request.modelConfig.primary.modelId
+      model: request.modelConfig.primary.modelId,
     },
-    model: request.modelConfig.primary.modelId
-  }
+    model: request.modelConfig.primary.modelId,
+  };
 
-  const agent = sdk.createAgent(createRequest)
+  const agent = sdk.createAgent(createRequest);
 
   return {
     ...agent,
@@ -146,38 +149,40 @@ export function createMultiModelAgent(
       modelConfig: {
         primary: request.modelConfig.primary,
         fallbacks: request.modelConfig.fallbacks ?? [],
-        performanceMode
-      }
-    }
-  }
+        performanceMode,
+      },
+    },
+  };
 }
 
 /**
  * Get all supported providers
  */
 export function getSupportedProviders(): readonly ModelProvider[] {
-  return VALID_PROVIDERS
+  return VALID_PROVIDERS;
 }
 
 /**
  * Get all models for a specific provider
  */
-export function getModelsForProvider(provider: ModelProvider): readonly string[] {
+export function getModelsForProvider(
+  provider: ModelProvider
+): readonly string[] {
   if (!isValidProvider(provider)) {
-    throw new ModelError(
-      `Invalid provider: ${provider}`,
-      { provider }
-    )
+    throw new ModelError(`Invalid provider: ${provider}`, { provider });
   }
-  return PROVIDER_MODELS[provider]
+  return PROVIDER_MODELS[provider];
 }
 
 /**
  * Check if a model is supported
  */
-export function isModelSupported(provider: ModelProvider, modelId: string): boolean {
+export function isModelSupported(
+  provider: ModelProvider,
+  modelId: string
+): boolean {
   if (!isValidProvider(provider)) {
-    return false
+    return false;
   }
-  return isValidModelForProvider(provider, modelId)
+  return isValidModelForProvider(provider, modelId);
 }

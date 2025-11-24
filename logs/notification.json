@@ -62,5 +62,29 @@
     "hook_event_name": "Notification",
     "message": "Claude is waiting for your input",
     "notification_type": "idle_prompt"
+  },
+  {
+    "session_id": "e165f9ba-6721-4ebd-a934-7817f06e661f",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/e165f9ba-6721-4ebd-a934-7817f06e661f.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "hook_event_name": "Notification",
+    "message": "Claude is waiting for your input",
+    "notification_type": "idle_prompt"
+  },
+  {
+    "session_id": "956f4b55-427d-4779-a491-4b5b4c351743",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/956f4b55-427d-4779-a491-4b5b4c351743.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "hook_event_name": "Notification",
+    "message": "Claude is waiting for your input",
+    "notification_type": "idle_prompt"
+  },
+  {
+    "session_id": "16d73a64-7ad9-43ab-9298-ed8efe31a503",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/16d73a64-7ad9-43ab-9298-ed8efe31a503.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "hook_event_name": "Notification",
+    "message": "Claude is waiting for your input",
+    "notification_type": "idle_prompt"
   }
 ]

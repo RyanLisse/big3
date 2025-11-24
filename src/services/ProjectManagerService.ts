@@ -1,14 +1,14 @@
-import { Context, Effect, Layer } from "effect"
-import { access } from "node:fs/promises"
-import { randomUUID } from "node:crypto"
+import { randomUUID } from "node:crypto";
+import { access } from "node:fs/promises";
+import { Context, Effect, Layer } from "effect";
 import type {
   AgentTool,
   ExecutionNode,
   ExecutionPlan,
-  WorkflowResult
-} from "../domain.js"
-import { BrowserService } from "./BrowserService.js"
-import { CoderService } from "./CoderService.js"
+  WorkflowResult,
+} from "../domain.js";
+import { BrowserServiceTag } from "./BrowserService.js";
+import { CoderServiceTag } from "./CoderService.js";
 
 /**
  * ProjectManagerService - Phase 1.1 MVP Implementation
@@ -16,7 +16,7 @@ import { CoderService } from "./CoderService.js"
  * Orchestrates task delegation and validation for multi-agent workflows.
  * Routes tools to appropriate services and creates parallel execution plans.
  */
-export interface ProjectManagerService {
+export type ProjectManagerService = {
   /**
    * Delegate tool execution by routing to appropriate service
    * and creating an execution plan with parallel batching.
@@ -26,18 +26,18 @@ export interface ProjectManagerService {
    * - BrowserUse → BrowserService
    * - CreateAgent → No-op (handled elsewhere)
    */
-  readonly delegate: (tool: AgentTool) => Effect.Effect<ExecutionPlan, Error>
+  readonly delegate: (tool: AgentTool) => Effect.Effect<ExecutionPlan, Error>;
 
   /**
    * Validate workflow results using file existence checks.
    * Gate mechanism prevents bad handoffs between agents.
    */
-  readonly validate: (result: WorkflowResult) => Effect.Effect<boolean, Error>
-}
+  readonly validate: (result: WorkflowResult) => Effect.Effect<boolean, Error>;
+};
 
 export const ProjectManagerService = Context.GenericTag<ProjectManagerService>(
   "ProjectManagerService"
-)
+);
 
 /**
  * Live implementation using Effect.gen pattern.
@@ -45,9 +45,9 @@ export const ProjectManagerService = Context.GenericTag<ProjectManagerService>(
  */
 export const ProjectManagerServiceLive = Layer.effect(
   ProjectManagerService,
-  Effect.gen(function*(_) {
-    const coderService = yield* _(CoderService)
-    const browserService = yield* _(BrowserService)
+  Effect.gen(function* (_) {
+    const _coderService = yield* _(CoderServiceTag);
+    const _browserService = yield* _(BrowserServiceTag);
 
     return {
       /**
@@ -65,29 +65,29 @@ export const ProjectManagerServiceLive = Layer.effect(
        *   Execution: Effect.all([...]) runs all concurrently
        */
       delegate: (tool) =>
-        Effect.gen(function*(_) {
+        Effect.gen(function* (_) {
           // Generate unique node ID using crypto.randomUUID
-          const nodeId = `node-${randomUUID()}`
+          const nodeId = `node-${randomUUID()}`;
 
           // Create execution node with no dependencies (single tool)
           const node: ExecutionNode = {
             id: nodeId,
             tool,
             dependencies: [], // No dependencies for single-tool plans
-            status: "pending"
-          }
+            status: "pending",
+          };
 
           // Single batch containing single node (no parallelization needed)
-          const parallelBatches: ReadonlyArray<ReadonlyArray<string>> = [[nodeId]]
+          const parallelBatches: readonly (readonly string[])[] = [[nodeId]];
 
           // Create execution plan with nodes as Record (keyed by nodeId)
           const plan: ExecutionPlan = {
             id: `plan-${randomUUID()}`,
             nodes: { [nodeId]: node },
-            parallelBatches
-          }
+            parallelBatches,
+          };
 
-          return plan
+          return plan;
         }),
 
       /**
@@ -101,53 +101,50 @@ export const ProjectManagerServiceLive = Layer.effect(
        * This prevents handoffs when expected artifacts are missing.
        */
       validate: (result) =>
-        Effect.gen(function*(_) {
+        Effect.gen(function* (_) {
           // Check for failed nodes first
           if (result.failedNodes.length > 0) {
-            return false
+            return false;
           }
 
           // Validate outputs contain data
-          const outputKeys = Object.keys(result.outputs)
+          const outputKeys = Object.keys(result.outputs);
           if (outputKeys.length === 0) {
-            return false
+            return false;
           }
 
           // Validate file paths if present in outputs
           // Pattern: check for string values that look like file paths
           const filePaths = outputKeys
-            .map(key => result.outputs[key])
-            .filter((value): value is string =>
-              typeof value === "string" &&
-              (value.includes("/") || value.includes("\\"))
-            )
+            .map((key) => result.outputs[key])
+            .filter(
+              (value): value is string =>
+                typeof value === "string" &&
+                (value.includes("/") || value.includes("\\"))
+            );
 
           // If no file paths to validate, consider valid
           if (filePaths.length === 0) {
-            return true
+            return true;
           }
 
           // Validate all file paths exist
           // Use Effect.forEach to check all paths
           const validationResults = yield* _(
-            Effect.forEach(
-              filePaths,
-              (filePath) =>
-                Effect.tryPromise({
-                  try: () => access(filePath),
-                  catch: () => new Error(`File not found: ${filePath}`)
-                }).pipe(
-                  Effect.map(() => true),
-                  Effect.catchAll(() => Effect.succeed(false))
-                )
+            Effect.forEach(filePaths, (filePath) =>
+              Effect.tryPromise({
+                try: () => access(filePath),
+                catch: () => new Error(`File not found: ${filePath}`),
+              }).pipe(
+                Effect.map(() => true),
+                Effect.catchAll(() => Effect.succeed(false))
+              )
             )
-          )
+          );
 
           // Check if all validations succeeded
-          return validationResults.every((isValid) => isValid)
-        }).pipe(
-          Effect.catchAll(() => Effect.succeed(false))
-        )
-    }
+          return validationResults.every((isValid) => isValid);
+        }).pipe(Effect.catchAll(() => Effect.succeed(false))),
+    };
   })
-)
+);

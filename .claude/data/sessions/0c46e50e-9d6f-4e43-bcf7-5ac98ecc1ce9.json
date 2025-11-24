@@ -1,0 +1,7 @@
+{
+  "session_id": "0c46e50e-9d6f-4e43-bcf7-5ac98ecc1ce9",
+  "prompts": [
+    "/refactor  \u25cb Fix all 517 remaining lint errors\n \u25cb Fix backend/agent/api.ts issues (static class, any types, complexity)\n \u25cb Fix backend/agent/artifact-repository.ts issues (shadow vars, complexity)\n \u25cb Fix backend/agent/browser.ts issues (any types, complexity, empty block)\n \u25cb Fix frontend img tags to use Next.js Image component\n \u25cb Fix test file issues (shadow vars, async, increments)\n \u25cb Run tests to verify fixes\n \u25cb Verify all checks pass"
+  ],
+  "agent_name": "Vortex"
+}

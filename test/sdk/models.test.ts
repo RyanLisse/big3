@@ -1,268 +1,277 @@
-import { describe, it, expect, beforeEach } from 'vitest'
-import { createMultiModelAgent, ModelConfig, ModelProvider, PerformanceMode } from '../../src/sdk/models'
-import { AIAgentSDK } from '../../src/sdk/index'
-import { SDKConfig } from '../../src/config/types'
+import { beforeEach, describe, expect, it } from "vitest";
+import type { SDKConfig } from "../../src/config/types";
+import { AIAgentSDK } from "../../src/sdk/index";
+import {
+  createMultiModelAgent,
+  type ModelConfig,
+  type ModelProvider,
+} from "../../src/sdk/models";
 
-describe('Multi-Model Agent Creation', () => {
-  let sdk: AIAgentSDK
+describe("Multi-Model Agent Creation", () => {
+  let sdk: AIAgentSDK;
 
   beforeEach(() => {
     const config: SDKConfig = {
-      apiKey: 'test-key-123456789'
-    }
-    sdk = new AIAgentSDK(config)
-  })
+      apiKey: "test-key-123456789",
+    };
+    sdk = new AIAgentSDK(config);
+  });
 
-  describe('createMultiModelAgent', () => {
-    it('should create agent with single model configuration', () => {
+  describe("createMultiModelAgent", () => {
+    it("should create agent with single model configuration", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
-        }
-      }
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
+        },
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-1',
-          name: 'SingleModelAgent',
-          instructions: 'You are helpful'
+          id: "agent-1",
+          name: "SingleModelAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-      expect(agent.status).toBe('initializing')
-    })
+      expect(agent.model).toBe("gpt-4");
+      expect(agent.status).toBe("initializing");
+    });
 
-    it('should create agent with multiple model fallbacks', () => {
+    it("should create agent with multiple model fallbacks", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
         },
         fallbacks: [
           {
-            provider: 'anthropic',
-            modelId: 'claude-3.5',
-            apiKey: 'sk_test123456789'
-          }
-        ]
-      }
+            provider: "anthropic",
+            modelId: "claude-3.5",
+            apiKey: "sk_test123456789",
+          },
+        ],
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-2',
-          name: 'MultiModelAgent',
-          instructions: 'You are helpful'
+          id: "agent-2",
+          name: "MultiModelAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-      expect(agent.config.model).toBe('gpt-4')
-    })
+      expect(agent.model).toBe("gpt-4");
+      expect(agent.config.model).toBe("gpt-4");
+    });
 
-    it('should throw error for invalid provider', () => {
+    it("should throw error for invalid provider", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'invalid-provider' as ModelProvider,
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
-        }
-      }
+          provider: "invalid-provider" as ModelProvider,
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
+        },
+      };
 
       expect(() => {
         createMultiModelAgent(sdk, {
           config: {
-            name: 'InvalidAgent',
-            instructions: 'You are helpful'
+            name: "InvalidAgent",
+            instructions: "You are helpful",
           },
-          modelConfig
-        })
-      }).toThrow()
-    })
+          modelConfig,
+        });
+      }).toThrow();
+    });
 
-    it('should validate model ID matches provider', () => {
+    it("should validate model ID matches provider", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'anthropic',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
-        }
-      }
+          provider: "anthropic",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
+        },
+      };
 
       expect(() => {
         createMultiModelAgent(sdk, {
           config: {
-            name: 'MismatchAgent',
-            instructions: 'You are helpful'
+            name: "MismatchAgent",
+            instructions: "You are helpful",
           },
-          modelConfig
-        })
-      }).toThrow()
-    })
+          modelConfig,
+        });
+      }).toThrow();
+    });
 
-    it('should support performance modes', () => {
+    it("should support performance modes", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
         },
-        performanceMode: 'balanced'
-      }
+        performanceMode: "balanced",
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-3',
-          name: 'BalancedAgent',
-          instructions: 'You are helpful'
+          id: "agent-3",
+          name: "BalancedAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-    })
+      expect(agent.model).toBe("gpt-4");
+    });
 
-    it('should require API key for primary model', () => {
+    it("should require API key for primary model", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: ''
-        }
-      }
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "",
+        },
+      };
 
       expect(() => {
         createMultiModelAgent(sdk, {
           config: {
-            name: 'NoKeyAgent',
-            instructions: 'You are helpful'
+            name: "NoKeyAgent",
+            instructions: "You are helpful",
           },
-          modelConfig
-        })
-      }).toThrow()
-    })
+          modelConfig,
+        });
+      }).toThrow();
+    });
 
-    it('should store model configuration in agent context', () => {
+    it("should store model configuration in agent context", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
-        }
-      }
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
+        },
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-4',
-          name: 'ContextAgent',
-          instructions: 'You are helpful'
+          id: "agent-4",
+          name: "ContextAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.context).toBeDefined()
-      expect(agent.context?.modelConfig).toBeDefined()
-    })
-  })
+      expect(agent.context).toBeDefined();
+      expect(agent.context?.modelConfig).toBeDefined();
+    });
+  });
 
-  describe('ModelProvider validation', () => {
-    it('should support all valid providers', () => {
-      const validProviders: ModelProvider[] = ['openai', 'anthropic', 'google']
+  describe("ModelProvider validation", () => {
+    it("should support all valid providers", () => {
+      const validProviders: ModelProvider[] = ["openai", "anthropic", "google"];
 
       validProviders.forEach((provider, idx) => {
-        const modelId = provider === 'openai' ? 'gpt-4' : provider === 'anthropic' ? 'claude-3.5' : 'gemini-pro'
+        const modelId =
+          provider === "openai"
+            ? "gpt-4"
+            : provider === "anthropic"
+              ? "claude-3.5"
+              : "gemini-pro";
 
         const modelConfig: ModelConfig = {
           primary: {
             provider,
             modelId,
-            apiKey: 'sk_test123456789'
-          }
-        }
+            apiKey: "sk_test123456789",
+          },
+        };
 
         const agent = createMultiModelAgent(sdk, {
           config: {
             id: `agent-provider-${idx}`,
             name: `Agent-${provider}`,
-            instructions: 'You are helpful'
+            instructions: "You are helpful",
           },
-          modelConfig
-        })
+          modelConfig,
+        });
 
-        expect(agent.model).toBe(modelId)
-      })
-    })
-  })
+        expect(agent.model).toBe(modelId);
+      });
+    });
+  });
 
-  describe('Performance modes', () => {
-    it('should handle speed mode', () => {
+  describe("Performance modes", () => {
+    it("should handle speed mode", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
         },
-        performanceMode: 'speed'
-      }
+        performanceMode: "speed",
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-speed',
-          name: 'SpeedAgent',
-          instructions: 'You are helpful'
+          id: "agent-speed",
+          name: "SpeedAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-    })
+      expect(agent.model).toBe("gpt-4");
+    });
 
-    it('should handle cost mode', () => {
+    it("should handle cost mode", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
         },
-        performanceMode: 'cost'
-      }
+        performanceMode: "cost",
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-cost',
-          name: 'CostAgent',
-          instructions: 'You are helpful'
+          id: "agent-cost",
+          name: "CostAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-    })
+      expect(agent.model).toBe("gpt-4");
+    });
 
-    it('should default to balanced mode', () => {
+    it("should default to balanced mode", () => {
       const modelConfig: ModelConfig = {
         primary: {
-          provider: 'openai',
-          modelId: 'gpt-4',
-          apiKey: 'sk_test123456789'
-        }
-      }
+          provider: "openai",
+          modelId: "gpt-4",
+          apiKey: "sk_test123456789",
+        },
+      };
 
       const agent = createMultiModelAgent(sdk, {
         config: {
-          id: 'agent-default',
-          name: 'DefaultAgent',
-          instructions: 'You are helpful'
+          id: "agent-default",
+          name: "DefaultAgent",
+          instructions: "You are helpful",
         },
-        modelConfig
-      })
+        modelConfig,
+      });
 
-      expect(agent.model).toBe('gpt-4')
-    })
-  })
-})
+      expect(agent.model).toBe("gpt-4");
+    });
+  });
+});

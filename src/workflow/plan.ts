@@ -5,21 +5,26 @@
  * for autonomous AI agent workflow execution.
  */
 
-import { WorkflowError } from '../core/errors';
+import { WorkflowError } from "../core/errors";
 
-export type StepType = 'action' | 'agent_init' | 'model_validation' | 'checkpoint' | 'recovery';
+export type StepType =
+  | "action"
+  | "agent_init"
+  | "model_validation"
+  | "checkpoint"
+  | "recovery";
 
-export interface WorkflowStepInput {
+export type WorkflowStepInput = {
   name: string;
   description?: string;
   type: StepType;
   input?: Record<string, unknown>;
   config?: Record<string, unknown>;
-}
+};
 
 export interface WorkflowStepDefinition extends WorkflowStepInput {
   id: string;
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'paused';
+  status: "pending" | "running" | "completed" | "failed" | "paused";
   dependencies: string[];
   output?: unknown;
   error?: {
@@ -31,21 +36,21 @@ export interface WorkflowStepDefinition extends WorkflowStepInput {
   endTime?: number;
 }
 
-export interface PlanConfig {
+export type PlanConfig = {
   maxSteps?: number;
   timeout?: number;
   retryAttempts?: number;
   retryDelay?: number;
-}
+};
 
-export interface WorkflowPlanInput {
+export type WorkflowPlanInput = {
   name: string;
   description?: string;
   config?: PlanConfig;
   context?: Record<string, unknown>;
-}
+};
 
-export interface WorkflowPlan {
+export type WorkflowPlan = {
   id: string;
   name: string;
   description: string;
@@ -54,22 +59,22 @@ export interface WorkflowPlan {
   context: Record<string, unknown>;
   createdAt: number;
   updatedAt: number;
-}
+};
 
-export interface WorkflowPlanDefinition {
+export type WorkflowPlanDefinition = {
   name: string;
   description?: string;
   steps: WorkflowStepInput[];
   config?: PlanConfig;
   context?: Record<string, unknown>;
-}
+};
 
 const VALID_STEP_TYPES: StepType[] = [
-  'action',
-  'agent_init',
-  'model_validation',
-  'checkpoint',
-  'recovery',
+  "action",
+  "agent_init",
+  "model_validation",
+  "checkpoint",
+  "recovery",
 ];
 
 function generateId(prefix: string): string {
@@ -85,13 +90,13 @@ function isValidStepType(type: string): type is StepType {
  */
 export function createWorkflowPlan(input: WorkflowPlanInput): WorkflowPlan {
   return {
-    id: generateId('plan'),
+    id: generateId("plan"),
     name: input.name,
-    description: input.description || '',
+    description: input.description || "",
     steps: [],
     config: {
       maxSteps: input.config?.maxSteps ?? 100,
-      timeout: input.config?.timeout ?? 300000,
+      timeout: input.config?.timeout ?? 300_000,
       retryAttempts: input.config?.retryAttempts ?? 3,
       retryDelay: input.config?.retryDelay ?? 1000,
     },
@@ -109,7 +114,7 @@ export function addStepToPlan(
   stepInput: WorkflowStepInput
 ): WorkflowStepDefinition {
   if (plan.steps.length >= plan.config.maxSteps) {
-    throw new WorkflowError('Plan exceeds maximum step limit', {
+    throw new WorkflowError("Plan exceeds maximum step limit", {
       maxSteps: plan.config.maxSteps,
       currentSteps: plan.steps.length,
     });
@@ -117,8 +122,8 @@ export function addStepToPlan(
 
   const step: WorkflowStepDefinition = {
     ...stepInput,
-    id: generateId('step'),
-    status: 'pending',
+    id: generateId("step"),
+    status: "pending",
     dependencies: [],
   };
 
@@ -140,20 +145,20 @@ export function addDependencyToPlan(
   const dependencyStep = plan.steps.find((s) => s.id === dependencyStepId);
 
   if (!dependentStep) {
-    throw new WorkflowError('Dependent step not found', {
+    throw new WorkflowError("Dependent step not found", {
       stepId: dependentStepId,
     });
   }
 
   if (!dependencyStep) {
-    throw new WorkflowError('Dependency step not found', {
+    throw new WorkflowError("Dependency step not found", {
       stepId: dependencyStepId,
     });
   }
 
   // Check for circular dependency - would the dependency already depend on dependent?
   if (wouldCreateCircularDependency(plan, dependentStepId, dependencyStepId)) {
-    throw new WorkflowError('Circular dependency detected', {
+    throw new WorkflowError("Circular dependency detected", {
       dependent: dependentStepId,
       dependency: dependencyStepId,
     });
@@ -205,17 +210,22 @@ function wouldCreateCircularDependency(
 /**
  * Resolve step dependencies and return execution order (topological sort)
  */
-export function resolveDependencies(plan: WorkflowPlan): WorkflowStepDefinition[] {
+export function resolveDependencies(
+  plan: WorkflowPlan
+): WorkflowStepDefinition[] {
   const visited = new Set<string>();
   const result: WorkflowStepDefinition[] = [];
   const visiting = new Set<string>();
   const MAX_DEPTH = plan.steps.length + 10;
 
-  function visit(stepId: string, depth: number = 0): void {
+  function visit(stepId: string, depth = 0): void {
     if (depth > MAX_DEPTH) {
-      throw new WorkflowError('Circular dependency detected - maximum recursion depth exceeded', {
-        stepId,
-      });
+      throw new WorkflowError(
+        "Circular dependency detected - maximum recursion depth exceeded",
+        {
+          stepId,
+        }
+      );
     }
 
     if (visited.has(stepId)) {
@@ -223,7 +233,7 @@ export function resolveDependencies(plan: WorkflowPlan): WorkflowStepDefinition[
     }
 
     if (visiting.has(stepId)) {
-      throw new WorkflowError('Circular dependency detected', {
+      throw new WorkflowError("Circular dependency detected", {
         stepId,
       });
     }
@@ -232,7 +242,7 @@ export function resolveDependencies(plan: WorkflowPlan): WorkflowStepDefinition[
 
     const step = plan.steps.find((s) => s.id === stepId);
     if (!step) {
-      throw new WorkflowError('Step not found', { stepId });
+      throw new WorkflowError("Step not found", { stepId });
     }
 
     for (const depId of step.dependencies) {
@@ -254,22 +264,24 @@ export function resolveDependencies(plan: WorkflowPlan): WorkflowStepDefinition[
 /**
  * Validate a workflow plan definition
  */
-export function validatePlanDefinition(definition: WorkflowPlanDefinition): void {
-  if (!definition.name || typeof definition.name !== 'string') {
-    throw new WorkflowError('Plan name is required and must be a string');
+export function validatePlanDefinition(
+  definition: WorkflowPlanDefinition
+): void {
+  if (!definition.name || typeof definition.name !== "string") {
+    throw new WorkflowError("Plan name is required and must be a string");
   }
 
   if (!Array.isArray(definition.steps) || definition.steps.length === 0) {
-    throw new WorkflowError('Plan must have at least one step');
+    throw new WorkflowError("Plan must have at least one step");
   }
 
   for (const step of definition.steps) {
-    if (!step.name || typeof step.name !== 'string') {
-      throw new WorkflowError('Step name is required and must be a string');
+    if (!step.name || typeof step.name !== "string") {
+      throw new WorkflowError("Step name is required and must be a string");
     }
 
     if (!isValidStepType(step.type)) {
-      throw new WorkflowError('Invalid step type', {
+      throw new WorkflowError("Invalid step type", {
         stepType: step.type,
         validTypes: VALID_STEP_TYPES,
       });
@@ -280,7 +292,9 @@ export function validatePlanDefinition(definition: WorkflowPlanDefinition): void
 /**
  * Create a plan from a definition
  */
-export function createPlanFromDefinition(definition: WorkflowPlanDefinition): WorkflowPlan {
+export function createPlanFromDefinition(
+  definition: WorkflowPlanDefinition
+): WorkflowPlan {
   validatePlanDefinition(definition);
 
   const plan = createWorkflowPlan({
@@ -341,6 +355,6 @@ export function areAllDependenciesCompleted(
 
   return step.dependencies.every((depId) => {
     const depStep = plan.steps.find((s) => s.id === depId);
-    return depStep && depStep.status === 'completed';
+    return depStep && depStep.status === "completed";
   });
 }

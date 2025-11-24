@@ -78,5 +78,29 @@
     "permission_mode": "bypassPermissions",
     "hook_event_name": "UserPromptSubmit",
     "prompt": "continue "
+  },
+  {
+    "session_id": "956f4b55-427d-4779-a491-4b5b4c351743",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/956f4b55-427d-4779-a491-4b5b4c351743.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "/check [ ] Fix TypeScript compilation errors in backend agent files\n[ ] Fix missing semicolons in return statements\n[ ] Fix Effect.gen syntax errors in browser.ts\n[ ] Fix missing imports and type definitions\n[ ] Fix duplicate service declarations\n[ ] Fix unused variables and console.log warnings\n[ ] Run tests to verify fixes"
+  },
+  {
+    "session_id": "0c46e50e-9d6f-4e43-bcf7-5ac98ecc1ce9",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/0c46e50e-9d6f-4e43-bcf7-5ac98ecc1ce9.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "/refactor  \u25cb Fix all 517 remaining lint errors\n \u25cb Fix backend/agent/api.ts issues (static class, any types, complexity)\n \u25cb Fix backend/agent/artifact-repository.ts issues (shadow vars, complexity)\n \u25cb Fix backend/agent/browser.ts issues (any types, complexity, empty block)\n \u25cb Fix frontend img tags to use Next.js Image component\n \u25cb Fix test file issues (shadow vars, async, increments)\n \u25cb Run tests to verify fixes\n \u25cb Verify all checks pass"
+  },
+  {
+    "session_id": "16d73a64-7ad9-43ab-9298-ed8efe31a503",
+    "transcript_path": "/Users/cortex-air/.claude/projects/-Users-cortex-air-Developer-ex-big3/16d73a64-7ad9-43ab-9298-ed8efe31a503.jsonl",
+    "cwd": "/Users/cortex-air/Developer/ex/big3",
+    "permission_mode": "bypassPermissions",
+    "hook_event_name": "UserPromptSubmit",
+    "prompt": "implement all thats missing '/Users/cortex-air/Developer/ex/big3/specs'"
   }
 ]
