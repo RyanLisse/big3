@@ -2,11 +2,11 @@
 
 import { ArrowLeft, Copy, RotateCcw } from "lucide-react";
 import { useParams, useRouter } from "next/navigation";
-import { AgentTimeline } from "@/src/components/AgentTimeline";
 import { Markdown } from "@/components/markdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
+import { AgentTimeline } from "@/src/components/AgentTimeline";
 import { useTaskStore } from "@/stores/tasks";
 
 export default function TaskDetailPage() {
@@ -121,14 +121,14 @@ export default function TaskDetailPage() {
               <h2 className="mb-4 font-semibold text-lg">Conversation</h2>
               <div className="space-y-4">
                 {task.messages && task.messages.length > 0 ? (
-                  task.messages.map((message) => (
+                  task.messages.map((message, index) => (
                     <Card
                       className={`p-4 ${
                         message.role === "user"
                           ? "bg-muted/50"
                           : "border-primary/20 bg-background"
                       }`}
-                      key={message.id}
+                      key={index}
                     >
                       <div className="flex items-start gap-3">
                         <div className="font-semibold text-muted-foreground text-xs uppercase">
@@ -136,9 +136,13 @@ export default function TaskDetailPage() {
                         </div>
                         <div className="flex-1">
                           {message.role === "assistant" ? (
-                            <Markdown content={message.content} />
+                            <Markdown>
+                              {(message.data as { text?: string })?.text ?? ""}
+                            </Markdown>
                           ) : (
-                            <p className="text-sm">{message.content}</p>
+                            <p className="text-sm">
+                              {(message.data as { text?: string })?.text ?? ""}
+                            </p>
                           )}
                         </div>
                       </div>
