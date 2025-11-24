@@ -5,7 +5,7 @@ import type {
   GitHubBranch,
   GitHubRepository,
   GitHubUser,
-} from "@/src/lib/github";
+} from "@/lib/github";
 
 interface UseGitHubAuthReturn {
   isAuthenticated: boolean;
