@@ -32,7 +32,7 @@ import { useGitHubAuth } from "@/src/hooks/use-github-auth";
 import { useEnvironmentStore } from "@/stores/environments";
 
 export default function EnvironmentsPage() {
-  const { environments, addEnvironment, removeEnvironment } =
+  const { environments, createEnvironment, deleteEnvironment } =
     useEnvironmentStore();
   const { isAuthenticated, user, repositories, login, logout } =
     useGitHubAuth();
@@ -45,12 +45,12 @@ export default function EnvironmentsPage() {
   const handleCreateEnvironment = () => {
     if (!(envName && selectedRepo)) return;
 
-    addEnvironment({
-      id: `env-${Date.now()}`,
+    createEnvironment({
       name: envName,
+      description: "",
+      githubOrganization: selectedRepo.split("/")[0] || "",
       githubRepository: selectedRepo,
       githubToken: "", // Token is stored in cookies
-      createdAt: new Date(),
     });
 
     setEnvName("");
@@ -59,7 +59,7 @@ export default function EnvironmentsPage() {
   };
 
   const handleDeleteEnvironment = (envId: string) => {
-    removeEnvironment(envId);
+    deleteEnvironment(envId);
     setIsDeleteOpen(false);
     setSelectedEnvId(null);
   };
