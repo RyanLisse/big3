@@ -3,13 +3,13 @@
 import type { LanguageModelUsage } from "ai";
 import { type ComponentProps, createContext, useContext } from "react";
 import { getUsage } from "tokenlens";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card";
-import { Progress } from "@/components/ui/progress";
+} from "@/src/components/ui/hover-card";
+import { Progress } from "@/src/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 const PERCENT_MAX = 100;

@@ -9,18 +9,18 @@ import {
   useEffect,
   useState,
 } from "react";
-import { Badge } from "@/components/ui/badge";
+import { Badge } from "@/src/components/ui/badge";
 import {
   Carousel,
   type CarouselApi,
   CarouselContent,
   CarouselItem,
-} from "@/components/ui/carousel";
+} from "@/src/components/ui/carousel";
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
-} from "@/components/ui/hover-card";
+} from "@/src/components/ui/hover-card";
 import { cn } from "@/lib/utils";
 
 export type InlineCitationProps = ComponentProps<"span">;

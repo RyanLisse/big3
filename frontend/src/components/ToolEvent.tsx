@@ -1,22 +1,10 @@
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
+import { Card } from "@/src/components/ui/card";
+import { Badge } from "@/src/components/ui/badge";
 import { Code, Terminal, Globe, Database } from "lucide-react";
-
-// AI SDK message structure
-type Message = {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  toolInvocations?: Array<{
-    toolName?: string;
-    state?: string;
-    args?: Record<string, unknown>;
-    result?: unknown;
-  }>;
-};
+import type { UIMessage } from "ai";
 
 type ToolEventProps = {
-  message: Message;
+  message: UIMessage;
 };
 
 const getToolIcon = (toolName: string) => {
@@ -41,34 +29,37 @@ const getToolIcon = (toolName: string) => {
 };
 
 export function ToolEvent({ message }: ToolEventProps) {
-  // If there are tool invocations in the message, display them
-  if (message.toolInvocations && message.toolInvocations.length > 0) {
+  // Extract tool invocations from message parts
+  const toolParts = message.parts?.filter((part) => part.type.startsWith("tool-")) || [];
+  
+  // If there are tool parts, display them
+  if (toolParts.length > 0) {
     return (
       <div className="space-y-2">
-        {message.toolInvocations.map((invocation, index) => (
+        {toolParts.map((part, index) => (
           <Card key={index} className="p-3">
             <div className="flex items-center gap-2 mb-2">
-              {getToolIcon(invocation.toolName || "tool")}
-              <span className="font-medium text-sm">{invocation.toolName || "Unknown Tool"}</span>
+              {getToolIcon((part as any).toolName || "tool")}
+              <span className="font-medium text-sm">{(part as any).toolName || "Unknown Tool"}</span>
               <Badge variant="outline" className="text-xs">
-                {invocation.state || "executing"}
+                {(part as any).state || "executing"}
               </Badge>
             </div>
             
-            {invocation.args && (
+            {(part as any).args && (
               <div className="text-xs text-muted-foreground mb-2">
                 <pre className="whitespace-pre-wrap bg-muted/50 p-2 rounded">
-                  {JSON.stringify(invocation.args, null, 2)}
+                  {JSON.stringify((part as any).args, null, 2)}
                 </pre>
               </div>
             )}
             
-            {invocation.result && (
+            {(part as any).result && (
               <div className="text-xs">
                 <pre className="whitespace-pre-wrap bg-green-50 dark:bg-green-950/20 p-2 rounded text-green-800 dark:text-green-200">
-                  {typeof invocation.result === "string" 
-                    ? invocation.result 
-                    : JSON.stringify(invocation.result, null, 2)
+                  {typeof (part as any).result === "string" 
+                    ? (part as any).result 
+                    : JSON.stringify((part as any).result, null, 2)
                   }
                 </pre>
               </div>
@@ -79,8 +70,10 @@ export function ToolEvent({ message }: ToolEventProps) {
     );
   }
 
-  // Fallback: show message content as a tool event
-  if (message.content && message.role === "assistant") {
+  // Fallback: show message content if available
+  const content = (message.parts?.find(p => p.type === 'text') as any)?.text;
+  
+  if (content && message.role === "assistant") {
     return (
       <Card className="p-3">
         <div className="flex items-center gap-2 mb-2">
@@ -92,8 +85,8 @@ export function ToolEvent({ message }: ToolEventProps) {
         </div>
         <div className="text-xs text-muted-foreground">
           <pre className="whitespace-pre-wrap bg-muted/50 p-2 rounded max-h-32 overflow-y-auto">
-            {message.content.slice(0, 200)}
-            {message.content.length > 200 && "..."}
+            {content.slice(0, 200)}
+            {content.length > 200 && "..."}
           </pre>
         </div>
       </Card>

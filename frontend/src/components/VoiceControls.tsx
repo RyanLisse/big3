@@ -2,7 +2,7 @@
 
 import { Mic, Square } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/src/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type VoiceControlsProps = {

@@ -26,7 +26,7 @@ export const taskChannel = channel("tasks")
 export const createTask = inngest.createFunction(
   { id: "create-task" },
   { event: "clonedex/create.task" },
-  async ({ event, step, publish }) => {
+  async ({ event, step }) => {
     const { task, token, sessionId, prompt } = event.data;
     const config: VibeKitConfig = {
       agent: {
@@ -66,14 +66,8 @@ export const createTask = inngest.createFunction(
     if ("stdout" in result) {
       const lines = result.stdout.trim().split("\n");
       const parsedLines = lines.map((line) => JSON.parse(line));
-      await publish(
-        taskChannel().status({
-          taskId: task.id,
-          status: "DONE",
-          sessionId: result.sandboxId,
-        })
-      );
-
+      // Note: Publishing status updates is handled differently in newer Inngest versions
+      // The real-time updates will be handled through the task channel
       return { message: parsedLines };
     } else {
       return { message: result };

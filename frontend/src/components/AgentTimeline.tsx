@@ -1,5 +1,5 @@
 import type { UIMessage } from "ai";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/src/components/ui/scroll-area";
 import { ToolEvent } from "./ToolEvent";
 
 type AgentTimelineProps = {
@@ -26,7 +26,11 @@ export function AgentTimeline({ messages }: AgentTimelineProps) {
           {toolParts.map((part, i) => (
             <ToolEvent
               key={(part as any).toolCallId || i}
-              toolInvocation={part as any}
+              message={{
+                id: (part as any).toolCallId || `tool-${i}`,
+                role: "assistant" as const,
+                parts: [part],
+              }}
             />
           ))}
         </div>

@@ -1,4 +1,4 @@
-import { CodexInterface } from "@/components/CodexInterface";
+import { CodexInterface } from "@/src/components/CodexInterface";
 
 export default function Home() {
   return <CodexInterface />;
