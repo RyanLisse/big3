@@ -94,7 +94,7 @@ describe("Session Persistence - User Story 2", () => {
       };
 
       // Mock checkpointer save
-      mockCheckpointer.save.mockResolvedValue(undefined);
+      mockCheckpointer.save.mockReturnValue(Effect.succeed(undefined));
 
       const saveProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -102,7 +102,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       await Effect.runPromise(
-        saveProgram.pipe(Layer.provide(TestPersistenceLayer))
+        saveProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(mockCheckpointer.save).toHaveBeenCalledWith(
@@ -111,7 +111,7 @@ describe("Session Persistence - User Story 2", () => {
       );
 
       // Mock checkpointer load
-      mockCheckpointer.load.mockResolvedValue(originalSession);
+      mockCheckpointer.load.mockReturnValue(Effect.succeed(originalSession));
 
       const loadProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -120,7 +120,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const restoredSession = await Effect.runPromise(
-        loadProgram.pipe(Layer.provide(TestPersistenceLayer))
+        loadProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(restoredSession).toEqual(originalSession);
@@ -131,7 +131,7 @@ describe("Session Persistence - User Story 2", () => {
       const sessionId = "session-corruption-test";
 
       // Mock corrupted data
-      mockCheckpointer.load.mockResolvedValue(null); // Session not found
+      mockCheckpointer.load.mockReturnValue(Effect.succeed(null)); // Session not found
 
       const loadProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -161,7 +161,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        loadProgram.pipe(Layer.provide(TestPersistenceLayer))
+        loadProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.recovered).toBe(false);
@@ -197,7 +197,7 @@ describe("Session Persistence - User Story 2", () => {
       ];
 
       // Mock successful saves
-      mockCheckpointer.save.mockResolvedValue(undefined);
+      mockCheckpointer.save.mockReturnValue(Effect.succeed(undefined));
 
       const continuityProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -229,7 +229,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const finalState = await Effect.runPromise(
-        continuityProgram.pipe(Layer.provide(TestPersistenceLayer))
+        continuityProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(finalState.operations).toHaveLength(4);
@@ -261,9 +261,9 @@ describe("Session Persistence - User Story 2", () => {
       ];
 
       // Mock filesystem operations
-      mockCompositeFilesystem.writeFile.mockResolvedValue(undefined);
-      mockCompositeFilesystem.readFile.mockResolvedValue(artifacts[0].content);
-      mockCompositeFilesystem.exists.mockReturnValue(true);
+      mockCompositeFilesystem.writeFile.mockReturnValue(Effect.succeed(undefined));
+      mockCompositeFilesystem.readFile.mockReturnValue(Effect.succeed(artifacts[0].content));
+      mockCompositeFilesystem.exists.mockReturnValue(Effect.succeed(true));
 
       const persistProgram = Effect.gen(function* (_) {
         const filesystem = yield* CompositeFilesystem;
@@ -284,7 +284,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        persistProgram.pipe(Layer.provide(TestPersistenceLayer))
+        persistProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.savedCount).toBe(2);
@@ -300,10 +300,8 @@ describe("Session Persistence - User Story 2", () => {
       const artifactPath = "/workspace/important/data.json";
 
       // Mock filesystem error
-      mockCompositeFilesystem.writeFile.mockRejectedValue(
-        new Error("Disk space full")
-      );
-      mockCompositeFilesystem.exists.mockReturnValue(false);
+      mockCompositeFilesystem.writeFile.mockImplementation((path: string, content: string) => path === artifactPath ? Effect.fail(new Error("Disk space full")) : Effect.succeed(undefined));
+      mockCompositeFilesystem.exists.mockReturnValue(Effect.succeed(false));
 
       const errorHandlingProgram = Effect.gen(function* (_) {
         const filesystem = yield* CompositeFilesystem;
@@ -338,7 +336,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        errorHandlingProgram.pipe(Layer.provide(TestPersistenceLayer))
+        errorHandlingProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.success).toBe(false);
@@ -356,12 +354,12 @@ describe("Session Persistence - User Story 2", () => {
         "/workspace/logs",
       ];
 
-      mockCompositeFilesystem.listFiles.mockResolvedValue([
+      mockCompositeFilesystem.listFiles.mockReturnValue(Effect.succeed([
         "research/analysis.md",
         "code/component.ts",
         "artifacts/result.json",
-        "logs/session.log",
-      ]);
+        "logs/session.log"
+      ]));
 
       const structureProgram = Effect.gen(function* (_) {
         const filesystem = yield* CompositeFilesystem;
@@ -384,7 +382,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        structureProgram.pipe(Layer.provide(TestPersistenceLayer))
+        structureProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.structureValid).toBe(true);
@@ -417,12 +415,9 @@ describe("Session Persistence - User Story 2", () => {
       ];
 
       // Mock successful persistence
-      mockCheckpointer.save.mockResolvedValue(undefined);
-      mockCheckpointer.load.mockResolvedValue(originalSession);
-      mockCompositeFilesystem.readFile.mockImplementation((path: string) => {
-        const artifact = artifacts.find((a) => a.path === path);
-        return Promise.resolve(artifact?.content || "");
-      });
+      mockCheckpointer.save.mockReturnValue(Effect.succeed(undefined));
+      mockCheckpointer.load.mockReturnValue(Effect.succeed(originalSession));
+      mockCompositeFilesystem.readFile.mockImplementation((path: string) => Effect.succeed(artifacts.find((a) => a.path === path)?.content ?? ""));
 
       const resumptionProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -452,7 +447,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        resumptionProgram.pipe(Layer.provide(TestPersistenceLayer))
+        resumptionProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.sessionResumed).toBe(true);
@@ -471,7 +466,7 @@ describe("Session Persistence - User Story 2", () => {
         // Missing createdAt, updatedAt, metadata
       };
 
-      mockCheckpointer.load.mockResolvedValue(partialSession);
+      mockCheckpointer.load.mockReturnValue(Effect.succeed(partialSession));
 
       const recoveryProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -501,7 +496,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        recoveryProgram.pipe(Layer.provide(TestPersistenceLayer))
+        recoveryProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.recovered).toBe(true);
@@ -534,8 +529,8 @@ describe("Session Persistence - User Story 2", () => {
         },
       };
 
-      mockCheckpointer.save.mockResolvedValue(undefined);
-      mockCheckpointer.load.mockResolvedValue(largeSession);
+      mockCheckpointer.save.mockReturnValue(Effect.succeed(undefined));
+      mockCheckpointer.load.mockReturnValue(Effect.succeed(largeSession));
 
       const performanceProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;
@@ -558,7 +553,7 @@ describe("Session Persistence - User Story 2", () => {
       });
 
       const result = await Effect.runPromise(
-        performanceProgram.pipe(Layer.provide(TestPersistenceLayer))
+        performanceProgram.pipe(Effect.provide(TestPersistenceLayer))
       );
 
       expect(result.dataSize).toBeGreaterThan(10_000); // Large data

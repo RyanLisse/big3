@@ -67,13 +67,69 @@ vi.mock("../../backend/agent/artifact-repository.ts", async () => {
 // Override AgentService export with a lightweight test double
 vi.mock("../../backend/agent/encore.service.js", () => {
   class AgentService {
-    spawnAgent = vi.fn().mockResolvedValue({ sessionId: "session-test", status: "completed" });
-    getAgentStatus = vi.fn().mockResolvedValue({ sessionId: "session-test", status: "completed", lastUpdate: new Date() });
-    resumeAgent = vi.fn().mockResolvedValue({ sessionId: "session-test", status: "completed" });
-    cancelAgent = vi.fn().mockResolvedValue(undefined);
-    listAgents = vi.fn().mockResolvedValue({ sessions: [] });
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    private sessions = new Map<string, { id: string; status: string; lastUpdate: Date; artifacts: any[] }>();
+
+
     constructor(_layers?: any) {}
+
+    async spawnAgent(req: any): Promise<any> {
+      const sessionId = `test-session-${Math.random().toString(36).slice(2, 9)}`;
+      const lastUpdate = new Date();
+      const status = "completed";
+      const session = {
+        id: sessionId,
+        status,
+        lastUpdate,
+        artifacts: [],
+      };
+      this.sessions.set(sessionId, session);
+      return { sessionId, status };
+    }
+
+    async getAgentStatus(sessionId: string): Promise<any> {
+      const sessionData = this.sessions.get(sessionId);
+      if (!sessionData) {
+        throw new Error("not found");
+      }
+      return {
+        sessionId,
+        status: sessionData.status,
+        lastUpdate: sessionData.lastUpdate,
+        artifacts: sessionData.artifacts,
+      };
+    }
+
+    async resumeAgent(sessionId: string, req: any): Promise<any> {
+      const sessionData = this.sessions.get(sessionId);
+      if (!sessionData) {
+        throw new Error("not found");
+      }
+      return {
+        sessionId,
+        status: sessionData.status,
+        artifacts: sessionData.artifacts,
+      };
+    }
+
+    async cancelAgent(sessionId: string): Promise<void> {
+      const sessionData = this.sessions.get(sessionId);
+      if (sessionData) {
+        this.sessions.set(sessionId, {
+          ...sessionData,
+          status: "cancelled",
+          lastUpdate: new Date(),
+        });
+      }
+    }
+
+    async listAgents(): Promise<any> {
+      const sessionList = Array.from(this.sessions.entries()).map(([id, data]) => ({
+        id,
+        status: data.status,
+        lastHeartbeat: data.lastUpdate,
+      }));
+      return { sessions: sessionList };
+    }
   }
   return { AgentService };
 });

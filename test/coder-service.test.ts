@@ -4,13 +4,13 @@ import { Effect, Layer } from "effect";
 import { vi } from "vitest";
 import { CoderServiceTag, CoderServiceLive } from "../src/services/CoderService";
 
-const mockAnthropic = vi.mock('@anthropic-ai/sdk', () => ({
+vi.mock('@anthropic-ai/sdk', () => ({
   default: vi.fn(() => ({
     messages: {
       create: vi.fn(),
     },
   })),
-})); vi.doMock('@anthropic-ai/sdk', () => mockAnthropic);
+}));
 
 describe("CoderService", () => {
   const mockApiKey = "sk-ant-test-key-12345";

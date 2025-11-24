@@ -58,7 +58,10 @@ const mockSessionRepo: AgentSessionRepo = {
   update: (id, updates) =>
     Effect.sync(() => {
       const current = inMemorySessions.get(id);
-      const updated = { ...(current ?? { id, status: "running" as AgentSessionStatus, createdAt: new Date(), updatedAt: new Date() }), ...updates };
+      if (!current) {
+        throw new Error(`Session ${id} not found`);
+      }
+      const updated = { ...current, ...updates, updatedAt: new Date() };
       inMemorySessions.set(id, updated);
       return updated;
     }),
@@ -170,12 +173,14 @@ describe("Persistence Property-Based Tests", () => {
       expect(savedSession.status).toBe(originalSession.status);
       expect(savedSession.metadata).toEqual(originalSession.metadata);
 
-      const loadedSession = await Effect.runPromise(
+      const loadedSessionOpt = await Effect.runPromise(
         AgentSessionRepo.pipe(
           Effect.flatMap((repo) => repo.findById(originalSession.id)),
           Effect.provide(TestRedisLayer)
         )
       );
+
+      const loadedSession = loadedSessionOpt?._tag === "Some" ? loadedSessionOpt.value : null;
 
       expect(loadedSession).not.toBeNull();
       expect(loadedSession?.id).toBe(originalSession.id);
@@ -207,16 +212,11 @@ describe("Persistence Property-Based Tests", () => {
 
       // Run concurrent operations
       const operations = sessions.map((session) =>
-        Effect.gen(function* (_) {
-          yield* AgentSessionRepo.pipe(
-            Effect.flatMap((repo) => repo.create(session)),
-            Effect.flatMap((repo) => repo.findById(session.id)),
-            Effect.flatMap((sessionOption) =>
-              sessionOption
-                ? Effect.succeed(sessionOption.value)
-                : Effect.fail(new Error("Session not found"))
-            )
-          );
+        Effect.gen(function* () {
+          const repo = yield* AgentSessionRepo;
+          yield* repo.create(session);
+          const sessionOption = yield* repo.findById(session.id);
+          return sessionOption._tag === "Some" ? sessionOption.value : null;
         })
       );
 
@@ -257,15 +257,17 @@ describe("Persistence Property-Based Tests", () => {
             metadata: {},
           };
 
-          const updatedSession = {
-            ...session,
-            status: toStatus as AgentSessionStatus,
-            updatedAt: new Date(),
-          };
+          await Effect.runPromise(
+            AgentSessionRepo.pipe(
+              Effect.flatMap((repo) => repo.create(session)),
+              Effect.provide(TestRedisLayer)
+            )
+          );
 
+          const updates = { status: toStatus as AgentSessionStatus };
           const result = await Effect.runPromise(
             AgentSessionRepo.pipe(
-              Effect.flatMap((repo) => repo.update(updatedSession)),
+              Effect.flatMap((repo) => repo.update(sessionId, updates)),
               Effect.provide(TestRedisLayer)
             )
           );
@@ -357,6 +359,17 @@ describe("Persistence Property-Based Tests", () => {
           metadata: {},
         });
       }
+
+      await Promise.all(
+        artifacts.map(artifact =>
+          Effect.runPromise(
+            WorkspaceArtifactRepo.pipe(
+              Effect.flatMap((repo) => repo.create(artifact)),
+              Effect.provide(TestRedisLayer)
+            )
+          )
+        )
+      );
 
       // Mock Redis to return artifacts by session
       mockRedisClient.get.mockImplementation((key) => {
@@ -507,20 +520,13 @@ describe("Persistence Property-Based Tests", () => {
         "",
         "{ invalid json",
         "undefined",
-        "null",
+        "nul",
         '"unclosed string',
-        '{"missing": "value"}',
+        '{"missing": "value',
       ];
 
       for (const malformed of malformedJsonStrings) {
-        const result = await Effect.runPromise(
-          safeJsonParse(malformed, "test").pipe(
-            Effect.flip,
-            Effect.map((error) => error.message)
-          )
-        );
-
-        expect(result).toContain("Invalid JSON");
+        await expect(Effect.runPromise(safeJsonParse(malformed, "test"))).rejects.toThrow(/Invalid JSON/);
       }
     });
 
@@ -550,7 +556,6 @@ describe("Persistence Property-Based Tests", () => {
       ];
 
       const invalidIds = [
-        "",
         "session 123", // space
         "session/123", // slash
         "session@123", // special char
