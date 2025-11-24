@@ -1,16 +1,15 @@
 "use client";
 import { useInngestSubscription } from "@inngest/realtime/hooks";
+import { Bot, Loader, Terminal, User } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-
-import TaskNavbar from "./_components/navbar";
-import MessageInput from "./_components/message-input";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { fetchRealtimeSubscriptionToken } from "@/app/actions/inngest";
-import { useTaskStore } from "@/stores/tasks";
-import { Terminal, Bot, User, Loader } from "lucide-react";
-import { TextShimmer } from "@/components/ui/text-shimmer";
+import {
+  fetchRealtimeSubscriptionToken,
+  type TaskChannelToken,
+} from "@/app/actions/inngest";
 import { Markdown } from "@/components/markdown";
 import { StreamingIndicator } from "@/components/streaming-indicator";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { TextShimmer } from "@/components/ui/text-shimmer";
 import {
   Tooltip,
   TooltipContent,
@@ -18,6 +17,18 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
+import { useTaskStore } from "@/stores/tasks";
+import MessageInput from "./_components/message-input";
+import TaskNavbar from "./_components/navbar";
+
+// Wrapper to handle null tokens gracefully
+async function safeRefreshToken(): Promise<TaskChannelToken> {
+  const token = await fetchRealtimeSubscriptionToken();
+  if (!token) {
+    throw new Error("Inngest realtime not configured");
+  }
+  return token;
+}
 
 interface Props {
   id: string;
@@ -110,24 +121,30 @@ export default function TaskClientPage({ id }: Props) {
   const task = getTaskById(id);
   const scrollAreaRef = useRef<HTMLDivElement>(null);
   const chatScrollAreaRef = useRef<HTMLDivElement>(null);
-  const [subscriptionEnabled, setSubscriptionEnabled] = useState(true);
+  const [realtimeEnabled, setRealtimeEnabled] = useState(false);
   const [streamingMessages, setStreamingMessages] = useState<
     Map<string, StreamingMessage>
   >(new Map());
 
+  // Check if realtime is available on mount
+  useEffect(() => {
+    fetchRealtimeSubscriptionToken().then((token) => {
+      setRealtimeEnabled(token !== null);
+    });
+  }, []);
+
   // Function to get the output message for a given shell call message
-  const getOutputForCall = (callId: string) => {
-    return task?.messages.find(
+  const getOutputForCall = (callId: string) =>
+    task?.messages.find(
       (message) =>
         message.type === "local_shell_call_output" &&
         message.data?.call_id === callId
     );
-  };
 
   const { latestData } = useInngestSubscription({
-    refreshToken: fetchRealtimeSubscriptionToken,
+    refreshToken: safeRefreshToken,
     bufferInterval: 0,
-    enabled: subscriptionEnabled,
+    enabled: realtimeEnabled,
   });
 
   useEffect(() => {
@@ -223,32 +240,33 @@ export default function TaskClientPage({ id }: Props) {
   }, []);
 
   // Cleanup subscription on unmount to prevent stream cancellation errors
-  useEffect(() => {
-    return () => {
-      setSubscriptionEnabled(false);
-    };
-  }, []);
+  useEffect(
+    () => () => {
+      setRealtimeEnabled(false);
+    },
+    []
+  );
 
   return (
-    <div className="flex flex-col h-screen">
+    <div className="flex h-screen flex-col">
       <TaskNavbar id={id} />
       <div className="flex flex-1 overflow-hidden">
         {/* Sidebar for chat messages */}
-        <div className="w-full max-w-3xl mx-auto border-r border-border bg-gradient-to-b from-background to-muted/5 flex flex-col h-full">
+        <div className="mx-auto flex h-full w-full max-w-3xl flex-col border-border border-r bg-gradient-to-b from-background to-muted/5">
           <ScrollArea
+            className="scroll-area-custom flex-1 overflow-y-auto"
             ref={chatScrollAreaRef}
-            className="flex-1 overflow-y-auto scroll-area-custom"
           >
-            <div className="p-6 flex flex-col gap-y-6">
+            <div className="flex flex-col gap-y-6 p-6">
               {/* Initial task message */}
-              <div className="flex justify-end animate-in slide-in-from-right duration-300">
-                <div className="max-w-[85%] flex gap-3">
-                  <div className="bg-primary text-primary-foreground rounded-2xl px-5 py-3 shadow-sm">
+              <div className="slide-in-from-right flex animate-in justify-end duration-300">
+                <div className="flex max-w-[85%] gap-3">
+                  <div className="rounded-2xl bg-primary px-5 py-3 text-primary-foreground shadow-sm">
                     <p className="text-sm leading-relaxed">{task?.title}</p>
                   </div>
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                      <User className="w-4 h-4 text-primary" />
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                      <User className="h-4 w-4 text-primary" />
                     </div>
                   </div>
                 </div>
@@ -264,22 +282,22 @@ export default function TaskClientPage({ id }: Props) {
                   const isAssistant = message.role === "assistant";
                   return (
                     <div
+                      className={cn(
+                        "flex animate-in gap-3 duration-300",
+                        isAssistant
+                          ? "slide-in-from-left justify-start"
+                          : "slide-in-from-right justify-end"
+                      )}
                       key={
                         (message.data as { id?: string })?.id ||
                         `message-${index}-${message.role}` ||
                         index
                       }
-                      className={cn(
-                        "flex gap-3 animate-in duration-300",
-                        isAssistant
-                          ? "justify-start slide-in-from-left"
-                          : "justify-end slide-in-from-right"
-                      )}
                     >
                       {isAssistant && (
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center border border-border">
-                            <Bot className="w-4 h-4 text-muted-foreground" />
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full border border-border bg-muted">
+                            <Bot className="h-4 w-4 text-muted-foreground" />
                           </div>
                         </div>
                       )}
@@ -287,33 +305,33 @@ export default function TaskClientPage({ id }: Props) {
                         className={cn(
                           "max-w-[85%] rounded-2xl px-5 py-3 shadow-sm",
                           isAssistant
-                            ? "bg-card border border-border"
+                            ? "border border-border bg-card"
                             : "bg-primary text-primary-foreground"
                         )}
                       >
                         {isAssistant ? (
                           <div className="prose prose-sm dark:prose-invert max-w-none overflow-hidden">
                             <Markdown
+                              branch={task?.branch}
                               repoUrl={
                                 task?.repository
                                   ? `https://github.com/${task.repository}`
                                   : undefined
                               }
-                              branch={task?.branch}
                             >
                               {message.data?.text as string}
                             </Markdown>
                           </div>
                         ) : (
-                          <p className="text-sm leading-relaxed break-words">
+                          <p className="break-words text-sm leading-relaxed">
                             {message.data?.text as string}
                           </p>
                         )}
                       </div>
                       {!isAssistant && (
                         <div className="flex-shrink-0">
-                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                            <User className="w-4 h-4 text-primary" />
+                          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                            <User className="h-4 w-4 text-primary" />
                           </div>
                         </div>
                       )}
@@ -326,18 +344,18 @@ export default function TaskClientPage({ id }: Props) {
                 const isAssistant = message.role === "assistant";
                 return (
                   <div
-                    key={message.data.streamId as string}
                     className={cn(
-                      "flex gap-3 animate-in duration-300",
+                      "flex animate-in gap-3 duration-300",
                       isAssistant
-                        ? "justify-start slide-in-from-left"
-                        : "justify-end slide-in-from-right"
+                        ? "slide-in-from-left justify-start"
+                        : "slide-in-from-right justify-end"
                     )}
+                    key={message.data.streamId as string}
                   >
                     {isAssistant && (
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center border border-border relative overflow-hidden">
-                          <Bot className="w-4 h-4 text-muted-foreground z-10 relative" />
+                        <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-border bg-muted">
+                          <Bot className="relative z-10 h-4 w-4 text-muted-foreground" />
                           <div
                             className="absolute inset-0 bg-gradient-to-r from-transparent via-primary/20 to-transparent"
                             style={{
@@ -352,28 +370,28 @@ export default function TaskClientPage({ id }: Props) {
                       className={cn(
                         "max-w-[85%] rounded-2xl px-5 py-3 shadow-sm",
                         isAssistant
-                          ? "bg-card border border-border"
+                          ? "border border-border bg-card"
                           : "bg-primary text-primary-foreground"
                       )}
                     >
                       {isAssistant ? (
                         <div className="prose prose-sm dark:prose-invert max-w-none overflow-hidden">
                           <Markdown
+                            branch={task?.branch}
                             repoUrl={
                               task?.repository
                                 ? `https://github.com/${task.repository}`
                                 : undefined
                             }
-                            branch={task?.branch}
                           >
                             {message.data?.text as string}
                           </Markdown>
                           {/* Enhanced streaming indicator */}
-                          <span className="inline-flex items-center gap-2 ml-1">
+                          <span className="ml-1 inline-flex items-center gap-2">
                             <StreamingIndicator size="sm" variant="cursor" />
                             {typeof message.data.chunkIndex === "number" &&
                               typeof message.data.totalChunks === "number" && (
-                                <span className="text-[10px] text-muted-foreground/60 font-mono">
+                                <span className="font-mono text-[10px] text-muted-foreground/60">
                                   {Math.round(
                                     ((message.data.chunkIndex + 1) /
                                       message.data.totalChunks) *
@@ -385,15 +403,15 @@ export default function TaskClientPage({ id }: Props) {
                           </span>
                         </div>
                       ) : (
-                        <p className="text-sm leading-relaxed break-words">
+                        <p className="break-words text-sm leading-relaxed">
                           {message.data?.text as string}
                         </p>
                       )}
                     </div>
                     {!isAssistant && (
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-                          <User className="w-4 h-4 text-primary" />
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+                          <User className="h-4 w-4 text-primary" />
                         </div>
                       </div>
                     )}
@@ -403,16 +421,16 @@ export default function TaskClientPage({ id }: Props) {
 
               {task?.status === "IN_PROGRESS" &&
                 streamingMessages.size === 0 && (
-                  <div className="flex justify-start animate-in slide-in-from-left duration-300">
+                  <div className="slide-in-from-left flex animate-in justify-start duration-300">
                     <div className="flex gap-3">
                       <div className="flex-shrink-0">
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center border border-border animate-pulse">
-                          <Bot className="w-4 h-4 text-muted-foreground" />
+                        <div className="flex h-8 w-8 animate-pulse items-center justify-center rounded-full border border-border bg-muted">
+                          <Bot className="h-4 w-4 text-muted-foreground" />
                         </div>
                       </div>
-                      <div className="bg-card border border-border rounded-2xl px-5 py-3 shadow-sm">
+                      <div className="rounded-2xl border border-border bg-card px-5 py-3 shadow-sm">
                         <div className="flex items-center gap-2">
-                          <Loader className="w-4 h-4 text-muted-foreground animate-spin" />
+                          <Loader className="h-4 w-4 animate-spin text-muted-foreground" />
                           <TextShimmer className="text-sm">
                             {task?.statusMessage
                               ? `${task.statusMessage}`
@@ -433,11 +451,11 @@ export default function TaskClientPage({ id }: Props) {
         </div>
 
         {/* Right panel for details */}
-        <div className="flex-1 bg-gradient-to-br from-muted/50 to-background relative">
+        <div className="relative flex-1 bg-gradient-to-br from-muted/50 to-background">
           {/* Fade overlay at the top */}
-          <div className="absolute top-0 left-0 right-0 h-20 bg-gradient-to-b from-muted/50 to-transparent pointer-events-none z-10" />
-          <ScrollArea ref={scrollAreaRef} className="h-full scroll-area-custom">
-            <div className="max-w-4xl mx-auto w-full py-10 px-6">
+          <div className="pointer-events-none absolute top-0 right-0 left-0 z-10 h-20 bg-gradient-to-b from-muted/50 to-transparent" />
+          <ScrollArea className="scroll-area-custom h-full" ref={scrollAreaRef}>
+            <div className="mx-auto w-full max-w-4xl px-6 py-10">
               {/* Details content will go here */}
               <div className="flex flex-col gap-y-10">
                 {task?.messages.map((message) => {
@@ -447,14 +465,14 @@ export default function TaskClientPage({ id }: Props) {
                     );
                     return (
                       <div
-                        key={message.data?.call_id as string}
                         className="flex flex-col"
+                        key={message.data?.call_id as string}
                       >
                         <div className="flex items-start gap-x-2">
                           <TooltipProvider>
                             <Tooltip>
                               <TooltipTrigger asChild>
-                                <p className="font-medium font-mono text-sm -mt-1 truncate max-w-md cursor-help">
+                                <p className="-mt-1 max-w-md cursor-help truncate font-medium font-mono text-sm">
                                   {(
                                     message.data as {
                                       action?: { command?: string[] };
@@ -479,16 +497,16 @@ export default function TaskClientPage({ id }: Props) {
                           </TooltipProvider>
                         </div>
                         {output && (
-                          <div className="mt-3 animate-in slide-in-from-bottom duration-300">
-                            <div className="rounded-xl bg-card border-2 border-border shadow-sm overflow-hidden transition-all duration-200 hover:shadow-md">
-                              <div className="flex items-center gap-2 bg-muted/50 border-b px-4 py-3">
+                          <div className="slide-in-from-bottom mt-3 animate-in duration-300">
+                            <div className="overflow-hidden rounded-xl border-2 border-border bg-card shadow-sm transition-all duration-200 hover:shadow-md">
+                              <div className="flex items-center gap-2 border-b bg-muted/50 px-4 py-3">
                                 <Terminal className="size-4 text-muted-foreground" />
-                                <span className="font-medium text-sm text-muted-foreground">
+                                <span className="font-medium text-muted-foreground text-sm">
                                   Output
                                 </span>
                               </div>
                               <ScrollArea className="max-h-[400px]">
-                                <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed p-4 text-muted-foreground">
+                                <pre className="whitespace-pre-wrap p-4 font-mono text-muted-foreground text-xs leading-relaxed">
                                   {(() => {
                                     try {
                                       const parsed = JSON.parse(

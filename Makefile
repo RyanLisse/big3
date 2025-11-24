@@ -1,7 +1,7 @@
 # Big3 AI Agent SDK - Makefile
 # Complete application orchestration
 
-.PHONY: help install dev dev-backend dev-frontend dev-all stop test test-watch test-coverage lint typecheck build clean setup-env check-deps redis-start redis-stop docker-up docker-down logs
+.PHONY: help install dev dev-backend dev-frontend dev-all stop test test-all test-watch test-coverage lint typecheck build clean setup-env check-deps redis-start redis-stop docker-up docker-down logs
 
 # Colors for output
 BLUE := \033[0;34m
@@ -192,6 +192,9 @@ test: ## Run all tests
 	@echo "$(BLUE)Running tests...$(NC)"
 	pnpm test --run
 
+test-all: ## Run all tests (alias for test)
+	@$(MAKE) test
+
 test-watch: ## Run tests in watch mode
 	@echo "$(BLUE)Running tests in watch mode...$(NC)"
 	pnpm test
@@ -290,14 +293,14 @@ quickstart: check-deps install setup-env redis-start ## Complete setup from scra
 ##@ CI/CD
 ci-test: ## Run tests in CI mode
 	@echo "$(BLUE)Running CI tests...$(NC)"
-	pnpm test --run --reporter=verbose
+	$(MAKE) test-all --reporter=verbose
 
 ci-build: ## Build for CI/CD
 	@echo "$(BLUE)Building for CI/CD...$(NC)"
 	$(MAKE) typecheck
 	$(MAKE) lint-check
 	$(MAKE) build
-	$(MAKE) test
+	$(MAKE) test-all
 
 ##@ Information
 status: ## Show status of all services

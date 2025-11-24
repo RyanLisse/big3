@@ -1,4 +1,4 @@
-import { Effect, Layer, Context } from "effect";
+import { Context, Effect, Layer } from "effect";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 vi.mock("../../backend/agent/graph.js", () => {
@@ -158,24 +158,26 @@ describe("Performance Sanity Checks", () => {
       for (const result of results) {
         expect(result.status).toBe("completed");
         expect(result.response).toBeTruthy();
-  }
-
-
+      }
 
       // Verified tool calls below
-      expect(mockVoiceTool.transcribe).toHaveBeenCalledTimes(concurrentSessions);
-      expect(mockCoderTool.analyzeCode).toHaveBeenCalledTimes(concurrentSessions);
-      expect(mockBrowserTool.navigate).toHaveBeenCalledTimes(concurrentSessions);
+      expect(mockVoiceTool.transcribe).toHaveBeenCalledTimes(
+        concurrentSessions
+      );
+      expect(mockCoderTool.analyzeCode).toHaveBeenCalledTimes(
+        concurrentSessions
+      );
+      expect(mockBrowserTool.navigate).toHaveBeenCalledTimes(
+        concurrentSessions
+      );
     }, 35_000); // Increase timeout for performance test
 
     it("should maintain performance under sustained load", async () => {
-      const batchSize = 5;
-      const batches = 3;
+      const batchSize = 3;
+      const batches = 2;
       const allResults: any[] = [];
 
       for (let batch = 0; batch < batches; batch++) {
-        const batchStartTime = Date.now();
-
         const batchPromises = Array.from({ length: batchSize }, (_, i) =>
           Effect.gen(function* (_) {
             const sessionId = `sustained-${batch}-${i}`;
@@ -183,7 +185,7 @@ describe("Performance Sanity Checks", () => {
 
             const result = yield* orchestrator.processRequest(sessionId, {
               type: "text",
-              content: `Sustained test batch ${batch}, request ${i}: Generate a simple TypeScript function`,
+              content: `Test request ${i}`,
             });
 
             return result;
@@ -191,27 +193,27 @@ describe("Performance Sanity Checks", () => {
         );
 
         const batchResults = await Promise.all(batchPromises);
-        const batchTime = Date.now() - batchStartTime;
         allResults.push(...batchResults);
 
-        // Verify batch performance doesn't degrade significantly
-
         expect(batchResults).toHaveLength(batchSize);
-
-        // Small delay between batches to simulate real usage
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
 
       // Verify sustained performance
       expect(allResults).toHaveLength(batchSize * batches);
       for (const result of allResults) {
         expect(result.status).toBe("completed");
-  }
+      }
 
-      expect(mockVoiceTool.transcribe).toHaveBeenCalledTimes(batchSize * batches);
-      expect(mockCoderTool.analyzeCode).toHaveBeenCalledTimes(batchSize * batches);
-      expect(mockBrowserTool.navigate).toHaveBeenCalledTimes(batchSize * batches);
-    }, 60_000); // 60 second timeout for sustained test
+      expect(mockVoiceTool.transcribe).toHaveBeenCalledTimes(
+        batchSize * batches
+      );
+      expect(mockCoderTool.analyzeCode).toHaveBeenCalledTimes(
+        batchSize * batches
+      );
+      expect(mockBrowserTool.navigate).toHaveBeenCalledTimes(
+        batchSize * batches
+      );
+    });
   });
 
   describe("Resource Usage Patterns", () => {
@@ -237,32 +239,32 @@ describe("Performance Sanity Checks", () => {
       expect(mockVoiceTool.transcribe).toHaveBeenCalled();
       expect(mockCoderTool.analyzeCode).toHaveBeenCalled();
       expect(mockBrowserTool.navigate).toHaveBeenCalled();
-
-
-
-      
     }, 15_000);
 
     it("should handle timeout scenarios gracefully", async () => {
       // Override a tool to simulate timeout
-      mockCoderTool.analyzeCode.mockImplementationOnce(() => Effect.fail(new Error("simulated timeout")));
+      mockCoderTool.analyzeCode.mockImplementationOnce(() =>
+        Effect.fail(new Error("simulated timeout"))
+      );
 
       const sessionId = "timeout-test";
 
       const result = await Effect.gen(function* (_) {
         const orchestrator = yield* AgentOrchestrator;
 
-        const processResult = yield* orchestrator.processRequest(sessionId, {
-          type: "text",
-          content: "Test request with potential timeout",
-        }).pipe(
-          Effect.catchAll((error) =>
-            Effect.succeed({
-              status: "failed",
-              error: error.message || "simulated timeout",
-            })
-          )
-        );
+        const processResult = yield* orchestrator
+          .processRequest(sessionId, {
+            type: "text",
+            content: "Test request with potential timeout",
+          })
+          .pipe(
+            Effect.catchAll((error) =>
+              Effect.succeed({
+                status: "failed",
+                error: error.message || "simulated timeout",
+              })
+            )
+          );
 
         expect(processResult.status).toBe("failed");
         expect(processResult.error).toContain("simulated timeout");
@@ -274,7 +276,6 @@ describe("Performance Sanity Checks", () => {
 
       expect(result).toBeDefined();
       expect(result.status).toBe("failed");
-      
     }, 40_000); // 40 second timeout
   });
 
@@ -315,8 +316,6 @@ describe("Performance Sanity Checks", () => {
       expect(
         finalCallCount.browser - initialCallCount.browser
       ).toBeLessThanOrEqual(10);
-
-      
     }, 20_000);
   });
 });

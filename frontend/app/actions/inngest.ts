@@ -1,10 +1,8 @@
 "use server";
+import { getSubscriptionToken, type Realtime } from "@inngest/realtime";
 import { cookies } from "next/headers";
-import { getSubscriptionToken, Realtime } from "@inngest/realtime";
-
-import { inngest } from "@/lib/inngest";
-import { Task } from "@/stores/tasks";
-import { getInngestApp, taskChannel } from "@/lib/inngest";
+import { getInngestApp, inngest, taskChannel } from "@/lib/inngest";
+import type { Task } from "@/stores/tasks";
 
 export type TaskChannelToken = Realtime.Token<
   typeof taskChannel,
@@ -32,8 +30,8 @@ export const createTaskAction = async ({
     data: {
       task,
       token: githubToken,
-      sessionId: sessionId,
-      prompt: prompt,
+      sessionId,
+      prompt,
     },
   });
 };
@@ -54,16 +52,28 @@ export const createPullRequestAction = async ({
     name: "clonedex/create.pull-request",
     data: {
       token: githubToken,
-      sessionId: sessionId,
+      sessionId,
     },
   });
 };
 
-export async function fetchRealtimeSubscriptionToken(): Promise<TaskChannelToken> {
-  const token = await getSubscriptionToken(getInngestApp(), {
-    channel: taskChannel(),
-    topics: ["status", "update"],
-  });
+export async function fetchRealtimeSubscriptionToken(): Promise<TaskChannelToken | null> {
+  // Skip in development if INNGEST_SIGNING_KEY is not configured
+  if (!process.env.INNGEST_SIGNING_KEY) {
+    console.warn(
+      "[Inngest] INNGEST_SIGNING_KEY not configured - realtime subscriptions disabled"
+    );
+    return null;
+  }
 
-  return token;
+  try {
+    const token = await getSubscriptionToken(getInngestApp(), {
+      channel: taskChannel(),
+      topics: ["status", "update"],
+    });
+    return token;
+  } catch (error) {
+    console.error("[Inngest] Failed to get subscription token:", error);
+    return null;
+  }
 }

@@ -18,7 +18,9 @@ const mockCheckpointer = {
       checkpointStore.set(id, value);
     })
   ),
-  load: vi.fn((id: string) => Effect.sync(() => checkpointStore.get(id) ?? null)),
+  load: vi.fn((id: string) =>
+    Effect.sync(() => checkpointStore.get(id) ?? null)
+  ),
   list: vi.fn(() => Effect.sync(() => checkpointStore.keys())),
 };
 
@@ -48,9 +50,7 @@ const mockCompositeFilesystem = {
   readFile: vi.fn((path: string) =>
     Effect.sync(() => fileStore.get(path) ?? "")
   ),
-  exists: vi.fn((path: string) =>
-    Effect.sync(() => fileStore.has(path))
-  ),
+  exists: vi.fn((path: string) => Effect.sync(() => fileStore.has(path))),
   delete: vi.fn((path: string) =>
     Effect.sync(() => {
       fileStore.delete(path);
@@ -261,8 +261,12 @@ describe("Session Persistence - User Story 2", () => {
       ];
 
       // Mock filesystem operations
-      mockCompositeFilesystem.writeFile.mockReturnValue(Effect.succeed(undefined));
-      mockCompositeFilesystem.readFile.mockReturnValue(Effect.succeed(artifacts[0].content));
+      mockCompositeFilesystem.writeFile.mockReturnValue(
+        Effect.succeed(undefined)
+      );
+      mockCompositeFilesystem.readFile.mockReturnValue(
+        Effect.succeed(artifacts[0].content)
+      );
       mockCompositeFilesystem.exists.mockReturnValue(Effect.succeed(true));
 
       const persistProgram = Effect.gen(function* (_) {
@@ -300,39 +304,49 @@ describe("Session Persistence - User Story 2", () => {
       const artifactPath = "/workspace/important/data.json";
 
       // Mock filesystem error
-      mockCompositeFilesystem.writeFile.mockImplementation((path: string, content: string) => path === artifactPath ? Effect.fail(new Error("Disk space full")) : Effect.succeed(undefined));
+      mockCompositeFilesystem.writeFile.mockImplementation(
+        (path: string, content: string) =>
+          path === artifactPath
+            ? Effect.fail(new Error("Disk space full"))
+            : Effect.succeed(undefined)
+      );
       mockCompositeFilesystem.exists.mockReturnValue(Effect.succeed(false));
 
       const errorHandlingProgram = Effect.gen(function* (_) {
         const filesystem = yield* CompositeFilesystem;
 
-        try {
-          yield* filesystem.writeFile(artifactPath, '{"important": "data"}');
-          return { success: true, path: artifactPath };
-        } catch (error) {
-          // Fallback: try temp directory
-          const tempPath = `/tmp/fallback-${sessionId}.json`;
+        return yield* filesystem
+          .writeFile(artifactPath, '{"important": "data"}')
+          .pipe(
+            Effect.as({ success: true, path: artifactPath }),
+            Effect.catchAll((error) => {
+              // Fallback: try temp directory
+              const tempPath = `/tmp/fallback-${sessionId}.json`;
 
-          try {
-            yield* filesystem.writeFile(tempPath, '{"important": "data"}');
-            return {
-              success: false,
-              originalPath: artifactPath,
-              fallbackPath: tempPath,
-              error: error instanceof Error ? error.message : "Unknown error",
-            };
-          } catch (fallbackError) {
-            return {
-              success: false,
-              originalPath: artifactPath,
-              fallbackPath: null,
-              error:
-                fallbackError instanceof Error
-                  ? fallbackError.message
-                  : "Unknown error",
-            };
-          }
-        }
+              return filesystem
+                .writeFile(tempPath, '{"important": "data"}')
+                .pipe(
+                  Effect.map(() => ({
+                    success: false,
+                    originalPath: artifactPath,
+                    fallbackPath: tempPath,
+                    error:
+                      error instanceof Error ? error.message : "Unknown error",
+                  })),
+                  Effect.catchAll((fallbackError) =>
+                    Effect.succeed({
+                      success: false,
+                      originalPath: artifactPath,
+                      fallbackPath: null,
+                      error:
+                        fallbackError instanceof Error
+                          ? fallbackError.message
+                          : "Unknown error",
+                    })
+                  )
+                );
+            })
+          );
       });
 
       const result = await Effect.runPromise(
@@ -354,12 +368,14 @@ describe("Session Persistence - User Story 2", () => {
         "/workspace/logs",
       ];
 
-      mockCompositeFilesystem.listFiles.mockReturnValue(Effect.succeed([
-        "research/analysis.md",
-        "code/component.ts",
-        "artifacts/result.json",
-        "logs/session.log"
-      ]));
+      mockCompositeFilesystem.listFiles.mockReturnValue(
+        Effect.succeed([
+          "research/analysis.md",
+          "code/component.ts",
+          "artifacts/result.json",
+          "logs/session.log",
+        ])
+      );
 
       const structureProgram = Effect.gen(function* (_) {
         const filesystem = yield* CompositeFilesystem;
@@ -417,7 +433,9 @@ describe("Session Persistence - User Story 2", () => {
       // Mock successful persistence
       mockCheckpointer.save.mockReturnValue(Effect.succeed(undefined));
       mockCheckpointer.load.mockReturnValue(Effect.succeed(originalSession));
-      mockCompositeFilesystem.readFile.mockImplementation((path: string) => Effect.succeed(artifacts.find((a) => a.path === path)?.content ?? ""));
+      mockCompositeFilesystem.readFile.mockImplementation((path: string) =>
+        Effect.succeed(artifacts.find((a) => a.path === path)?.content ?? "")
+      );
 
       const resumptionProgram = Effect.gen(function* (_) {
         const checkpointer = yield* Checkpointer;

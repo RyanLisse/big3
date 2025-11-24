@@ -146,7 +146,6 @@ describe("ProjectManagerService", () => {
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
 
-
       const nodeId = result.parallelBatches[0]?.[0]!;
       expect(result.nodes[nodeId]).toBeDefined();
     });
@@ -175,7 +174,6 @@ describe("ProjectManagerService", () => {
       );
 
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-
 
       const nodeId1 = Object.keys(result.plan1.nodes)[0]!;
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -562,7 +560,12 @@ describe("ProjectManagerService", () => {
     });
 
     afterEach(async () => {
-      await rm(testDir, { recursive: true, force: true });
+      try {
+        await rm(testDir, { recursive: true, force: true });
+      } catch (error) {
+        // Ignore cleanup errors in tests - directory may still be in use
+        console.warn(`Failed to cleanup test directory ${testDir}:`, error);
+      }
     });
 
     it("should delegate tool and validate successful result with file outputs", async () => {
