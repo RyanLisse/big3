@@ -9,7 +9,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import {
   Carousel,
@@ -22,6 +21,7 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
+import { cn } from "@/lib/utils";
 
 export type InlineCitationProps = ComponentProps<"span">;
 

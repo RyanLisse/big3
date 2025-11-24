@@ -2,7 +2,6 @@
 
 import { BookmarkIcon, type LucideProps } from "lucide-react";
 import type { ComponentProps, HTMLAttributes } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -10,6 +9,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 
 export type CheckpointProps = HTMLAttributes<HTMLDivElement>;
 

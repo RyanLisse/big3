@@ -1,11 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type {
-  GitHubBranch,
-  GitHubRepository,
-  GitHubUser,
-} from "@/lib/github";
+import type { GitHubBranch, GitHubRepository, GitHubUser } from "@/lib/github";
 
 interface UseGitHubAuthReturn {
   isAuthenticated: boolean;

@@ -1,6 +1,16 @@
 import { Console, Context, Duration, Effect, Layer, Queue } from "effect";
 import WebSocket from "ws";
 
+type WebSocketConstructor = typeof WebSocket;
+
+const WebSocketImpl: WebSocketConstructor =
+  // Allow tests to inject a mock implementation without touching the real network
+  (
+    globalThis as typeof globalThis & {
+      __VOICE_WEBSOCKET__?: WebSocketConstructor;
+    }
+  ).__VOICE_WEBSOCKET__ ?? WebSocket;
+
 export type VoiceService = {
   readonly connect: Effect.Effect<void, Error>;
   readonly eventStream: Queue.Dequeue<unknown>; // Stream of events from OpenAI
@@ -20,7 +30,7 @@ export const VoiceServiceLive = Layer.scoped(
           const url =
             "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-10-01";
           return new Promise<WebSocket>((resolve, reject) => {
-            const socket = new WebSocket(url, {
+            const socket = new WebSocketImpl(url, {
               headers: {
                 Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
                 "OpenAI-Beta": "realtime=v1",
@@ -56,7 +66,7 @@ export const VoiceServiceLive = Layer.scoped(
       Effect.acquireRelease(
         Effect.sync(() =>
           setInterval(() => {
-            if (ws.readyState === WebSocket.OPEN) {
+            if (ws.readyState === WebSocketImpl.OPEN) {
               ws.ping();
             }
           }, 15_000)

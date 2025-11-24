@@ -6,7 +6,6 @@ import {
   MessageCircleIcon,
 } from "lucide-react";
 import { type ComponentProps, createContext, useContext } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -16,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 
 const providers = {
   github: {

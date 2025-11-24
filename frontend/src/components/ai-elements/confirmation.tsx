@@ -7,9 +7,9 @@ import {
   type ReactNode,
   useContext,
 } from "react";
-import { cn } from "@/lib/utils";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type ToolUIPartApproval =
   | {

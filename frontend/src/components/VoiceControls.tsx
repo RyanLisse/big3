@@ -2,8 +2,8 @@
 
 import { Mic, Square } from "lucide-react";
 import { useRef, useState } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 type VoiceControlsProps = {
   onAudioData: (blob: Blob) => void;

@@ -3,7 +3,6 @@
 import { ChevronsUpDownIcon } from "lucide-react";
 import type { ComponentProps } from "react";
 import { createContext, useContext } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -19,6 +18,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
+import { cn } from "@/lib/utils";
 import { Shimmer } from "./shimmer";
 
 type PlanContextValue = {

@@ -35,7 +35,6 @@ import {
   useRef,
   useState,
 } from "react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
   Command,
@@ -70,6 +69,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 // ============================================================================
 // Provider Context & Types
