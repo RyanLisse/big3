@@ -4,6 +4,7 @@ import { ThemeProvider } from "next-themes";
 import "./globals.css";
 
 import InngestContainer from "./InngestContainer";
+import { Navbar } from "@/src/components/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -36,7 +37,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <InngestContainer>{children}</InngestContainer>
+          <InngestContainer>
+            <Navbar />
+            {children}
+          </InngestContainer>
         </ThemeProvider>
       </body>
     </html>
