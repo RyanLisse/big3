@@ -54,6 +54,19 @@ The V2 system provides:
 - **🔧 RESTful API** with Server-Sent Events streaming
 - **📱 CLI visualizer** with real-time terminal display
 
+### 🎨 Codex-Style Task Dashboard
+
+The frontend now includes a powerful task management interface:
+
+- **✨ AI-Powered Code Generation** - Create tasks with "Code" or "Ask" modes
+- **🔄 Real-time Task Updates** - Live status updates via Inngest
+- **🐙 GitHub Integration** - OAuth login, repository selection, branch management
+- **🌍 Environment Management** - Configure multiple GitHub repositories
+- **📝 Conversation History** - View full chat history with markdown rendering
+- **🎯 Task Execution Timeline** - See tool events and execution steps
+- **🎨 Modern UI** - Cyberpunk theme with dark/light mode support
+- **📱 Responsive Design** - Works on desktop, tablet, and mobile
+
 ### 🤖 AI Agent SDK Features
 
 The bundled AI Agent SDK provides comprehensive multi-model support:
@@ -161,18 +174,52 @@ big3/
 ## 🔧 Development
 
 ```bash
-# Development mode
+# Development mode (all services)
 pnpm dev
+
+# Or run individually:
+pnpm dev:backend  # Backend on port 4000
+pnpm dev:frontend # Frontend on port 3000
 
 # Build project
 pnpm build
 
-# Start Encore service
-cd backend && encore dev
+# Build frontend only
+cd frontend && pnpm run build
 
-# Monitor Redis
-redis-cli monitor
+# Run tests
+pnpm test
+
+# Run tests with coverage
+pnpm coverage
+
+# Lint and format
+pnpm lint
 ```
+
+## 🎨 Frontend Development
+
+The frontend is a Next.js 16 application with:
+
+```bash
+# Start frontend dev server
+cd frontend && npm run dev
+
+# Build frontend
+cd frontend && npm run build
+
+# Run frontend tests (when configured)
+cd frontend && npm run test
+```
+
+**Frontend Features**:
+- Task dashboard with real-time updates
+- GitHub OAuth integration
+- Environment management
+- Conversation history with markdown
+- Dark/light theme toggle
+- Responsive design
+- Cyberpunk theme
 
 ## 📖 Documentation
 
