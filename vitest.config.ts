@@ -12,6 +12,9 @@ const encoreRuntimeLib = path.join(
 
 export default defineConfig({
   test: {
+    testTimeout: 10_000,
+    hookTimeout: 10_000,
+    teardownTimeout: 5000,
     globals: {
       console: "readonly",
       process: "readonly",

@@ -118,14 +118,16 @@ export class WorkflowEngine {
               output: result,
               endTime: Date.now(),
             });
-          } catch (error) {
+          } catch (err) {
+            const errorMessage =
+              err instanceof Error ? err.message : String(err);
             results.push({
               ...step,
               status: "failed",
               error: {
                 code: "STEP_EXECUTION_FAILED",
-                message: `Step ${step.name} failed: ${error.message}`,
-                details: error instanceof Error ? error.message : String(error),
+                message: `Step ${step.name} failed: ${errorMessage}`,
+                details: errorMessage,
               },
               endTime: Date.now(),
             });

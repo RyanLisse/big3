@@ -116,7 +116,7 @@ const mockMultiAgentService = {
       createdAt: new Date(),
       deliveredAt: new Date(),
     }),
-  broadcastToTeam: (_fromAgentId: string, _teamId: string, _request) =>
+  broadcastToTeam: (_fromAgentId: string, _teamId: string, _request: unknown) =>
     Effect.succeed([]),
   getAgentMessages: (_agentId: string, _filters) => Effect.succeed([]),
   getTeamMessages: (_teamId: string, _filters) => Effect.succeed([]),
